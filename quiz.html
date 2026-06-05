@@ -379,6 +379,49 @@
     font-style: italic;
   }
 
+  /* SCORE */
+  .score-circle {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    border: 3px solid var(--sand);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    background: white;
+    box-shadow: 0 8px 32px rgba(92,74,62,0.08);
+  }
+  .score-circle-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px;
+    line-height: 1;
+    font-weight: 400;
+  }
+  .score-circle-denom { font-size: 14px; color: var(--honey); }
+  .score-label-badge {
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 40px;
+  }
+  .score-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+  .score-col { background: var(--ecru); border-radius: 12px; padding: 24px; }
+  .score-col-title { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 16px; font-weight: 500; }
+  .score-col.good .score-col-title { color: var(--sage); }
+  .score-col.warn .score-col-title { color: var(--honey); }
+  .score-item { font-size: 13px; line-height: 1.5; padding: 8px 0; border-bottom: 1px solid var(--sand); display: flex; gap: 8px; align-items: flex-start; color: var(--tabac); }
+  .score-item:last-child { border: none; }
+  .score-dot-good { color: var(--sage); font-weight: 700; flex-shrink: 0; }
+  .score-dot-warn { color: var(--honey); font-weight: 700; flex-shrink: 0; }
+  .score-estim { background: var(--tabac); border-radius: 12px; padding: 28px 32px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .score-estim-label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
+  .score-estim-val { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--ecru); font-weight: 400; }
+  .score-unlock { background: var(--sage-mist); border-radius: 10px; padding: 20px 24px; text-align: center; margin-top: 16px; }
+  .score-unlock p { font-size: 13px; color: var(--sage); line-height: 1.7; }
+
   /* SUMMARY PAGE */
   .summary-card {
     background: white;
@@ -1040,8 +1083,47 @@
       </div>
     </div>
 
-    <!-- RÉSUMÉ + OFFRE -->
+    <!-- SCORE KYNO -->
     <div class="question-card" data-step="22">
+      <div class="question-eyebrow">Résultat</div>
+      <h2 class="question-title">L'indice nutritionnel<br>de <em><span id="scoreName">votre chien</span></em></h2>
+      <p class="question-subtitle" style="margin-bottom:32px;">Calculé à partir de ses 21 réponses. Une estimation gratuite avant votre plan complet.</p>
+
+      <div class="score-circle">
+        <div class="score-circle-num" id="scoreCircleVal">—</div>
+        <div class="score-circle-denom">/100</div>
+      </div>
+      <div class="score-label-badge" id="scoreLabel">—</div>
+
+      <div class="score-cols">
+        <div class="score-col good">
+          <div class="score-col-title">✓ Points forts</div>
+          <div id="scoreForces"></div>
+        </div>
+        <div class="score-col warn">
+          <div class="score-col-title">→ À améliorer</div>
+          <div id="scoreAmeliorations"></div>
+        </div>
+      </div>
+
+      <div class="score-estim">
+        <div>
+          <div class="score-estim-label">Besoin calorique estimé</div>
+          <div class="score-estim-val" id="scoreKcal">—</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="score-estim-label">Ration journalière</div>
+          <div class="score-estim-val" id="scoreRation">—</div>
+        </div>
+      </div>
+
+      <div class="score-unlock">
+        <p>Pour connaître les <strong>ingrédients exacts</strong>, les <strong>quantités précises</strong>, les <strong>recettes adaptées</strong> et les <strong>compléments recommandés</strong> pour <span id="scoreEstimName">votre chien</span>, déverrouillez le plan complet.</p>
+      </div>
+    </div>
+
+    <!-- RÉSUMÉ + OFFRE -->
+    <div class="question-card" data-step="23">
       <div class="question-eyebrow">Récapitulatif</div>
       <h2 class="question-title">Le profil de<br><em><span class="dog-name-display" id="nameDisplaySummary">votre chien</span></em></h2>
       <p class="question-subtitle">Vérifiez les informations avant de recevoir son plan nutritionnel personnalisé.</p>
@@ -1155,16 +1237,106 @@
   function updateNav() {
     document.getElementById('btnPrev').disabled = currentStep === 1;
     const btn = document.getElementById('btnNext');
-    if (currentStep === 22) {
+    if (currentStep === 23) {
       btn.innerHTML = '🎉 Recevoir mon plan →';
       btn.style.background = 'var(--honey)';
+    } else if (currentStep === 22) {
+      btn.innerHTML = 'Voir mon plan →';
+      btn.style.background = 'var(--sage)';
     } else if (currentStep === 21) {
-      btn.innerHTML = 'Voir le récapitulatif →';
+      btn.innerHTML = 'Voir mon score Kyno™ →';
       btn.style.background = 'var(--sage)';
     } else {
       btn.innerHTML = 'Suivant →';
       btn.style.background = 'var(--sage)';
     }
+  }
+
+  function computeScore() {
+    let score = 70;
+    let forces = [];
+    let ameliorations = [];
+
+    // Activité
+    if (answers['activite'] && answers['activite'].includes('Très actif')) { score += 8; forces.push('Excellent niveau d\'activité physique'); }
+    else if (answers['activite'] && answers['activite'].includes('Actif')) { score += 5; forces.push('Bon niveau d\'activité physique'); }
+    else if (answers['activite'] && answers['activite'].includes('sédentaire')) { score -= 5; ameliorations.push('Activité physique insuffisante'); }
+
+    // Pelage
+    if (answers['pelage'] && answers['pelage'].includes('Brillant')) { score += 4; forces.push('Pelage brillant et sain'); }
+    if (answers['pelage'] && answers['pelage'].includes('Chute excessive')) { score -= 4; ameliorations.push('Chute de poils excessive — besoin en oméga-3 et zinc'); }
+    if (answers['pelage'] && answers['pelage'].includes('Pellicules')) { score -= 3; ameliorations.push('Pellicules — carence possible en acides gras essentiels'); }
+    if (answers['pelage'] && answers['pelage'].includes('Terne')) { score -= 3; ameliorations.push('Pelage terne — apport en biotine à renforcer'); }
+
+    // Selles
+    if (answers['selles'] && answers['selles'].includes('Normales')) { score += 5; forces.push('Transit digestif équilibré'); }
+    if (answers['selles'] && answers['selles'].includes('Molles')) { score -= 5; ameliorations.push('Selles molles — digestion sensible, fibres à rééquilibrer'); }
+    if (answers['selles'] && answers['selles'].includes('Dures')) { score -= 4; ameliorations.push('Selles dures — hydratation et fibres insuffisantes'); }
+    if (answers['selles'] && answers['selles'].includes('Irrégulières')) { score -= 3; ameliorations.push('Transit irrégulier — microbiote à rééquilibrer'); }
+
+    // Dents
+    if (answers['dents'] && answers['dents'].includes('Blanches')) { score += 3; forces.push('Bonne santé dentaire'); }
+    if (answers['dents'] && answers['dents'].includes('Tartre important')) { score -= 4; ameliorations.push('Tartre important — calcium/phosphore à rééquilibrer'); }
+
+    // Santé
+    if (answers['sante'] && answers['sante'].includes('Aucun')) { score += 6; forces.push('Aucun problème de santé connu'); }
+    if (answers['sante'] && answers['sante'].includes('articulaires')) { score -= 5; ameliorations.push('Problèmes articulaires — glucosamine et oméga-3 essentiels'); }
+    if (answers['sante'] && answers['sante'].includes('digestifs')) { score -= 4; ameliorations.push('Problèmes digestifs — probiotiques et fibres adaptées'); }
+    if (answers['sante'] && answers['sante'].includes('peau')) { score -= 3; ameliorations.push('Problèmes de peau — acides gras essentiels à augmenter'); }
+
+    // Troubles comportement
+    if (answers['comportement'] && answers['comportement'].includes('Aucun')) { score += 3; forces.push('Comportement équilibré'); }
+    if (answers['comportement'] && answers['comportement'].includes('Hyperactivité')) { score -= 3; ameliorations.push('Hyperactivité — magnésium et tryptophane à surveiller'); }
+    if (answers['comportement'] && answers['comportement'].includes('Anxiété')) { score -= 3; ameliorations.push('Anxiété — oméga-3 et vitamine B à renforcer'); }
+
+    // Alimentation actuelle
+    if (answers['alimentation'] && answers['alimentation'].includes('Fait maison')) { score += 4; forces.push('Déjà en alimentation maison — bonne base'); }
+    if (answers['alimentation'] && answers['alimentation'].includes('Croquettes uniquement')) { score -= 2; ameliorations.push('Alimentation ultra-transformée — transition vers le frais recommandée'); }
+
+    score = Math.max(30, Math.min(100, score));
+
+    // Estimation kcal
+    const poids = parseFloat(answers['poids']) || 15;
+    let facteur = 1.6;
+    if (answers['activite'] && answers['activite'].includes('sédentaire')) facteur = 1.2;
+    else if (answers['activite'] && answers['activite'].includes('Modéré')) facteur = 1.4;
+    else if (answers['activite'] && answers['activite'].includes('Très actif')) facteur = 2.0;
+    if (answers['sterilise'] === 'Oui') facteur *= 0.85;
+    const rer = 70 * Math.pow(poids, 0.75);
+    const kcal = Math.round(rer * facteur);
+    const rations = Math.round(kcal / 1.5);
+
+    return { score, forces: forces.slice(0, 4), ameliorations: ameliorations.slice(0, 4), kcal, rations };
+  }
+
+  function buildScore() {
+    const { score, forces, ameliorations, kcal, rations } = computeScore();
+    const name = answers['nom'] || 'votre chien';
+
+    // Score color
+    let scoreColor = score >= 80 ? '#5C7A5E' : score >= 60 ? '#C4A15A' : '#B05040';
+    let scoreLabel = score >= 80 ? 'Excellent' : score >= 65 ? 'Bon' : 'À améliorer';
+
+    document.getElementById('scoreName').textContent = name;
+    document.getElementById('scoreCircleVal').textContent = score;
+    document.getElementById('scoreCircleVal').style.color = scoreColor;
+    document.getElementById('scoreLabel').textContent = scoreLabel;
+    document.getElementById('scoreLabel').style.color = scoreColor;
+
+    // Forces
+    document.getElementById('scoreForces').innerHTML = forces.length
+      ? forces.map(f => `<div class="score-item score-good"><span class="score-dot-good">✓</span>${f}</div>`).join('')
+      : '<div class="score-item" style="color:var(--honey)">Complétez le profil pour voir vos points forts</div>';
+
+    // Améliorations
+    document.getElementById('scoreAmeliorations').innerHTML = ameliorations.length
+      ? ameliorations.map(a => `<div class="score-item score-warn"><span class="score-dot-warn">→</span>${a}</div>`).join('')
+      : '<div class="score-item" style="color:var(--sage)">Aucun point critique détecté 🎉</div>';
+
+    // Estimation
+    document.getElementById('scoreKcal').textContent = kcal.toLocaleString() + ' kcal / jour';
+    document.getElementById('scoreRation').textContent = '≈ ' + rations + ' g / jour';
+    document.getElementById('scoreEstimName').textContent = name;
   }
 
   function buildSummary() {
@@ -1182,18 +1354,27 @@
       { label: 'Activité', key: 'activite' },
       { label: 'Alimentation actuelle', key: 'alimentation' },
       { label: 'Intolérances', key: 'intolerance' },
+      { label: 'Détail allergies', key: 'intoleranceAutre' },
       { label: 'Santé', key: 'sante' },
+      { label: 'Détail santé', key: 'santeDetail' },
       { label: 'Pelage', key: 'pelage' },
       { label: 'Dents', key: 'dents' },
       { label: 'Selles', key: 'selles' },
       { label: 'Comportement alimentaire', key: 'comportAlim' },
       { label: 'Troubles', key: 'comportement' },
+      { label: 'Détail troubles', key: 'comportementAutre' },
+      { label: 'Traitement en cours', key: 'traitement' },
+      { label: 'Détail traitement', key: 'traitementDetail' },
+      { label: 'Antécédents', key: 'antecedents' },
+      { label: 'Détail antécédents', key: 'antecedentsDetail' },
       { label: 'Environnement', key: 'environnement' },
       { label: 'Objectif', key: 'objectif' },
+      { label: 'Budget mensuel', key: 'budget' },
+      { label: 'Attentes', key: 'attentes' },
     ];
 
     const body = document.getElementById('summaryBody');
-    body.innerHTML = fields.map(f => `
+    body.innerHTML = fields.filter(f => answers[f.key]).map(f => `
       <div class="summary-item">
         <div class="summary-item-label">${f.label}</div>
         <div class="summary-item-value">${(answers[f.key] || '—') + (f.suffix && answers[f.key] ? f.suffix : '')}</div>
@@ -1202,7 +1383,7 @@
   }
 
   function nextStep() {
-    if (currentStep === 22) {
+    if (currentStep === 23) {
       alert('Merci ! Votre plan nutritionnel pour ' + (answers['nom'] || 'votre chien') + ' est en cours de génération. Vous allez être redirigé vers le paiement.');
       return;
     }
@@ -1215,7 +1396,8 @@
     document.querySelector(`.question-card[data-step="${currentStep}"]`).classList.remove('active');
     currentStep++;
 
-    if (currentStep === 22) buildSummary();
+    if (currentStep === 22) buildScore();
+    if (currentStep === 23) buildSummary();
 
     const nextCard = document.querySelector(`.question-card[data-step="${currentStep}"]`);
     nextCard.classList.add('active');
