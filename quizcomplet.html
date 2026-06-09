@@ -1,0 +1,1202 @@
+ <!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kyno — Programme Suivi Continu</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sage: #5C7A5E;
+    --sage-light: #7D9B7F;
+    --sage-mist: #EDF3ED;
+    --ecru: #F5F0E8;
+    --sand: #E8E0D0;
+    --honey: #C4A15A;
+    --tabac: #7B5C3E;
+    --warm-white: #FAF8F4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--warm-white);
+    color: var(--tabac);
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--sand);
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--sage);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-badge {
+    background: var(--honey);
+    color: white;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .nav-back {
+    font-size: 12px;
+    color: var(--honey);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+  }
+
+  .progress-wrap {
+    position: fixed;
+    top: 52px; left: 0; right: 0;
+    z-index: 99;
+    background: var(--warm-white);
+    padding: 14px 40px 12px;
+    border-bottom: 1px solid var(--sand);
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--honey);
+  }
+
+  .progress-pct {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--sage);
+  }
+
+  .progress-track {
+    height: 2px;
+    background: var(--sand);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sage), var(--honey));
+    border-radius: 1px;
+    transition: width 0.5s ease;
+  }
+
+  /* Bloc section */
+  .section-divider {
+    display: none;
+    padding: 40px 0 20px;
+    text-align: center;
+  }
+
+  .section-divider.active { display: block; }
+
+  .section-tag {
+    display: inline-block;
+    background: var(--tabac);
+    color: var(--ecru);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: var(--tabac);
+  }
+
+  .dog-card-fixed {
+    position: fixed;
+    top: 116px;
+    right: 40px;
+    width: 200px;
+    background: var(--ecru);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 1px solid var(--sand);
+    display: none;
+    z-index: 98;
+  }
+
+  .dog-card-fixed.visible { display: block; }
+
+  .dog-card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--tabac);
+    margin-bottom: 4px;
+  }
+
+  .dog-card-info {
+    font-size: 11px;
+    color: var(--honey);
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+  }
+
+  main {
+    padding-top: 140px;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-bottom: 120px;
+  }
+
+  .quiz-wrap {
+    width: 100%;
+    max-width: 660px;
+    padding: 0 24px;
+  }
+
+  .q-card {
+    display: none;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .q-card.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sage-light);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .q-eyebrow::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--sage-light);
+  }
+
+  .q-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--tabac);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+
+  .q-title em { color: var(--sage); font-style: italic; }
+
+  .q-sub {
+    font-size: 14px;
+    color: var(--honey);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .inp {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--sand);
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    color: var(--tabac);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 8px;
+  }
+
+  .inp:focus {
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px var(--sage-mist);
+  }
+
+  .inp::placeholder { color: var(--sand); }
+
+  textarea.inp {
+    resize: vertical;
+    min-height: 100px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .opts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+  .opts.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .opts.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .opt {
+    background: white;
+    border: 1px solid var(--sand);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--tabac);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    line-height: 1.4;
+  }
+
+  .opt:hover { border-color: var(--sage-light); background: var(--sage-mist); }
+
+  .opt.selected {
+    border-color: var(--sage);
+    background: var(--sage-mist);
+    color: var(--sage);
+    font-weight: 500;
+  }
+
+  .opt-check {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--sand);
+    flex-shrink: 0;
+    margin-top: 1px;
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .opt.selected .opt-check {
+    background: var(--sage);
+    border-color: var(--sage);
+  }
+
+  .opt.selected .opt-check::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: white;
+  }
+
+  .opt.cb .opt-check { border-radius: 4px; }
+
+  .opt.cb.selected .opt-check::after {
+    content: '✓';
+    font-size: 10px;
+    color: white;
+    background: none;
+    width: auto; height: auto;
+    font-weight: 700;
+  }
+
+  .q-hint {
+    font-size: 12px;
+    color: var(--honey);
+    font-style: italic;
+    margin-top: 6px;
+    opacity: 0.8;
+  }
+
+  .autre-wrap { display: none; margin-top: 10px; }
+
+  /* Section break visuel */
+  .section-break {
+    background: var(--tabac);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-break-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .section-break-text {
+    color: var(--ecru);
+  }
+
+  .section-break-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+
+  .section-break-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.06em;
+  }
+
+  /* EMAIL STEP */
+  .email-block {
+    background: var(--ecru);
+    border-radius: 12px;
+    padding: 28px;
+    border: 1px solid var(--sand);
+    margin-bottom: 24px;
+  }
+
+  .email-block-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--tabac);
+    margin-bottom: 6px;
+  }
+
+  .email-block-sub {
+    font-size: 13px;
+    color: var(--honey);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  /* OFFRE UNIQUE pour quiz complet */
+  .offre-unique {
+    background: var(--tabac);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 24px;
+    border: 2px solid var(--honey);
+  }
+
+  .offre-unique-tag {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--honey);
+    margin-bottom: 12px;
+  }
+
+  .offre-unique-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--ecru);
+    margin-bottom: 4px;
+  }
+
+  .offre-unique-freq {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 20px;
+  }
+
+  .offre-unique-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    color: var(--ecru);
+    margin-bottom: 16px;
+  }
+
+  .offre-features { display: flex; flex-direction: column; gap: 8px; }
+
+  .offre-feat {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  .feat-dot { color: var(--honey); flex-shrink: 0; margin-top: 4px; }
+
+  .reassurance {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .reassurance-item {
+    font-size: 11px;
+    color: var(--honey);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  .quiz-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--warm-white);
+    border-top: 1px solid var(--sand);
+    padding: 14px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .btn-prev {
+    background: transparent;
+    border: 1px solid var(--sand);
+    color: var(--honey);
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-prev:hover { border-color: var(--honey); }
+  .btn-prev:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-next {
+    background: var(--sage);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: all 0.2s;
+  }
+
+  .btn-next:hover { background: var(--sage-light); transform: translateY(-1px); }
+
+  @media (max-width: 640px) {
+    nav { padding: 0 20px; }
+    .progress-wrap { padding: 12px 20px 10px; }
+    .quiz-wrap { padding: 0 16px; }
+    .q-title { font-size: 28px; }
+    .opts.grid2, .opts.grid3 { grid-template-columns: 1fr; }
+    .quiz-nav { padding: 12px 20px; }
+    .dog-card-fixed { display: none !important; }
+    .reassurance { flex-direction: column; align-items: center; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="46" stroke="#5C7A5E" stroke-width="2"/>
+      <text x="50" y="68" text-anchor="middle" font-family="Georgia,serif" font-size="52" fill="#5C7A5E">k</text>
+    </svg>
+    kyno
+    <span class="nav-badge">Suivi continu</span>
+  </a>
+  <a href="index.html" class="nav-back">← Retour</a>
+</nav>
+
+<div class="progress-wrap">
+  <div class="progress-meta">
+    <span class="progress-label" id="stepLabel">Étape 1 sur 35</span>
+    <span class="progress-pct" id="stepPct">3%</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:3%"></div>
+  </div>
+</div>
+
+<div class="dog-card-fixed" id="dogCardFixed">
+  <div class="dog-card-name" id="fixedName">—</div>
+  <div class="dog-card-info" id="fixedInfo">—</div>
+</div>
+
+<main>
+  <div class="quiz-wrap">
+
+    <!-- ===== BLOC 1 : IDENTITÉ ===== -->
+
+    <!-- Q1 -->
+    <div class="q-card active" data-step="1">
+      <div class="q-eyebrow">Présentation</div>
+      <h2 class="q-title">Comment s'appelle<br><em>votre chien ?</em></h2>
+      <p class="q-sub">Son prénom personnalisera l'ensemble de son programme nutritionnel.</p>
+      <input type="text" class="inp" id="dogName" placeholder="Ex : Viva, Max, Luna..." oninput="onNameInput(this.value)" autocomplete="off" />
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-card" data-step="2">
+      <div class="q-eyebrow">Identité</div>
+      <h2 class="q-title">La race de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">La race détermine les prédispositions génétiques, les alertes nutritionnelles et les besoins spécifiques.</p>
+      <input type="text" class="inp" id="dogRace" placeholder="Ex : Épagneul Breton, Labrador, Croisé..." autocomplete="off" />
+      <p class="q-hint">Si vous ne connaissez pas la race exacte, indiquez "croisé" ou la taille approximative.</p>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-card" data-step="3">
+      <div class="q-eyebrow">Identité</div>
+      <h2 class="q-title">L'âge de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Les besoins évoluent radicalement entre chiot, adulte et senior.</p>
+      <div class="opts grid2">
+        <button class="opt" onclick="pick(this,'age','Moins de 6 mois — Chiot')"><span class="opt-check"></span><div><strong>Moins de 6 mois</strong><br><span style="font-size:12px;color:var(--honey)">Chiot</span></div></button>
+        <button class="opt" onclick="pick(this,'age','6 mois à 1 an — Jeune')"><span class="opt-check"></span><div><strong>6 mois à 1 an</strong><br><span style="font-size:12px;color:var(--honey)">Jeune</span></div></button>
+        <button class="opt" onclick="pick(this,'age','1 à 3 ans — Jeune adulte')"><span class="opt-check"></span><div><strong>1 à 3 ans</strong><br><span style="font-size:12px;color:var(--honey)">Jeune adulte</span></div></button>
+        <button class="opt" onclick="pick(this,'age','3 à 7 ans — Adulte')"><span class="opt-check"></span><div><strong>3 à 7 ans</strong><br><span style="font-size:12px;color:var(--honey)">Adulte</span></div></button>
+        <button class="opt" onclick="pick(this,'age','7 à 10 ans — Senior')"><span class="opt-check"></span><div><strong>7 à 10 ans</strong><br><span style="font-size:12px;color:var(--honey)">Senior</span></div></button>
+        <button class="opt" onclick="pick(this,'age','Plus de 10 ans — Grand senior')"><span class="opt-check"></span><div><strong>Plus de 10 ans</strong><br><span style="font-size:12px;color:var(--honey)">Grand senior</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-card" data-step="4">
+      <div class="q-eyebrow">Identité</div>
+      <h2 class="q-title">Le poids de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Le poids est la base du calcul des rations journalières. Soyez aussi précis que possible.</p>
+      <input type="number" class="inp" id="dogWeight" placeholder="Poids en kg — Ex : 14" min="0.5" max="100" step="0.5" autocomplete="off" />
+      <p class="q-hint">Si vous ne connaissez pas le poids exact, estimez approximativement.</p>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-card" data-step="5">
+      <div class="q-eyebrow">Identité</div>
+      <h2 class="q-title">Sexe et statut de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Le statut hormonal modifie les besoins caloriques de 20 à 30%.</p>
+      <div class="opts grid2">
+        <button class="opt" onclick="pick(this,'statut','Mâle entier')"><span class="opt-check"></span><div><strong>Mâle</strong><br><span style="font-size:12px;color:var(--honey)">Entier</span></div></button>
+        <button class="opt" onclick="pick(this,'statut','Mâle stérilisé')"><span class="opt-check"></span><div><strong>Mâle</strong><br><span style="font-size:12px;color:var(--honey)">Stérilisé</span></div></button>
+        <button class="opt" onclick="pick(this,'statut','Femelle entière')"><span class="opt-check"></span><div><strong>Femelle</strong><br><span style="font-size:12px;color:var(--honey)">Entière</span></div></button>
+        <button class="opt" onclick="pick(this,'statut','Femelle stérilisée')"><span class="opt-check"></span><div><strong>Femelle</strong><br><span style="font-size:12px;color:var(--honey)">Stérilisée</span></div></button>
+        <button class="opt" onclick="pick(this,'statut','Femelle gestante')"><span class="opt-check"></span><div><strong>Femelle</strong><br><span style="font-size:12px;color:var(--honey)">Gestante</span></div></button>
+        <button class="opt" onclick="pick(this,'statut','Femelle allaitante')"><span class="opt-check"></span><div><strong>Femelle</strong><br><span style="font-size:12px;color:var(--honey)">Allaitante</span></div></button>
+      </div>
+    </div>
+
+    <!-- ===== BLOC 2 : MODE DE VIE ===== -->
+
+    <!-- Q6 -->
+    <div class="q-card" data-step="6">
+      <div class="section-break">
+        <div class="section-break-icon">🏃</div>
+        <div class="section-break-text">
+          <div class="section-break-title">Mode de vie</div>
+          <div class="section-break-sub">Questions 6 à 8</div>
+        </div>
+      </div>
+      <div class="q-eyebrow">Mode de vie</div>
+      <h2 class="q-title">Niveau d'activité de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">L'activité physique est le principal facteur d'ajustement des besoins caloriques.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'activite','Très sédentaire — moins de 30 min/jour')"><span class="opt-check"></span><div><strong>Très sédentaire</strong><br><span style="font-size:12px;color:var(--honey)">Moins de 30 min de sortie par jour</span></div></button>
+        <button class="opt" onclick="pick(this,'activite','Modéré — 30 min à 1h/jour')"><span class="opt-check"></span><div><strong>Modéré</strong><br><span style="font-size:12px;color:var(--honey)">30 min à 1h par jour</span></div></button>
+        <button class="opt" onclick="pick(this,'activite','Actif — 1 à 2h/jour')"><span class="opt-check"></span><div><strong>Actif</strong><br><span style="font-size:12px;color:var(--honey)">1 à 2h d'activité par jour</span></div></button>
+        <button class="opt" onclick="pick(this,'activite','Très actif — plus de 2h/jour')"><span class="opt-check"></span><div><strong>Très actif</strong><br><span style="font-size:12px;color:var(--honey)">Plus de 2h — sport, chasse, travail</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="q-card" data-step="7">
+      <div class="q-eyebrow">Mode de vie</div>
+      <h2 class="q-title">Où vit<br><em><span class="dn">votre chien</span></em> ?</h2>
+      <p class="q-sub">L'environnement influence l'hydratation, l'exposition et les risques parasitaires.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'environnement','Grande ville — appartement')"><span class="opt-check"></span><div><strong>Grande ville — appartement</strong><br><span style="font-size:12px;color:var(--honey)">Peu d'espace extérieur, bitume</span></div></button>
+        <button class="opt" onclick="pick(this,'environnement','Ville — avec jardin')"><span class="opt-check"></span><div><strong>Ville — avec jardin</strong><br><span style="font-size:12px;color:var(--honey)">Accès extérieur régulier</span></div></button>
+        <button class="opt" onclick="pick(this,'environnement','Campagne ou nature')"><span class="opt-check"></span><div><strong>Campagne ou nature</strong><br><span style="font-size:12px;color:var(--honey)">Grande liberté, espaces naturels</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="q-card" data-step="8">
+      <div class="q-eyebrow">Mode de vie</div>
+      <h2 class="q-title">Comment mange<br><em><span class="dn">votre chien</span></em> actuellement ?</h2>
+      <p class="q-sub">Son alimentation actuelle nous aide à comprendre la transition à prévoir.</p>
+      <div class="opts grid2">
+        <button class="opt" onclick="pick(this,'alim','Croquettes uniquement')"><span class="opt-check"></span><div><strong>Croquettes</strong><br><span style="font-size:12px;color:var(--honey)">Uniquement</span></div></button>
+        <button class="opt" onclick="pick(this,'alim','Pâtée uniquement')"><span class="opt-check"></span><div><strong>Pâtée</strong><br><span style="font-size:12px;color:var(--honey)">Uniquement</span></div></button>
+        <button class="opt" onclick="pick(this,'alim','Mixte industriel')"><span class="opt-check"></span><div><strong>Mixte</strong><br><span style="font-size:12px;color:var(--honey)">Croquettes + pâtée</span></div></button>
+        <button class="opt" onclick="pick(this,'alim','Ration ménagère cuite')"><span class="opt-check"></span><div><strong>Ration maison</strong><br><span style="font-size:12px;color:var(--honey)">Fait maison cuit</span></div></button>
+        <button class="opt" onclick="pick(this,'alim','BARF — alimentation crue')"><span class="opt-check"></span><div><strong>BARF / Cru</strong><br><span style="font-size:12px;color:var(--honey)">Alimentation crue</span></div></button>
+        <button class="opt" onclick="pick(this,'alim','Mixte avec du frais')"><span class="opt-check"></span><div><strong>Mixte + frais</strong><br><span style="font-size:12px;color:var(--honey)">Industriel + fait maison</span></div></button>
+      </div>
+    </div>
+
+    <!-- ===== BLOC 3 : SANTÉ ===== -->
+
+    <!-- Q9 -->
+    <div class="q-card" data-step="9">
+      <div class="section-break">
+        <div class="section-break-icon">🏥</div>
+        <div class="section-break-text">
+          <div class="section-break-title">Santé & Bien-être</div>
+          <div class="section-break-sub">Questions 9 à 16</div>
+        </div>
+      </div>
+      <div class="q-eyebrow">Santé</div>
+      <h2 class="q-title">Problèmes de santé<br>de <em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Sélectionnez tout ce qui s'applique. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'sante','Aucun problème connu')"><span class="opt-check"></span>Aucun connu</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Problèmes articulaires')"><span class="opt-check"></span>Articulaires</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Problèmes digestifs')"><span class="opt-check"></span>Digestifs</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Problèmes de peau')"><span class="opt-check"></span>Peau / Pelage</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Problèmes rénaux')"><span class="opt-check"></span>Rénaux</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Problèmes cardiaques')"><span class="opt-check"></span>Cardiaques</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Surpoids')"><span class="opt-check"></span>Surpoids</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Diabète')"><span class="opt-check"></span>Diabète</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Autre',true,'santeAutreWrap')"><span class="opt-check"></span>Autre</button>
+      </div>
+      <div class="autre-wrap" id="santeAutreWrap">
+        <input type="text" class="inp" placeholder="Précisez..." oninput="A['santeAutre']=this.value" />
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="q-card" data-step="10">
+      <div class="q-eyebrow">Santé</div>
+      <h2 class="q-title">Antécédents médicaux<br>de <em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Chirurgies, hospitalisations, pathologies passées. Ces informations affinent la précision du programme.</p>
+      <textarea class="inp" id="antecedents" placeholder="Ex : opéré des ligaments à 3 ans, pancréatite en 2022, hernie discale..." oninput="A['antecedents']=this.value"></textarea>
+      <p class="q-hint">Laissez vide si aucun antécédent particulier.</p>
+    </div>
+
+    <!-- Q11 -->
+    <div class="q-card" data-step="11">
+      <div class="q-eyebrow">Santé</div>
+      <h2 class="q-title"><em><span class="dn">Votre chien</span></em><br>est-il sous traitement ?</h2>
+      <p class="q-sub">Certains médicaments interagissent avec les nutriments. Information essentielle pour la sécurité du programme.</p>
+      <div class="opts grid2">
+        <button class="opt" onclick="pick(this,'traitement','Non');hideEl('traitementWrap')"><span class="opt-check"></span><strong>Non, aucun</strong></button>
+        <button class="opt" onclick="pick(this,'traitement','Oui');showEl('traitementWrap')"><span class="opt-check"></span><strong>Oui</strong></button>
+      </div>
+      <div class="autre-wrap" id="traitementWrap">
+        <input type="text" class="inp" placeholder="Nom du médicament, raison, durée..." oninput="A['traitementDetail']=this.value" />
+      </div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="q-card" data-step="12">
+      <div class="q-eyebrow">Bien-être</div>
+      <h2 class="q-title">L'état du pelage de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Indicateur clé de l'état nutritionnel — oméga-3, zinc, biotine. Plusieurs réponses possibles.</p>
+      <div class="opts">
+        <button class="opt cb" onclick="toggle(this,'pelage','Brillant et sain')"><span class="opt-check"></span><div><strong>Brillant et sain</strong><br><span style="font-size:12px;color:var(--honey)">Éclat visible</span></div></button>
+        <button class="opt cb" onclick="toggle(this,'pelage','Terne ou sec')"><span class="opt-check"></span><div><strong>Terne ou sec</strong><br><span style="font-size:12px;color:var(--honey)">Manque d'éclat</span></div></button>
+        <button class="opt cb" onclick="toggle(this,'pelage','Chute excessive')"><span class="opt-check"></span><div><strong>Chute excessive</strong><br><span style="font-size:12px;color:var(--honey)">Plus que la normale pour sa race</span></div></button>
+        <button class="opt cb" onclick="toggle(this,'pelage','Pellicules')"><span class="opt-check"></span><div><strong>Pellicules</strong><br><span style="font-size:12px;color:var(--honey)">Squames visibles</span></div></button>
+        <button class="opt cb" onclick="toggle(this,'pelage','Irritations ou rougeurs')"><span class="opt-check"></span><div><strong>Irritations ou rougeurs</strong><br><span style="font-size:12px;color:var(--honey)">Démangeaisons, zones irritées</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="q-card" data-step="13">
+      <div class="q-eyebrow">Bien-être</div>
+      <h2 class="q-title">L'état des selles de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Les selles sont le meilleur indicateur de la santé digestive et de l'équilibre des fibres.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'selles','Normales — bien formées et régulières')"><span class="opt-check"></span><div><strong>Normales</strong><br><span style="font-size:12px;color:var(--honey)">Bien formées, régulières</span></div></button>
+        <button class="opt" onclick="pick(this,'selles','Molles ou liquides')"><span class="opt-check"></span><div><strong>Molles ou liquides</strong><br><span style="font-size:12px;color:var(--honey)">Difficiles à ramasser</span></div></button>
+        <button class="opt" onclick="pick(this,'selles','Dures ou sèches')"><span class="opt-check"></span><div><strong>Dures ou sèches</strong><br><span style="font-size:12px;color:var(--honey)">Effort visible</span></div></button>
+        <button class="opt" onclick="pick(this,'selles','Irrégulières')"><span class="opt-check"></span><div><strong>Irrégulières</strong><br><span style="font-size:12px;color:var(--honey)">Alternance mou/dur</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="q-card" data-step="14">
+      <div class="q-eyebrow">Bien-être</div>
+      <h2 class="q-title">Les odeurs de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Les odeurs sont des indicateurs nutritionnels précis. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'odeurs','Aucune odeur particulière')"><span class="opt-check"></span>Aucune odeur</button>
+        <button class="opt cb" onclick="toggle(this,'odeurs','Mauvaise haleine')"><span class="opt-check"></span>Mauvaise haleine</button>
+        <button class="opt cb" onclick="toggle(this,'odeurs','Odeur corporelle forte')"><span class="opt-check"></span>Odeur corporelle</button>
+        <button class="opt cb" onclick="toggle(this,'odeurs','Oreilles malodorantes')"><span class="opt-check"></span>Oreilles malodorantes</button>
+      </div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="q-card" data-step="15">
+      <div class="q-eyebrow">Santé approfondie</div>
+      <h2 class="q-title">Comportement alimentaire de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'comportAlim','Mange très vite')"><span class="opt-check"></span>Mange très vite</button>
+        <button class="opt cb" onclick="toggle(this,'comportAlim','Mange lentement')"><span class="opt-check"></span>Mange lentement</button>
+        <button class="opt cb" onclick="toggle(this,'comportAlim','Difficile / sélectif')"><span class="opt-check"></span>Difficile / sélectif</button>
+        <button class="opt cb" onclick="toggle(this,'comportAlim','Mange tout ce qu\'il trouve')"><span class="opt-check"></span>Mange tout</button>
+        <button class="opt cb" onclick="toggle(this,'comportAlim','Vole la nourriture des autres')"><span class="opt-check"></span>Vole la nourriture</button>
+      </div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="q-card" data-step="16">
+      <div class="q-eyebrow">Santé approfondie</div>
+      <h2 class="q-title">Troubles du comportement de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Le comportement est lié au microbiote et à la nutrition. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'comportement','Aucun trouble')"><span class="opt-check"></span>Aucun trouble</button>
+        <button class="opt cb" onclick="toggle(this,'comportement','Hyperactivité')"><span class="opt-check"></span>Hyperactivité</button>
+        <button class="opt cb" onclick="toggle(this,'comportement','Anxiété / stress')"><span class="opt-check"></span>Anxiété / stress</button>
+        <button class="opt cb" onclick="toggle(this,'comportement','Agressivité')"><span class="opt-check"></span>Agressivité</button>
+        <button class="opt cb" onclick="toggle(this,'comportement','Peurs / phobies')"><span class="opt-check"></span>Peurs / phobies</button>
+        <button class="opt cb" onclick="toggle(this,'comportement','Destruction / ennui')"><span class="opt-check"></span>Destruction</button>
+      </div>
+    </div>
+
+    <!-- ===== BLOC 4 : SANTÉ APPROFONDIE ===== -->
+
+    <!-- Q17 -->
+    <div class="q-card" data-step="17">
+      <div class="section-break">
+        <div class="section-break-icon">🔬</div>
+        <div class="section-break-text">
+          <div class="section-break-title">Santé approfondie</div>
+          <div class="section-break-sub">Questions 17 à 22</div>
+        </div>
+      </div>
+      <div class="q-eyebrow">Santé approfondie</div>
+      <h2 class="q-title">État des dents de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">La santé dentaire influence l'alimentation et les recommandations texturales.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'dents','Blanches et saines')"><span class="opt-check"></span><div><strong>Blanches et saines</strong><br><span style="font-size:12px;color:var(--honey)">Pas de tartre visible</span></div></button>
+        <button class="opt" onclick="pick(this,'dents','Tartre léger')"><span class="opt-check"></span><div><strong>Tartre léger</strong><br><span style="font-size:12px;color:var(--honey)">Quelques dépôts jaunâtres</span></div></button>
+        <button class="opt" onclick="pick(this,'dents','Tartre important')"><span class="opt-check"></span><div><strong>Tartre important</strong><br><span style="font-size:12px;color:var(--honey)">Dépôts bruns, gencives rouges</span></div></button>
+        <button class="opt" onclick="pick(this,'dents','Mauvaise haleine sévère')"><span class="opt-check"></span><div><strong>Mauvaise haleine sévère</strong><br><span style="font-size:12px;color:var(--honey)">Odeur très prononcée</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="q-card" data-step="18">
+      <div class="q-eyebrow">Santé approfondie</div>
+      <h2 class="q-title">Personnes vulnérables<br><em>dans votre foyer ?</em></h2>
+      <p class="q-sub">Important si vous envisagez une alimentation BARF — risques zoonotiques à prendre en compte. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'vulnerables','Aucune')"><span class="opt-check"></span>Aucune</button>
+        <button class="opt cb" onclick="toggle(this,'vulnerables','Enfants moins de 5 ans')"><span class="opt-check"></span>Enfants &lt;5 ans</button>
+        <button class="opt cb" onclick="toggle(this,'vulnerables','Personnes âgées')"><span class="opt-check"></span>Personnes âgées</button>
+        <button class="opt cb" onclick="toggle(this,'vulnerables','Femme enceinte')"><span class="opt-check"></span>Femme enceinte</button>
+        <button class="opt cb" onclick="toggle(this,'vulnerables','Personne immunodéprimée')"><span class="opt-check"></span>Immunodéprimé</button>
+      </div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="q-card" data-step="19">
+      <div class="q-eyebrow">Santé approfondie</div>
+      <h2 class="q-title">Réactions allergiques<br><em>passées ?</em></h2>
+      <p class="q-sub">Plus précis que les intolérances connues — nous permet d'identifier le type de réaction.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'allergie','Non, jamais')"><span class="opt-check"></span><div><strong>Non, jamais</strong><br><span style="font-size:12px;color:var(--honey)">Pas de réaction connue</span></div></button>
+        <button class="opt" onclick="pick(this,'allergie','Oui — cutanée')"><span class="opt-check"></span><div><strong>Oui — cutanée</strong><br><span style="font-size:12px;color:var(--honey)">Démangeaisons, rougeurs, irritations</span></div></button>
+        <button class="opt" onclick="pick(this,'allergie','Oui — digestive')"><span class="opt-check"></span><div><strong>Oui — digestive</strong><br><span style="font-size:12px;color:var(--honey)">Vomissements, diarrhées</span></div></button>
+        <button class="opt" onclick="pick(this,'allergie','Oui — cutanée et digestive')"><span class="opt-check"></span><div><strong>Oui — les deux</strong><br><span style="font-size:12px;color:var(--honey)">Réactions multiples</span></div></button>
+        <button class="opt" onclick="pick(this,'allergie','Je ne sais pas')"><span class="opt-check"></span><div><strong>Je ne sais pas</strong><br><span style="font-size:12px;color:var(--honey)">Pas sûr(e)</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="q-card" data-step="20">
+      <div class="q-eyebrow">Santé approfondie</div>
+      <h2 class="q-title">Calculs urinaires ou<br><em>problèmes urinaires ?</em></h2>
+      <p class="q-sub">Le type de calcul détermine une adaptation nutritionnelle radicalement différente.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'urinaire','Non, aucun')"><span class="opt-check"></span><strong>Non, aucun</strong></button>
+        <button class="opt" onclick="pick(this,'urinaire','Oui — struvite')"><span class="opt-check"></span><div><strong>Oui — struvite</strong><br><span style="font-size:12px;color:var(--honey)">Phosphate ammoniaco-magnésien</span></div></button>
+        <button class="opt" onclick="pick(this,'urinaire','Oui — oxalate de calcium')"><span class="opt-check"></span><div><strong>Oui — oxalate de calcium</strong><br><span style="font-size:12px;color:var(--honey)">Ne se dissout pas</span></div></button>
+        <button class="opt" onclick="pick(this,'urinaire','Oui — type inconnu')"><span class="opt-check"></span><strong>Oui — type inconnu</strong></button>
+        <button class="opt" onclick="pick(this,'urinaire','Infections urinaires récurrentes')"><span class="opt-check"></span><div><strong>Infections urinaires récurrentes</strong><br><span style="font-size:12px;color:var(--honey)">Sans calculs diagnostiqués</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q21 -->
+    <div class="q-card" data-step="21">
+      <div class="q-eyebrow">Santé approfondie</div>
+      <h2 class="q-title">Problèmes d'oreilles<br><em>récurrents ?</em></h2>
+      <p class="q-sub">Les otites chroniques sont souvent liées à l'alimentation et aux intolérances.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'oreilles','Non, aucun problème')"><span class="opt-check"></span><strong>Non, aucun problème</strong></button>
+        <button class="opt" onclick="pick(this,'oreilles','Otites régulières')"><span class="opt-check"></span><div><strong>Otites régulières</strong><br><span style="font-size:12px;color:var(--honey)">Plus de 2 fois par an</span></div></button>
+        <button class="opt" onclick="pick(this,'oreilles','Odeur forte des oreilles')"><span class="opt-check"></span><div><strong>Odeur forte</strong><br><span style="font-size:12px;color:var(--honey)">Sans otite diagnostiquée</span></div></button>
+        <button class="opt" onclick="pick(this,'oreilles','Grattage fréquent des oreilles')"><span class="opt-check"></span><div><strong>Grattage fréquent</strong><br><span style="font-size:12px;color:var(--honey)">Se gratte régulièrement les oreilles</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q22 -->
+    <div class="q-card" data-step="22">
+      <div class="q-eyebrow">Santé approfondie</div>
+      <h2 class="q-title">Glandes anales de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Directement lié aux fibres alimentaires — un problème courant et souvent nutritionnel.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'glandes','Pas de problème')"><span class="opt-check"></span><strong>Pas de problème</strong></button>
+        <button class="opt" onclick="pick(this,'glandes','Scooting régulier')"><span class="opt-check"></span><div><strong>Scooting régulier</strong><br><span style="font-size:12px;color:var(--honey)">Se traîne les fesses au sol</span></div></button>
+        <button class="opt" onclick="pick(this,'glandes','Expressions fréquentes chez le vétérinaire')"><span class="opt-check"></span><div><strong>Expressions fréquentes</strong><br><span style="font-size:12px;color:var(--honey)">Vidanges manuelles régulières</span></div></button>
+      </div>
+    </div>
+
+    <!-- ===== BLOC 5 : ALIMENTATION ===== -->
+
+    <!-- Q23 -->
+    <div class="q-card" data-step="23">
+      <div class="section-break">
+        <div class="section-break-icon">🥩</div>
+        <div class="section-break-text">
+          <div class="section-break-title">Alimentation & Préférences</div>
+          <div class="section-break-sub">Questions 23 à 29</div>
+        </div>
+      </div>
+      <div class="q-eyebrow">Alimentation</div>
+      <h2 class="q-title">Intolérances ou allergies<br><em>connues ?</em></h2>
+      <p class="q-sub">Ces éléments seront exclus de tous les menus. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'intol','Aucune connue')"><span class="opt-check"></span>Aucune connue</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Bœuf')"><span class="opt-check"></span>Bœuf</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Poulet')"><span class="opt-check"></span>Poulet</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Poisson')"><span class="opt-check"></span>Poisson</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Gluten / Blé')"><span class="opt-check"></span>Gluten / Blé</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Produits laitiers')"><span class="opt-check"></span>Produits laitiers</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Soja')"><span class="opt-check"></span>Soja</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Autre',true,'intolAutreWrap')"><span class="opt-check"></span>Autre</button>
+      </div>
+      <div class="autre-wrap" id="intolAutreWrap">
+        <input type="text" class="inp" placeholder="Précisez l'allergie ou intolérance..." oninput="A['intolAutre']=this.value" />
+      </div>
+    </div>
+
+    <!-- Q24 -->
+    <div class="q-card" data-step="24">
+      <div class="q-eyebrow">Alimentation</div>
+      <h2 class="q-title">Niveau de stress général de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Le stress chronique impacte le microbiote, la digestion et les besoins en tryptophane et magnésium.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'stress','Très calme')"><span class="opt-check"></span><div><strong>Très calme</strong><br><span style="font-size:12px;color:var(--honey)">Détendu en toutes circonstances</span></div></button>
+        <button class="opt" onclick="pick(this,'stress','Légèrement anxieux')"><span class="opt-check"></span><div><strong>Légèrement anxieux</strong><br><span style="font-size:12px;color:var(--honey)">Quelques situations difficiles</span></div></button>
+        <button class="opt" onclick="pick(this,'stress','Anxieux')"><span class="opt-check"></span><div><strong>Anxieux</strong><br><span style="font-size:12px;color:var(--honey)">Stress fréquent et visible</span></div></button>
+        <button class="opt" onclick="pick(this,'stress','Très anxieux / phobique')"><span class="opt-check"></span><div><strong>Très anxieux / phobique</strong><br><span style="font-size:12px;color:var(--honey)">Peurs intenses, crises fréquentes</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q25 -->
+    <div class="q-card" data-step="25">
+      <div class="q-eyebrow">Vos préférences</div>
+      <h2 class="q-title">Quel mode alimentaire<br><em>vous attire ?</em></h2>
+      <p class="q-sub">Le programme mensuel sera adapté à la méthode que vous êtes prêt(e) à mettre en place.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'modeAlim','Ration ménagère cuite')"><span class="opt-check"></span><div><strong>Ration ménagère cuite</strong><br><span style="font-size:12px;color:var(--honey)">Vous cuisinez pour lui — vapeur, mijotée</span></div></button>
+        <button class="opt" onclick="pick(this,'modeAlim','BARF — alimentation crue')"><span class="opt-check"></span><div><strong>BARF / Alimentation crue</strong><br><span style="font-size:12px;color:var(--honey)">Viande crue, os charnus, légumes mixés</span></div></button>
+        <button class="opt" onclick="pick(this,'modeAlim','Mixte — cuit et cru')"><span class="opt-check"></span><div><strong>Mixte — cuit et cru</strong><br><span style="font-size:12px;color:var(--honey)">Combinaison des deux approches</span></div></button>
+        <button class="opt" onclick="pick(this,'modeAlim','Je ne sais pas encore')"><span class="opt-check"></span><div><strong>Je ne sais pas encore</strong><br><span style="font-size:12px;color:var(--honey)">Kyno me guidera selon mon profil</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q26 -->
+    <div class="q-card" data-step="26">
+      <div class="q-eyebrow">Vos préférences</div>
+      <h2 class="q-title">Votre budget<br><em>alimentation mensuel</em></h2>
+      <p class="q-sub">Les recommandations d'ingrédients seront orientées vers ce qui est accessible pour vous.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'budget','Moins de 30€ / mois')"><span class="opt-check"></span><div><strong>Moins de 30€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Ingrédients économiques et accessibles</span></div></button>
+        <button class="opt" onclick="pick(this,'budget','30 à 60€ / mois')"><span class="opt-check"></span><div><strong>30 à 60€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Bon rapport qualité/prix</span></div></button>
+        <button class="opt" onclick="pick(this,'budget','60 à 100€ / mois')"><span class="opt-check"></span><div><strong>60 à 100€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Ingrédients premium</span></div></button>
+        <button class="opt" onclick="pick(this,'budget','Plus de 100€ / mois')"><span class="opt-check"></span><div><strong>Plus de 100€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Pas de contrainte, meilleure qualité</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q27 -->
+    <div class="q-card" data-step="27">
+      <div class="q-eyebrow">Vos préférences</div>
+      <h2 class="q-title">Votre équipement<br><em>de cuisine</em></h2>
+      <p class="q-sub">Les recettes mensuelles seront adaptées à ce que vous avez à disposition. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'equip','Casserole / poêle classique')"><span class="opt-check"></span>Casserole/poêle</button>
+        <button class="opt cb" onclick="toggle(this,'equip','Cuiseur vapeur')"><span class="opt-check"></span>Cuiseur vapeur</button>
+        <button class="opt cb" onclick="toggle(this,'equip','Cocotte / mijoteuse')"><span class="opt-check"></span>Cocotte/mijoteuse</button>
+        <button class="opt cb" onclick="toggle(this,'equip','Four')"><span class="opt-check"></span>Four</button>
+        <button class="opt cb" onclick="toggle(this,'equip','Sous vide')"><span class="opt-check"></span>Sous vide</button>
+        <button class="opt cb" onclick="toggle(this,'equip','Mixeur / blender')"><span class="opt-check"></span>Mixeur/blender</button>
+      </div>
+    </div>
+
+    <!-- Q28 -->
+    <div class="q-card" data-step="28">
+      <div class="q-eyebrow">Vos préférences</div>
+      <h2 class="q-title">Votre temps de préparation<br><em>par semaine</em></h2>
+      <p class="q-sub">On adapte la complexité des recettes et la fréquence de préparation à votre emploi du temps.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'temps','Moins de 30 min / semaine')"><span class="opt-check"></span><div><strong>Moins de 30 min</strong><br><span style="font-size:12px;color:var(--honey)">Recettes ultra-simples, batch cooking</span></div></button>
+        <button class="opt" onclick="pick(this,'temps','30 min à 1h / semaine')"><span class="opt-check"></span><div><strong>30 min à 1h</strong><br><span style="font-size:12px;color:var(--honey)">Recettes simples, préparation hebdomadaire</span></div></button>
+        <button class="opt" onclick="pick(this,'temps','1 à 2h / semaine')"><span class="opt-check"></span><div><strong>1 à 2h</strong><br><span style="font-size:12px;color:var(--honey)">Recettes variées, bonne organisation</span></div></button>
+        <button class="opt" onclick="pick(this,'temps','Plus de 2h / semaine')"><span class="opt-check"></span><div><strong>Plus de 2h</strong><br><span style="font-size:12px;color:var(--honey)">Recettes élaborées, passion culinaire</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q29 -->
+    <div class="q-card" data-step="29">
+      <div class="q-eyebrow">Vos préférences</div>
+      <h2 class="q-title">Votre objectif principal<br><em>pour <span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Cette information oriente la priorité nutritionnelle de tout le programme.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'objectif','Santé générale et prévention')"><span class="opt-check"></span><div><strong>Santé générale et prévention</strong><br><span style="font-size:12px;color:var(--honey)">Alimentation équilibrée et préventive</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Perte de poids')"><span class="opt-check"></span><div><strong>Perte de poids</strong><br><span style="font-size:12px;color:var(--honey)">Réduction calorique adaptée et sécurisée</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Améliorer le pelage et la peau')"><span class="opt-check"></span><div><strong>Améliorer le pelage et la peau</strong><br><span style="font-size:12px;color:var(--honey)">Oméga-3, zinc, biotine ciblés</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Améliorer la digestion')"><span class="opt-check"></span><div><strong>Améliorer la digestion</strong><br><span style="font-size:12px;color:var(--honey)">Microbiote, fibres, probiotiques</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Chien de sport ou très actif')"><span class="opt-check"></span><div><strong>Chien de sport ou très actif</strong><br><span style="font-size:12px;color:var(--honey)">Énergie, récupération, performance</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Bien vieillir — chien senior')"><span class="opt-check"></span><div><strong>Bien vieillir — chien senior</strong><br><span style="font-size:12px;color:var(--honey)">Cognition, articulations, masse musculaire</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Problème spécifique à traiter')"><span class="opt-check"></span><div><strong>Problème spécifique</strong><br><span style="font-size:12px;color:var(--honey)">Cibler une pathologie ou un trouble</span></div></button>
+      </div>
+    </div>
+
+    <!-- ===== BLOC 6 : PROPRIÉTAIRE ===== -->
+
+    <!-- Q30 -->
+    <div class="q-card" data-step="30">
+      <div class="section-break">
+        <div class="section-break-icon">👤</div>
+        <div class="section-break-text">
+          <div class="section-break-title">Votre profil</div>
+          <div class="section-break-sub">Questions 30 à 34</div>
+        </div>
+      </div>
+      <div class="q-eyebrow">Votre profil</div>
+      <h2 class="q-title">Vos connaissances en<br><em>nutrition canine</em></h2>
+      <p class="q-sub">Le niveau de détail des explications sera adapté à votre niveau.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'niveau','Aucune — je débute')"><span class="opt-check"></span><div><strong>Aucune — je débute</strong><br><span style="font-size:12px;color:var(--honey)">Explications détaillées et guides pas à pas</span></div></button>
+        <button class="opt" onclick="pick(this,'niveau','Quelques bases')"><span class="opt-check"></span><div><strong>Quelques bases</strong><br><span style="font-size:12px;color:var(--honey)">J'ai déjà quelques notions</span></div></button>
+        <button class="opt" onclick="pick(this,'niveau','Je me suis formé(e)')"><span class="opt-check"></span><div><strong>Je me suis formé(e)</strong><br><span style="font-size:12px;color:var(--honey)">Lectures, formations, pratique</span></div></button>
+        <button class="opt" onclick="pick(this,'niveau','Expert(e)')"><span class="opt-check"></span><div><strong>Expert(e)</strong><br><span style="font-size:12px;color:var(--honey)">Données techniques et scientifiques</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q31 -->
+    <div class="q-card" data-step="31">
+      <div class="q-eyebrow">Votre profil</div>
+      <h2 class="q-title">Où faites-vous<br><em>vos courses ?</em></h2>
+      <p class="q-sub">Les recommandations d'ingrédients seront adaptées à vos circuits d'approvisionnement. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'courses','Supermarché classique')"><span class="opt-check"></span>Supermarché</button>
+        <button class="opt cb" onclick="toggle(this,'courses','Marché local / producteurs')"><span class="opt-check"></span>Marché local</button>
+        <button class="opt cb" onclick="toggle(this,'courses','Boucherie artisanale')"><span class="opt-check"></span>Boucherie</button>
+        <button class="opt cb" onclick="toggle(this,'courses','Drive / livraison en ligne')"><span class="opt-check"></span>Drive / livraison</button>
+        <button class="opt cb" onclick="toggle(this,'courses','Mixte')"><span class="opt-check"></span>Mixte</button>
+      </div>
+    </div>
+
+    <!-- Q32 -->
+    <div class="q-card" data-step="32">
+      <div class="q-eyebrow">Votre profil</div>
+      <h2 class="q-title">Autres animaux<br><em>à la maison ?</em></h2>
+      <p class="q-sub">Utile pour les recommandations de stockage et de sécurité alimentaire. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'animaux','Non, aucun autre animal')"><span class="opt-check"></span>Aucun autre</button>
+        <button class="opt cb" onclick="toggle(this,'animaux','Autre(s) chien(s)')"><span class="opt-check"></span>Autre(s) chien(s)</button>
+        <button class="opt cb" onclick="toggle(this,'animaux','Chat(s)')"><span class="opt-check"></span>Chat(s)</button>
+        <button class="opt cb" onclick="toggle(this,'animaux','Autres animaux')"><span class="opt-check"></span>Autres</button>
+      </div>
+    </div>
+
+    <!-- Q33 -->
+    <div class="q-card" data-step="33">
+      <div class="q-eyebrow">Votre profil</div>
+      <h2 class="q-title">Fréquence des menus<br><em>souhaitée</em></h2>
+      <p class="q-sub">À quelle fréquence souhaitez-vous recevoir les nouveaux menus de <span class="dn">votre chien</span> ?</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'frequence','Chaque semaine')"><span class="opt-check"></span><div><strong>Chaque semaine</strong><br><span style="font-size:12px;color:var(--honey)">Menus variés, adaptation fine</span></div></button>
+        <button class="opt" onclick="pick(this,'frequence','Toutes les 2 semaines')"><span class="opt-check"></span><div><strong>Toutes les 2 semaines</strong><br><span style="font-size:12px;color:var(--honey)">Bon équilibre variété / simplicité</span></div></button>
+        <button class="opt" onclick="pick(this,'frequence','Chaque mois')"><span class="opt-check"></span><div><strong>Chaque mois</strong><br><span style="font-size:12px;color:var(--honey)">Planning mensuel complet</span></div></button>
+      </div>
+    </div>
+
+    <!-- Q34 -->
+    <div class="q-card" data-step="34">
+      <div class="q-eyebrow">Votre profil</div>
+      <h2 class="q-title">Vos attentes<br><em>pour <span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Décrivez en quelques mots ce qui vous tient le plus à cœur. Cette information personnalise profondément le programme.</p>
+      <textarea class="inp" id="attentes" placeholder="Ex : Je veux que Viva retrouve un pelage brillant et arrête de se gratter. Elle a 18 mois et est très active..." oninput="A['attentes']=this.value" style="min-height:140px"></textarea>
+    </div>
+
+    <!-- ===== Q35 : EMAIL + OFFRE ===== -->
+
+    <div class="q-card" data-step="35">
+      <div class="section-break" style="background:var(--honey)">
+        <div class="section-break-icon">🎉</div>
+        <div class="section-break-text">
+          <div class="section-break-title" style="color:white">Dernière étape !</div>
+          <div class="section-break-sub" style="color:rgba(255,255,255,0.7)">Le profil de <span class="dn">votre chien</span> est complet</div>
+        </div>
+      </div>
+
+      <div class="email-block">
+        <div class="email-block-title">Votre adresse email</div>
+        <div class="email-block-sub">Le programme nutritionnel personnalisé de <span class="dn">votre chien</span> vous sera envoyé immédiatement après votre abonnement.</div>
+        <input type="email" class="inp" id="clientEmail" placeholder="votre@email.com" oninput="A['email']=this.value" autocomplete="email" />
+      </div>
+
+      <div class="offre-unique">
+        <div class="offre-unique-tag">Programme complet — Suivi continu</div>
+        <div class="offre-unique-price">9<span style="font-size:24px;color:var(--honey)">€</span></div>
+        <div class="offre-unique-freq">par mois · sans engagement · annulation en 1 clic</div>
+        <div class="offre-unique-name">Kyno Suivi Continu</div>
+        <div class="offre-features">
+          <div class="offre-feat"><span class="feat-dot">·</span>Plan nutritionnel complet personnalisé dès votre inscription</div>
+          <div class="offre-feat"><span class="feat-dot">·</span>Nouveau menu chaque mois adapté à la saison</div>
+          <div class="offre-feat"><span class="feat-dot">·</span>Conseiller nutritionnel personnalisé inclus</div>
+          <div class="offre-feat"><span class="feat-dot">·</span>Chatbot de suivi mensuel — <span class="dn">votre chien</span> nous contacte en premier</div>
+          <div class="offre-feat"><span class="feat-dot">·</span>Adaptation automatique selon l'évolution de son profil</div>
+          <div class="offre-feat"><span class="feat-dot">·</span>Alertes nutritionnelles spécifiques à sa race</div>
+        </div>
+      </div>
+
+      <div class="reassurance">
+        <div class="reassurance-item">🔒 Paiement sécurisé Stripe</div>
+        <div class="reassurance-item">✓ Sans engagement</div>
+        <div class="reassurance-item">↩ Annulation en 1 clic</div>
+        <div class="reassurance-item">📧 Plan reçu sous 5 minutes</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="quiz-nav">
+  <button class="btn-prev" id="btnPrev" onclick="prev()" disabled>← Précédent</button>
+  <button class="btn-next" id="btnNext" onclick="next()">Suivant →</button>
+</div>
+
+<script>
+  let step = 1;
+  const TOTAL = 35;
+  let A = {};
+  let MA = {};
+  let dogName = 'votre chien';
+
+  function onNameInput(v) {
+    dogName = v.trim() || 'votre chien';
+    A['nom'] = v.trim();
+    document.querySelectorAll('.dn').forEach(el => el.textContent = dogName);
+    updateDogCard();
+  }
+
+  function updateDogCard() {
+    const card = document.getElementById('dogCardFixed');
+    if (A['nom']) {
+      card.classList.add('visible');
+      document.getElementById('fixedName').textContent = A['nom'];
+      const parts = [];
+      if (A['race']) parts.push(A['race']);
+      if (A['age']) parts.push(A['age'].split(' — ')[0]);
+      if (A['poids']) parts.push(A['poids'] + ' kg');
+      document.getElementById('fixedInfo').textContent = parts.join(' · ') || '—';
+    }
+  }
+
+  function pick(btn, key, val) {
+    btn.closest('.q-card').querySelectorAll('.opt:not(.cb)').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    A[key] = val;
+  }
+
+  function toggle(btn, key, val, hasAutre, wrapId) {
+    btn.classList.toggle('selected');
+    if (!MA[key]) MA[key] = [];
+    if (btn.classList.contains('selected')) {
+      if (!MA[key].includes(val)) MA[key].push(val);
+    } else {
+      MA[key] = MA[key].filter(v => v !== val);
+    }
+    A[key] = MA[key].join(', ');
+    if (hasAutre && wrapId) {
+      const w = document.getElementById(wrapId);
+      if (w) w.style.display = MA[key] && MA[key].includes(val) ? 'block' : 'none';
+    }
+  }
+
+  function showEl(id) { const el = document.getElementById(id); if(el) el.style.display = 'block'; }
+  function hideEl(id) { const el = document.getElementById(id); if(el) el.style.display = 'none'; }
+
+  function updateProgress() {
+    const pct = Math.round((step / TOTAL) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('stepPct').textContent = pct + '%';
+    document.getElementById('stepLabel').textContent = `Étape ${step} sur ${TOTAL}`;
+  }
+
+  function updateNav() {
+    document.getElementById('btnPrev').disabled = step === 1;
+    const btn = document.getElementById('btnNext');
+    if (step === TOTAL) {
+      btn.innerHTML = '🎉 Démarrer mon programme à 9€/mois →';
+      btn.style.background = 'var(--honey)';
+    } else {
+      btn.innerHTML = 'Suivant →';
+      btn.style.background = 'var(--sage)';
+    }
+  }
+
+  function next() {
+    if (step === TOTAL) {
+      if (!A['email']) { alert('Veuillez entrer votre adresse email pour démarrer votre programme.'); return; }
+      alert('Merci ! Le programme de ' + (A['nom'] || 'votre chien') + ' va être créé. Redirection vers le paiement sécurisé...');
+      return;
+    }
+    if (step === 1) A['nom'] = (document.getElementById('dogName').value || '').trim();
+    if (step === 2) { A['race'] = (document.getElementById('dogRace').value || '').trim(); updateDogCard(); }
+    if (step === 4) { A['poids'] = document.getElementById('dogWeight').value; updateDogCard(); }
+    if (step === 10) A['antecedents'] = (document.getElementById('antecedents').value || '').trim();
+    if (step === 34) A['attentes'] = (document.getElementById('attentes').value || '').trim();
+
+    document.querySelector(`[data-step="${step}"]`).classList.remove('active');
+    step++;
+    const nextCard = document.querySelector(`[data-step="${step}"]`);
+    nextCard.classList.add('active');
+    nextCard.style.animation = 'none';
+    nextCard.offsetHeight;
+    nextCard.style.animation = '';
+    updateProgress();
+    updateNav();
+    updateDogCard();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function prev() {
+    if (step === 1) return;
+    document.querySelector(`[data-step="${step}"]`).classList.remove('active');
+    step--;
+    document.querySelector(`[data-step="${step}"]`).classList.add('active');
+    updateProgress();
+    updateNav();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
