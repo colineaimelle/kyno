@@ -3,21 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kyno — Créer le profil de mon chien</title>
+<title>Kyno — Profil nutritionnel de votre chien</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --sage:       #5C7A5E;
+    --sage: #5C7A5E;
     --sage-light: #7D9B7F;
-    --sage-mist:  #EDF3ED;
-    --ecru:       #F5F0E8;
-    --sand:       #E8E0D0;
-    --honey:      #C4A15A;
-    --tabac:      #7B5C3E;
+    --sage-mist: #EDF3ED;
+    --ecru: #F5F0E8;
+    --sand: #E8E0D0;
+    --honey: #C4A15A;
+    --tabac: #7B5C3E;
     --warm-white: #FAF8F4;
+    --dark: #2A1F14;
   }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
 
   body {
@@ -57,32 +58,29 @@
     color: var(--honey);
     text-decoration: none;
     letter-spacing: 0.06em;
-    display: flex;
-    align-items: center;
-    gap: 6px;
   }
   .nav-back:hover { color: var(--sage); }
 
-  /* PROGRESS BAR */
-  .progress-container {
+  /* PROGRESS */
+  .progress-wrap {
     position: fixed;
     top: 52px; left: 0; right: 0;
     z-index: 99;
     background: var(--warm-white);
-    padding: 16px 40px 12px;
+    padding: 14px 40px 12px;
     border-bottom: 1px solid var(--sand);
   }
 
-  .progress-info {
+  .progress-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
-  .progress-step {
+  .progress-label {
     font-size: 11px;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--honey);
   }
@@ -107,9 +105,39 @@
     transition: width 0.5s ease;
   }
 
+  /* DOG CARD FIXE */
+  .dog-card-fixed {
+    position: fixed;
+    top: 116px;
+    right: 40px;
+    width: 200px;
+    background: var(--ecru);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 1px solid var(--sand);
+    display: none;
+    z-index: 98;
+  }
+
+  .dog-card-fixed.visible { display: block; }
+
+  .dog-card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--tabac);
+    margin-bottom: 4px;
+  }
+
+  .dog-card-info {
+    font-size: 11px;
+    color: var(--honey);
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+  }
+
   /* MAIN */
   main {
-    padding-top: 130px;
+    padding-top: 140px;
     min-height: 100vh;
     display: flex;
     align-items: flex-start;
@@ -117,28 +145,26 @@
     padding-bottom: 120px;
   }
 
-  .quiz-wrapper {
+  .quiz-wrap {
     width: 100%;
-    max-width: 680px;
+    max-width: 660px;
     padding: 0 24px;
   }
 
-  /* QUESTION CARD */
-  .question-card {
+  /* QUESTION */
+  .q-card {
     display: none;
-    animation: fadeIn 0.4s ease both;
+    animation: fadeUp 0.4s ease both;
   }
 
-  .question-card.active {
-    display: block;
-  }
+  .q-card.active { display: block; }
 
-  @keyframes fadeIn {
+  @keyframes fadeUp {
     from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .question-eyebrow {
+  .q-eyebrow {
     font-size: 10px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -148,15 +174,15 @@
     align-items: center;
     gap: 10px;
   }
-  .question-eyebrow::before {
+  .q-eyebrow::before {
     content: '';
     width: 20px; height: 1px;
     background: var(--sage-light);
   }
 
-  .question-title {
+  .q-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 44px;
+    font-size: 40px;
     font-weight: 400;
     line-height: 1.1;
     color: var(--tabac);
@@ -164,54 +190,45 @@
     margin-bottom: 8px;
   }
 
-  .question-title em {
-    color: var(--sage);
-    font-style: italic;
-  }
+  .q-title em { color: var(--sage); font-style: italic; }
 
-  .question-subtitle {
+  .q-sub {
     font-size: 14px;
     color: var(--honey);
     line-height: 1.7;
-    margin-bottom: 40px;
+    margin-bottom: 36px;
   }
 
-  /* INPUT STYLES */
-  .input-field {
+  /* INPUT */
+  .inp {
     width: 100%;
     background: white;
     border: 1px solid var(--sand);
     border-radius: 8px;
-    padding: 18px 20px;
+    padding: 16px 18px;
     font-family: 'DM Sans', sans-serif;
     font-size: 16px;
     color: var(--tabac);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
-  .input-field:focus {
+  .inp:focus {
     border-color: var(--sage);
     box-shadow: 0 0 0 3px var(--sage-mist);
   }
-  .input-field::placeholder { color: var(--sand); }
+  .inp::placeholder { color: var(--sand); }
 
-  /* OPTIONS GRID */
-  .options-grid {
-    display: grid;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
+  /* OPTIONS */
+  .opts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+  .opts.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .opts.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
-  .options-grid.cols-2 { grid-template-columns: 1fr 1fr; }
-  .options-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-  .options-grid.cols-1 { grid-template-columns: 1fr; }
-
-  .option-btn {
+  .opt {
     background: white;
     border: 1px solid var(--sand);
     border-radius: 8px;
-    padding: 16px 20px;
+    padding: 14px 18px;
     font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     color: var(--tabac);
@@ -219,40 +236,36 @@
     text-align: left;
     transition: all 0.2s;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     line-height: 1.4;
   }
 
-  .option-btn:hover {
-    border-color: var(--sage-light);
-    background: var(--sage-mist);
-  }
+  .opt:hover { border-color: var(--sage-light); background: var(--sage-mist); }
 
-  .option-btn.selected {
+  .opt.selected {
     border-color: var(--sage);
     background: var(--sage-mist);
     color: var(--sage);
     font-weight: 500;
   }
 
-  .option-btn.selected .option-check {
-    background: var(--sage);
-    border-color: var(--sage);
-  }
-  .option-btn.selected .option-check::after {
-    opacity: 1;
-  }
-
-  .option-check {
+  .opt-check {
     width: 18px; height: 18px;
     border-radius: 50%;
     border: 1.5px solid var(--sand);
     flex-shrink: 0;
+    margin-top: 1px;
     position: relative;
     transition: all 0.2s;
   }
-  .option-check::after {
+
+  .opt.selected .opt-check {
+    background: var(--sage);
+    border-color: var(--sage);
+  }
+
+  .opt.selected .opt-check::after {
     content: '';
     position: absolute;
     top: 50%; left: 50%;
@@ -260,20 +273,11 @@
     width: 6px; height: 6px;
     border-radius: 50%;
     background: white;
-    opacity: 0;
-    transition: opacity 0.2s;
   }
 
-  .option-icon {
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  /* CHECKBOX OPTIONS (multi-select) */
-  .option-btn.checkbox .option-check {
-    border-radius: 4px;
-  }
-  .option-btn.checkbox.selected .option-check::after {
+  /* CHECKBOX */
+  .opt.cb .opt-check { border-radius: 4px; }
+  .opt.cb.selected .opt-check::after {
     content: '✓';
     font-size: 10px;
     color: white;
@@ -282,58 +286,173 @@
     font-weight: 700;
   }
 
-  /* SCALE */
-  .scale-container {
-    margin-bottom: 12px;
-  }
-
-  .scale-track {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .scale-btn {
-    flex: 1;
-    height: 48px;
-    border-radius: 6px;
-    border: 1px solid var(--sand);
-    background: white;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--honey);
-    transition: all 0.2s;
-    font-weight: 400;
-  }
-
-  .scale-btn:hover { border-color: var(--sage-light); background: var(--sage-mist); }
-  .scale-btn.selected { background: var(--sage); border-color: var(--sage); color: white; font-weight: 500; }
-
-  .scale-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--honey);
-    letter-spacing: 0.06em;
-  }
-
-  /* HINT */
-  .question-hint {
+  /* TEXT HINT */
+  .q-hint {
     font-size: 12px;
     color: var(--honey);
-    opacity: 0.7;
-    margin-top: 8px;
     font-style: italic;
+    margin-top: 6px;
+    opacity: 0.8;
   }
 
-  /* NAVIGATION BUTTONS */
+  /* AUTRE FIELD */
+  .autre-wrap { display: none; margin-top: 10px; }
+
+  /* SCORE PREVIEW */
+  .score-preview {
+    background: var(--tabac);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    display: none;
+  }
+
+  .score-preview.visible { display: block; }
+
+  .score-label-sm {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 8px;
+  }
+
+  .score-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--ecru);
+    margin-bottom: 4px;
+  }
+
+  .score-mention {
+    font-size: 13px;
+    color: var(--sage-light);
+    letter-spacing: 0.08em;
+  }
+
+  /* EMAIL STEP */
+  .email-block {
+    background: var(--ecru);
+    border-radius: 12px;
+    padding: 32px;
+    border: 1px solid var(--sand);
+    margin-bottom: 24px;
+  }
+
+  .email-block-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    color: var(--tabac);
+    margin-bottom: 8px;
+  }
+
+  .email-block-sub {
+    font-size: 14px;
+    color: var(--honey);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  /* OFFRES */
+  .offres-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .offre-card {
+    border-radius: 12px;
+    padding: 28px 24px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .offre-card.basic {
+    background: var(--ecru);
+    border-color: var(--sand);
+  }
+
+  .offre-card.premium {
+    background: var(--tabac);
+  }
+
+  .offre-card.selected.basic { border-color: var(--sage); }
+  .offre-card.selected.premium { border-color: var(--honey); }
+
+  .offre-tag {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .basic .offre-tag { color: var(--sage); }
+  .premium .offre-tag { color: var(--honey); }
+
+  .offre-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .basic .offre-price { color: var(--tabac); }
+  .premium .offre-price { color: var(--ecru); }
+
+  .offre-freq {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+  .basic .offre-freq { color: var(--honey); }
+  .premium .offre-freq { color: rgba(255,255,255,0.5); }
+
+  .offre-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .basic .offre-name { color: var(--tabac); }
+  .premium .offre-name { color: var(--ecru); }
+
+  .offre-features { display: flex; flex-direction: column; gap: 6px; }
+  .offre-feat {
+    font-size: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+  .basic .offre-feat { color: var(--tabac); }
+  .premium .offre-feat { color: rgba(255,255,255,0.7); }
+  .feat-dot { flex-shrink: 0; margin-top: 5px; }
+  .basic .feat-dot { color: var(--sage); }
+  .premium .feat-dot { color: var(--honey); }
+
+  .reassurance {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .reassurance-item {
+    font-size: 11px;
+    color: var(--honey);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  /* NAV BOTTOM */
   .quiz-nav {
     position: fixed;
     bottom: 0; left: 0; right: 0;
     background: var(--warm-white);
     border-top: 1px solid var(--sand);
-    padding: 16px 40px;
+    padding: 14px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -344,7 +463,7 @@
     background: transparent;
     border: 1px solid var(--sand);
     color: var(--honey);
-    padding: 13px 28px;
+    padding: 12px 24px;
     border-radius: 4px;
     font-size: 13px;
     font-family: 'DM Sans', sans-serif;
@@ -358,7 +477,7 @@
     background: var(--sage);
     color: white;
     border: none;
-    padding: 13px 36px;
+    padding: 12px 32px;
     border-radius: 4px;
     font-size: 13px;
     font-weight: 500;
@@ -366,206 +485,20 @@
     cursor: pointer;
     letter-spacing: 0.06em;
     transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
   }
   .btn-next:hover { background: var(--sage-light); transform: translateY(-1px); }
-
-  /* DOG NAME DISPLAY */
-  .dog-name-display {
-    font-family: 'Cormorant Garamond', serif;
-    color: var(--sage);
-    font-style: italic;
-  }
-
-  /* SCORE */
-  .score-circle {
-    width: 160px; height: 160px;
-    border-radius: 50%;
-    border: 3px solid var(--sand);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 8px;
-    background: white;
-    box-shadow: 0 8px 32px rgba(92,74,62,0.08);
-  }
-  .score-circle-num {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 64px;
-    line-height: 1;
-    font-weight: 400;
-  }
-  .score-circle-denom { font-size: 14px; color: var(--honey); }
-  .score-label-badge {
-    text-align: center;
-    font-size: 12px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    font-weight: 500;
-    margin-bottom: 40px;
-  }
-  .score-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
-  .score-col { background: var(--ecru); border-radius: 12px; padding: 24px; }
-  .score-col-title { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 16px; font-weight: 500; }
-  .score-col.good .score-col-title { color: var(--sage); }
-  .score-col.warn .score-col-title { color: var(--honey); }
-  .score-item { font-size: 13px; line-height: 1.5; padding: 8px 0; border-bottom: 1px solid var(--sand); display: flex; gap: 8px; align-items: flex-start; color: var(--tabac); }
-  .score-item:last-child { border: none; }
-  .score-dot-good { color: var(--sage); font-weight: 700; flex-shrink: 0; }
-  .score-dot-warn { color: var(--honey); font-weight: 700; flex-shrink: 0; }
-  .score-estim { background: var(--tabac); border-radius: 12px; padding: 28px 32px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .score-estim-label { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
-  .score-estim-val { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--ecru); font-weight: 400; }
-  .score-unlock { background: var(--sage-mist); border-radius: 10px; padding: 20px 24px; text-align: center; margin-top: 16px; }
-  .score-unlock p { font-size: 13px; color: var(--sage); line-height: 1.7; }
-
-  /* SUMMARY PAGE */
-  .summary-card {
-    background: white;
-    border-radius: 16px;
-    border: 1px solid var(--sand);
-    overflow: hidden;
-    margin-bottom: 24px;
-  }
-
-  .summary-header {
-    background: var(--tabac);
-    padding: 28px 32px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .summary-avatar {
-    width: 48px; height: 48px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-  }
-
-  .summary-dog-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px;
-    color: var(--ecru);
-    font-weight: 400;
-  }
-
-  .summary-dog-sub {
-    font-size: 12px;
-    color: var(--honey);
-  }
-
-  .summary-body {
-    padding: 28px 32px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .summary-item {
-    padding: 14px 0;
-    border-bottom: 1px solid var(--sand);
-  }
-
-  .summary-item-label {
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--honey);
-    margin-bottom: 4px;
-  }
-
-  .summary-item-value {
-    font-size: 14px;
-    color: var(--tabac);
-    font-weight: 400;
-  }
-
-  .offer-choice {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-
-  .offer-opt {
-    border-radius: 12px;
-    padding: 28px 24px;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: all 0.2s;
-  }
-
-  .offer-opt.basic {
-    background: var(--ecru);
-    border-color: var(--sand);
-  }
-
-  .offer-opt.premium {
-    background: var(--tabac);
-  }
-
-  .offer-opt.selected.basic { border-color: var(--sage); }
-  .offer-opt.selected.premium { border-color: var(--honey); }
-
-  .offer-opt-tag {
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-  .basic .offer-opt-tag { color: var(--sage); }
-  .premium .offer-opt-tag { color: var(--honey); }
-
-  .offer-opt-price {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 48px;
-    font-weight: 300;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-  .basic .offer-opt-price { color: var(--tabac); }
-  .premium .offer-opt-price { color: var(--ecru); }
-
-  .offer-opt-freq {
-    font-size: 12px;
-    margin-bottom: 16px;
-  }
-  .basic .offer-opt-freq { color: var(--honey); }
-  .premium .offer-opt-freq { color: rgba(255,255,255,0.5); }
-
-  .offer-opt-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px;
-    font-weight: 400;
-    margin-bottom: 8px;
-  }
-  .basic .offer-opt-name { color: var(--tabac); }
-  .premium .offer-opt-name { color: var(--ecru); }
-
-  .offer-opt-desc {
-    font-size: 12px;
-    line-height: 1.7;
-  }
-  .basic .offer-opt-desc { color: var(--honey); }
-  .premium .offer-opt-desc { color: rgba(255,255,255,0.55); }
 
   /* MOBILE */
   @media (max-width: 640px) {
     nav { padding: 0 20px; }
-    .progress-container { padding: 12px 20px 10px; }
-    .quiz-wrapper { padding: 0 16px; }
-    .question-title { font-size: 32px; }
-    .options-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+    .progress-wrap { padding: 12px 20px 10px; }
+    .quiz-wrap { padding: 0 16px; }
+    .q-title { font-size: 30px; }
+    .opts.grid2, .opts.grid3 { grid-template-columns: 1fr; }
     .quiz-nav { padding: 12px 20px; }
-    .summary-body { grid-template-columns: 1fr; }
-    .offer-choice { grid-template-columns: 1fr; }
+    .offres-grid { grid-template-columns: 1fr; }
+    .dog-card-fixed { display: none !important; }
+    .reassurance { flex-direction: column; align-items: center; gap: 8px; }
   }
 </style>
 </head>
@@ -574,847 +507,475 @@
 <!-- NAV -->
 <nav>
   <a href="index.html" class="nav-logo">
-    <svg width="24" height="24" viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="600" cy="340" r="185" fill="none" stroke="#5C7A5E" stroke-width="40"/>
-      <text x="600" y="455" text-anchor="middle" font-family="Georgia, serif" font-size="270" fill="#5C7A5E">K</text>
+    <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="46" stroke="#5C7A5E" stroke-width="2"/>
+      <text x="50" y="68" text-anchor="middle" font-family="Georgia,serif" font-size="52" fill="#5C7A5E">k</text>
     </svg>
     kyno
   </a>
-  <a href="index.html" class="nav-back">← Retour à l'accueil</a>
+  <a href="index.html" class="nav-back">← Retour</a>
 </nav>
 
 <!-- PROGRESS -->
-<div class="progress-container">
-  <div class="progress-info">
-    <span class="progress-step" id="stepLabel">Étape 1 sur 17</span>
-    <span class="progress-pct" id="stepPct">6%</span>
+<div class="progress-wrap">
+  <div class="progress-meta">
+    <span class="progress-label" id="stepLabel">Étape 1 sur 20</span>
+    <span class="progress-pct" id="stepPct">5%</span>
   </div>
   <div class="progress-track">
-    <div class="progress-fill" id="progressFill" style="width:6%"></div>
+    <div class="progress-fill" id="progressFill" style="width:5%"></div>
   </div>
 </div>
 
-<!-- MAIN QUIZ -->
-<main>
-  <div class="quiz-wrapper">
+<!-- DOG CARD FIXE -->
+<div class="dog-card-fixed" id="dogCardFixed">
+  <div class="dog-card-name" id="fixedName">—</div>
+  <div class="dog-card-info" id="fixedInfo">—</div>
+</div>
 
-    <!-- Q1: Nom -->
-    <div class="question-card active" data-step="1">
-      <div class="question-eyebrow">Présentation</div>
-      <h2 class="question-title">Comment s'appelle<br><em>votre chien ?</em></h2>
-      <p class="question-subtitle">On va créer son profil nutritionnel personnalisé. Commençons par faire connaissance.</p>
-      <input type="text" class="input-field" id="dogName" placeholder="Ex : Viva, Max, Luna..." oninput="updateDogName(this.value)" />
+<!-- MAIN -->
+<main>
+  <div class="quiz-wrap">
+
+    <!-- Q1: Prénom -->
+    <div class="q-card active" data-step="1">
+      <div class="q-eyebrow">Présentation</div>
+      <h2 class="q-title">Comment s'appelle<br><em>votre chien ?</em></h2>
+      <p class="q-sub">On commence par faire connaissance. Son prénom personnalisera tout son plan nutritionnel.</p>
+      <input type="text" class="inp" id="dogName" placeholder="Ex : Viva, Max, Luna..." oninput="onNameInput(this.value)" autocomplete="off" />
     </div>
 
     <!-- Q2: Race -->
-    <div class="question-card" data-step="2">
-      <div class="question-eyebrow">Identité</div>
-      <h2 class="question-title">Quelle est la race<br>de <em><span class="dog-name-display" id="nameDisplay2">votre chien</span></em> ?</h2>
-      <p class="question-subtitle">La race influence énormément les besoins nutritionnels, la taille des portions et les prédispositions génétiques.</p>
-      <input type="text" class="input-field" id="dogRace" placeholder="Ex : Épagneul Breton, Labrador, Golden Retriever..." />
-      <p class="question-hint">Si vous ne connaissez pas la race exacte, indiquez "croisé" ou la taille approximative.</p>
+    <div class="q-card" data-step="2">
+      <div class="q-eyebrow">Identité</div>
+      <h2 class="q-title">La race de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">La race influence les besoins nutritionnels, les prédispositions génétiques et les alertes spécifiques.</p>
+      <input type="text" class="inp" id="dogRace" placeholder="Ex : Épagneul Breton, Labrador, Croisé..." autocomplete="off" />
+      <p class="q-hint">Si vous ne connaissez pas la race exacte, indiquez "croisé" ou la taille approximative.</p>
     </div>
 
     <!-- Q3: Âge -->
-    <div class="question-card" data-step="3">
-      <div class="question-eyebrow">Identité</div>
-      <h2 class="question-title">Quel âge a<br><em><span class="dog-name-display" id="nameDisplay3">votre chien</span></em> ?</h2>
-      <p class="question-subtitle">Les besoins évoluent radicalement entre chiot, adulte et senior.</p>
-      <div class="options-grid cols-2">
-        <button class="option-btn" onclick="selectOption(this, 'age', 'Moins de 6 mois — Chiot')">
-          <span class="option-check"></span>
-          <div><strong>Moins de 6 mois</strong><br><span style="font-size:12px;color:var(--honey)">Chiot</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'age', '6 mois à 1 an — Jeune')">
-          <span class="option-check"></span>
-          <div><strong>6 mois à 1 an</strong><br><span style="font-size:12px;color:var(--honey)">Jeune</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'age', '1 à 3 ans — Jeune adulte')">
-          <span class="option-check"></span>
-          <div><strong>1 à 3 ans</strong><br><span style="font-size:12px;color:var(--honey)">Jeune adulte</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'age', '3 à 7 ans — Adulte')">
-          <span class="option-check"></span>
-          <div><strong>3 à 7 ans</strong><br><span style="font-size:12px;color:var(--honey)">Adulte</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'age', '7 à 10 ans — Senior')">
-          <span class="option-check"></span>
-          <div><strong>7 à 10 ans</strong><br><span style="font-size:12px;color:var(--honey)">Senior</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'age', 'Plus de 10 ans — Grand senior')">
-          <span class="option-check"></span>
-          <div><strong>Plus de 10 ans</strong><br><span style="font-size:12px;color:var(--honey)">Grand senior</span></div>
-        </button>
+    <div class="q-card" data-step="3">
+      <div class="q-eyebrow">Identité</div>
+      <h2 class="q-title">L'âge de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Les besoins évoluent radicalement entre chiot, adulte et senior.</p>
+      <div class="opts grid2">
+        <button class="opt" onclick="pick(this,'age','Moins de 6 mois — Chiot')"><span class="opt-check"></span><div><strong>Moins de 6 mois</strong><br><span style="font-size:12px;color:var(--honey)">Chiot</span></div></button>
+        <button class="opt" onclick="pick(this,'age','6 mois à 1 an — Jeune')"><span class="opt-check"></span><div><strong>6 mois à 1 an</strong><br><span style="font-size:12px;color:var(--honey)">Jeune</span></div></button>
+        <button class="opt" onclick="pick(this,'age','1 à 3 ans — Jeune adulte')"><span class="opt-check"></span><div><strong>1 à 3 ans</strong><br><span style="font-size:12px;color:var(--honey)">Jeune adulte</span></div></button>
+        <button class="opt" onclick="pick(this,'age','3 à 7 ans — Adulte')"><span class="opt-check"></span><div><strong>3 à 7 ans</strong><br><span style="font-size:12px;color:var(--honey)">Adulte</span></div></button>
+        <button class="opt" onclick="pick(this,'age','7 à 10 ans — Senior')"><span class="opt-check"></span><div><strong>7 à 10 ans</strong><br><span style="font-size:12px;color:var(--honey)">Senior</span></div></button>
+        <button class="opt" onclick="pick(this,'age','Plus de 10 ans — Grand senior')"><span class="opt-check"></span><div><strong>Plus de 10 ans</strong><br><span style="font-size:12px;color:var(--honey)">Grand senior</span></div></button>
       </div>
     </div>
 
     <!-- Q4: Poids -->
-    <div class="question-card" data-step="4">
-      <div class="question-eyebrow">Identité</div>
-      <h2 class="question-title">Quel est le poids<br>de <em><span class="dog-name-display" id="nameDisplay4">votre chien</span></em> ?</h2>
-      <p class="question-subtitle">Le poids est la base du calcul des rations journalières. Soyez précis si possible.</p>
-      <input type="number" class="input-field" id="dogWeight" placeholder="Poids en kg — Ex : 14" min="0.5" max="100" step="0.5" />
-      <p class="question-hint">Si vous ne connaissez pas le poids exact, estimez approximativement.</p>
+    <div class="q-card" data-step="4">
+      <div class="q-eyebrow">Identité</div>
+      <h2 class="q-title">Le poids de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Le poids est la base du calcul des rations journalières. Soyez aussi précis que possible.</p>
+      <input type="number" class="inp" id="dogWeight" placeholder="Poids en kg — Ex : 14" min="0.5" max="100" step="0.5" autocomplete="off" />
+      <p class="q-hint">Si vous ne connaissez pas le poids exact, estimez approximativement.</p>
     </div>
 
-    <!-- Q5: Sexe -->
-    <div class="question-card" data-step="5">
-      <div class="question-eyebrow">Identité</div>
-      <h2 class="question-title">Le sexe de<br><em><span class="dog-name-display" id="nameDisplay5">votre chien</span></em></h2>
-      <p class="question-subtitle">Le sexe influence le métabolisme basal et les besoins hormonaux.</p>
-      <div class="options-grid cols-2">
-        <button class="option-btn" onclick="selectOption(this, 'sexe', 'Mâle')">
-          <span class="option-icon">♂</span>
-          <span class="option-check"></span>
-          <strong>Mâle</strong>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'sexe', 'Femelle')">
-          <span class="option-icon">♀</span>
-          <span class="option-check"></span>
-          <strong>Femelle</strong>
-        </button>
+    <!-- Q5: Sexe et statut -->
+    <div class="q-card" data-step="5">
+      <div class="q-eyebrow">Identité</div>
+      <h2 class="q-title">Sexe et statut de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Le statut hormonal modifie les besoins caloriques de 20 à 30%.</p>
+      <div class="opts grid2">
+        <button class="opt" onclick="pick(this,'statut','Mâle entier')"><span class="opt-check"></span><div><strong>Mâle</strong><br><span style="font-size:12px;color:var(--honey)">Entier</span></div></button>
+        <button class="opt" onclick="pick(this,'statut','Mâle stérilisé')"><span class="opt-check"></span><div><strong>Mâle</strong><br><span style="font-size:12px;color:var(--honey)">Stérilisé</span></div></button>
+        <button class="opt" onclick="pick(this,'statut','Femelle entière')"><span class="opt-check"></span><div><strong>Femelle</strong><br><span style="font-size:12px;color:var(--honey)">Entière</span></div></button>
+        <button class="opt" onclick="pick(this,'statut','Femelle stérilisée')"><span class="opt-check"></span><div><strong>Femelle</strong><br><span style="font-size:12px;color:var(--honey)">Stérilisée</span></div></button>
+        <button class="opt" onclick="pick(this,'statut','Femelle gestante')"><span class="opt-check"></span><div><strong>Femelle</strong><br><span style="font-size:12px;color:var(--honey)">Gestante</span></div></button>
+        <button class="opt" onclick="pick(this,'statut','Femelle allaitante')"><span class="opt-check"></span><div><strong>Femelle</strong><br><span style="font-size:12px;color:var(--honey)">Allaitante</span></div></button>
       </div>
     </div>
 
-    <!-- Q6: Stérilisé -->
-    <div class="question-card" data-step="6">
-      <div class="question-eyebrow">Identité</div>
-      <h2 class="question-title"><em><span class="dog-name-display" id="nameDisplay6">Votre chien</span></em><br>est-il stérilisé ?</h2>
-      <p class="question-subtitle">La stérilisation réduit le métabolisme de 20 à 30% et modifie les besoins caloriques de façon importante.</p>
-      <div class="options-grid cols-2">
-        <button class="option-btn" onclick="selectOption(this, 'sterilise', 'Oui')">
-          <span class="option-check"></span>
-          <strong>Oui, stérilisé(e)</strong>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'sterilise', 'Non')">
-          <span class="option-check"></span>
-          <strong>Non, entier(ère)</strong>
-        </button>
+    <!-- Q6: Activité -->
+    <div class="q-card" data-step="6">
+      <div class="q-eyebrow">Mode de vie</div>
+      <h2 class="q-title">Niveau d'activité de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">L'activité physique est le principal facteur d'ajustement des besoins caloriques.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'activite','Très sédentaire — moins de 30 min/jour')"><span class="opt-check"></span><div><strong>Très sédentaire</strong><br><span style="font-size:12px;color:var(--honey)">Moins de 30 min de sortie par jour</span></div></button>
+        <button class="opt" onclick="pick(this,'activite','Modéré — 30 min à 1h/jour')"><span class="opt-check"></span><div><strong>Modéré</strong><br><span style="font-size:12px;color:var(--honey)">30 min à 1h par jour</span></div></button>
+        <button class="opt" onclick="pick(this,'activite','Actif — 1 à 2h/jour')"><span class="opt-check"></span><div><strong>Actif</strong><br><span style="font-size:12px;color:var(--honey)">1 à 2h d'activité par jour</span></div></button>
+        <button class="opt" onclick="pick(this,'activite','Très actif — plus de 2h/jour')"><span class="opt-check"></span><div><strong>Très actif</strong><br><span style="font-size:12px;color:var(--honey)">Plus de 2h — sport, chasse, travail</span></div></button>
       </div>
     </div>
 
-    <!-- Q7: Activité -->
-    <div class="question-card" data-step="7">
-      <div class="question-eyebrow">Mode de vie</div>
-      <h2 class="question-title">Niveau d'activité<br>de <em><span class="dog-name-display" id="nameDisplay7">votre chien</span></em></h2>
-      <p class="question-subtitle">L'activité physique est le principal facteur d'ajustement des besoins caloriques.</p>
-      <div class="options-grid cols-1">
-        <button class="option-btn" onclick="selectOption(this, 'activite', 'Très sédentaire — moins de 30 min/jour')">
-          <span class="option-check"></span>
-          <div><strong>Très sédentaire</strong><br><span style="font-size:12px;color:var(--honey)">Moins de 30 min de marche par jour</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'activite', 'Modéré — 30 min à 1h/jour')">
-          <span class="option-check"></span>
-          <div><strong>Modéré</strong><br><span style="font-size:12px;color:var(--honey)">30 min à 1h de marche par jour</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'activite', 'Actif — 1 à 2h/jour')">
-          <span class="option-check"></span>
-          <div><strong>Actif</strong><br><span style="font-size:12px;color:var(--honey)">1 à 2h d'activité par jour</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'activite', 'Très actif — plus de 2h/jour')">
-          <span class="option-check"></span>
-          <div><strong>Très actif</strong><br><span style="font-size:12px;color:var(--honey)">Plus de 2h d'activité — sport, chasse, travail</span></div>
-        </button>
+    <!-- Q7: Environnement -->
+    <div class="q-card" data-step="7">
+      <div class="q-eyebrow">Mode de vie</div>
+      <h2 class="q-title">Où vit<br><em><span class="dn">votre chien</span></em> ?</h2>
+      <p class="q-sub">L'environnement influence l'hydratation, l'exposition solaire et les risques parasitaires.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'environnement','Grande ville — appartement')"><span class="opt-check"></span><div><strong>Grande ville — appartement</strong><br><span style="font-size:12px;color:var(--honey)">Peu d'espace extérieur, bitume, trottoirs</span></div></button>
+        <button class="opt" onclick="pick(this,'environnement','Ville — avec jardin')"><span class="opt-check"></span><div><strong>Ville — avec jardin</strong><br><span style="font-size:12px;color:var(--honey)">Accès extérieur régulier</span></div></button>
+        <button class="opt" onclick="pick(this,'environnement','Campagne ou nature')"><span class="opt-check"></span><div><strong>Campagne ou nature</strong><br><span style="font-size:12px;color:var(--honey)">Grande liberté, espaces naturels</span></div></button>
       </div>
     </div>
 
     <!-- Q8: Alimentation actuelle -->
-    <div class="question-card" data-step="8">
-      <div class="question-eyebrow">Alimentation</div>
-      <h2 class="question-title">Comment<br><em><span class="dog-name-display" id="nameDisplay8">votre chien</span></em> mange-t-il ?</h2>
-      <p class="question-subtitle">Son alimentation actuelle nous aide à comprendre sa transition nutritionnelle.</p>
-      <div class="options-grid cols-2">
-        <button class="option-btn" onclick="selectOption(this, 'alimentation', 'Croquettes uniquement')">
-          <span class="option-check"></span>
-          <div><strong>Croquettes</strong><br><span style="font-size:12px;color:var(--honey)">Uniquement</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'alimentation', 'Pâtée uniquement')">
-          <span class="option-check"></span>
-          <div><strong>Pâtée</strong><br><span style="font-size:12px;color:var(--honey)">Uniquement</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'alimentation', 'Mixte — croquettes + pâtée')">
-          <span class="option-check"></span>
-          <div><strong>Mixte</strong><br><span style="font-size:12px;color:var(--honey)">Croquettes + pâtée</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'alimentation', 'Fait maison')">
-          <span class="option-check"></span>
-          <div><strong>Fait maison</strong><br><span style="font-size:12px;color:var(--honey)">Déjà en ration ménagère</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'alimentation', 'BARF / cru')">
-          <span class="option-check"></span>
-          <div><strong>BARF / Cru</strong><br><span style="font-size:12px;color:var(--honey)">Alimentation crue</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'alimentation', 'Mixte — plusieurs types')">
-          <span class="option-check"></span>
-          <div><strong>Mixte varié</strong><br><span style="font-size:12px;color:var(--honey)">Plusieurs types combinés</span></div>
-        </button>
+    <div class="q-card" data-step="8">
+      <div class="q-eyebrow">Alimentation</div>
+      <h2 class="q-title">Comment mange<br><em><span class="dn">votre chien</span></em> actuellement ?</h2>
+      <p class="q-sub">Son alimentation actuelle nous aide à comprendre la transition à prévoir.</p>
+      <div class="opts grid2">
+        <button class="opt" onclick="pick(this,'alim','Croquettes uniquement')"><span class="opt-check"></span><div><strong>Croquettes</strong><br><span style="font-size:12px;color:var(--honey)">Uniquement</span></div></button>
+        <button class="opt" onclick="pick(this,'alim','Pâtée uniquement')"><span class="opt-check"></span><div><strong>Pâtée</strong><br><span style="font-size:12px;color:var(--honey)">Uniquement</span></div></button>
+        <button class="opt" onclick="pick(this,'alim','Mixte industriel')"><span class="opt-check"></span><div><strong>Mixte</strong><br><span style="font-size:12px;color:var(--honey)">Croquettes + pâtée</span></div></button>
+        <button class="opt" onclick="pick(this,'alim','Ration ménagère cuite')"><span class="opt-check"></span><div><strong>Ration maison</strong><br><span style="font-size:12px;color:var(--honey)">Déjà en fait maison cuit</span></div></button>
+        <button class="opt" onclick="pick(this,'alim','BARF — alimentation crue')"><span class="opt-check"></span><div><strong>BARF / Cru</strong><br><span style="font-size:12px;color:var(--honey)">Alimentation crue</span></div></button>
+        <button class="opt" onclick="pick(this,'alim','Mixte avec du frais')"><span class="opt-check"></span><div><strong>Mixte + frais</strong><br><span style="font-size:12px;color:var(--honey)">Industriel + fait maison</span></div></button>
       </div>
     </div>
 
-    <!-- Q9: Intolérances -->
-    <div class="question-card" data-step="9">
-      <div class="question-eyebrow">Santé</div>
-      <h2 class="question-title">Intolérances ou<br><em>allergies connues ?</em></h2>
-      <p class="question-subtitle">Sélectionnez tout ce qui s'applique. Ces éléments seront exclus des menus de <span class="dog-name-display" id="nameDisplay9">votre chien</span>.</p>
-      <div class="options-grid cols-2">
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'intolerance', 'Gluten / Blé')">
-          <span class="option-check"></span>Gluten / Blé
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'intolerance', 'Poulet')">
-          <span class="option-check"></span>Poulet
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'intolerance', 'Bœuf')">
-          <span class="option-check"></span>Bœuf
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'intolerance', 'Poisson')">
-          <span class="option-check"></span>Poisson
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'intolerance', 'Produits laitiers')">
-          <span class="option-check"></span>Produits laitiers
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'intolerance', 'Œufs')">
-          <span class="option-check"></span>Œufs
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'intolerance', 'Soja')">
-          <span class="option-check"></span>Soja
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'intolerance', 'Aucune connue')">
-          <span class="option-check"></span>Aucune connue
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'intolerance', 'Autre')">
-          <span class="option-check"></span>Autre
-        </button>
+    <!-- Q9: Problèmes de santé -->
+    <div class="q-card" data-step="9">
+      <div class="q-eyebrow">Santé</div>
+      <h2 class="q-title">Problèmes de santé<br>de <em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Sélectionnez tout ce qui s'applique. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'sante','Aucun problème connu')"><span class="opt-check"></span>Aucun connu</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Problèmes articulaires')"><span class="opt-check"></span>Articulaires</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Problèmes digestifs')"><span class="opt-check"></span>Digestifs</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Problèmes de peau')"><span class="opt-check"></span>Peau / Pelage</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Problèmes rénaux')"><span class="opt-check"></span>Rénaux</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Problèmes cardiaques')"><span class="opt-check"></span>Cardiaques</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Surpoids')"><span class="opt-check"></span>Surpoids</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Diabète')"><span class="opt-check"></span>Diabète</button>
+        <button class="opt cb" onclick="toggle(this,'sante','Autre',true)"><span class="opt-check"></span>Autre</button>
       </div>
-      <div id="intoleranceAutreWrap" style="display:none;margin-top:10px;">
-        <input type="text" class="input-field" id="intoleranceAutre" placeholder="Précisez l'allergie ou intolérance..." oninput="answers['intoleranceAutre']=this.value" />
+      <div class="autre-wrap" id="santeAutreWrap">
+        <input type="text" class="inp" id="santeAutre" placeholder="Précisez..." oninput="A['santeAutre']=this.value" />
       </div>
     </div>
 
-    <!-- Q10: Problèmes de santé -->
-    <div class="question-card" data-step="10">
-      <div class="question-eyebrow">Santé</div>
-      <h2 class="question-title"><em><span class="dog-name-display" id="nameDisplay10">Votre chien</span></em><br>a-t-il des problèmes<br>de santé ?</h2>
-      <p class="question-subtitle">Sélectionnez tout ce qui s'applique et décrivez si possible.</p>
-      <div class="options-grid cols-2">
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'sante', 'Problèmes articulaires')">
-          <span class="option-check"></span>Problèmes articulaires
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'sante', 'Problèmes digestifs')">
-          <span class="option-check"></span>Problèmes digestifs
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'sante', 'Problèmes de peau')">
-          <span class="option-check"></span>Problèmes de peau
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'sante', 'Problèmes rénaux')">
-          <span class="option-check"></span>Problèmes rénaux
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'sante', 'Diabète')">
-          <span class="option-check"></span>Diabète
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'sante', 'Surpoids')">
-          <span class="option-check"></span>Surpoids
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'sante', 'Problèmes cardiaques')">
-          <span class="option-check"></span>Problèmes cardiaques
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'sante', 'Aucun problème connu')">
-          <span class="option-check"></span>Aucun problème connu
-        </button>
+    <!-- Q10: Traitements -->
+    <div class="q-card" data-step="10">
+      <div class="q-eyebrow">Santé</div>
+      <h2 class="q-title"><em><span class="dn">Votre chien</span></em><br>est-il sous traitement ?</h2>
+      <p class="q-sub">Certains médicaments interagissent avec les nutriments. Information importante pour la sécurité du plan.</p>
+      <div class="opts grid2">
+        <button class="opt" onclick="pick(this,'traitement','Non');hideEl('traitementWrap')"><span class="opt-check"></span><strong>Non, aucun</strong></button>
+        <button class="opt" onclick="pick(this,'traitement','Oui');showEl('traitementWrap')"><span class="opt-check"></span><strong>Oui</strong></button>
       </div>
-      <textarea class="input-field" id="santeDetail" placeholder="Décrivez les problèmes de santé en détail si vous le souhaitez — symptômes, durée, diagnostic vétérinaire..." style="margin-top:12px;min-height:100px;resize:vertical;" oninput="answers['santeDetail']=this.value"></textarea>
-    </div>
-
-    <!-- Q11: État du pelage -->
-    <div class="question-card" data-step="11">
-      <div class="question-eyebrow">Bien-être</div>
-      <h2 class="question-title">Comment est le pelage<br>de <em><span class="dog-name-display" id="nameDisplay11">votre chien</span></em> ?</h2>
-      <p class="question-subtitle">Sélectionnez tout ce qui s'applique — plusieurs réponses possibles.</p>
-      <div class="options-grid cols-1">
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'pelage', 'Brillant et sain')">
-          <span class="option-check"></span>
-          <div><strong>Brillant et sain</strong><br><span style="font-size:12px;color:var(--honey)">Poil brillant, éclat visible</span></div>
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'pelage', 'Terne ou sec')">
-          <span class="option-check"></span>
-          <div><strong>Terne ou sec</strong><br><span style="font-size:12px;color:var(--honey)">Manque d'éclat, peu de brillance</span></div>
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'pelage', 'Chute excessive')">
-          <span class="option-check"></span>
-          <div><strong>Chute excessive</strong><br><span style="font-size:12px;color:var(--honey)">Plus que la normale pour sa race</span></div>
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'pelage', 'Pellicules')">
-          <span class="option-check"></span>
-          <div><strong>Pellicules</strong><br><span style="font-size:12px;color:var(--honey)">Squames visibles sur le pelage</span></div>
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'pelage', 'Irritations ou rougeurs')">
-          <span class="option-check"></span>
-          <div><strong>Irritations ou rougeurs</strong><br><span style="font-size:12px;color:var(--honey)">Démangeaisons, zones irritées</span></div>
-        </button>
+      <div class="autre-wrap" id="traitementWrap">
+        <input type="text" class="inp" id="traitementDetail" placeholder="Nom du médicament, raison, durée..." oninput="A['traitementDetail']=this.value" />
       </div>
     </div>
 
-    <!-- Q12: État des dents -->
-    <div class="question-card" data-step="12">
-      <div class="question-eyebrow">Bien-être</div>
-      <h2 class="question-title">État des dents<br>de <em><span class="dog-name-display" id="nameDisplay12">votre chien</span></em></h2>
-      <p class="question-subtitle">La santé dentaire influence le type d'aliments recommandés et les besoins en calcium/phosphore.</p>
-      <div class="options-grid cols-1">
-        <button class="option-btn" onclick="selectOption(this, 'dents', 'Blanches et saines')">
-          <span class="option-check"></span>
-          <div><strong>Blanches et saines</strong><br><span style="font-size:12px;color:var(--honey)">Pas de tartre, haleine correcte</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'dents', 'Tartre léger')">
-          <span class="option-check"></span>
-          <div><strong>Tartre léger</strong><br><span style="font-size:12px;color:var(--honey)">Début de dépôt, haleine un peu forte</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'dents', 'Tartre important')">
-          <span class="option-check"></span>
-          <div><strong>Tartre important</strong><br><span style="font-size:12px;color:var(--honey)">Dépôt visible, mauvaise haleine</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'dents', 'Je ne sais pas')">
-          <span class="option-check"></span>
-          <strong>Je ne sais pas</strong>
-        </button>
+    <!-- Q11: Pelage -->
+    <div class="q-card" data-step="11">
+      <div class="q-eyebrow">Bien-être</div>
+      <h2 class="q-title">L'état du pelage de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Indicateur clé de la qualité nutritionnelle — oméga-3, zinc, biotine. Plusieurs réponses possibles.</p>
+      <div class="opts">
+        <button class="opt cb" onclick="toggle(this,'pelage','Brillant et sain')"><span class="opt-check"></span><div><strong>Brillant et sain</strong><br><span style="font-size:12px;color:var(--honey)">Poil brillant, éclat visible</span></div></button>
+        <button class="opt cb" onclick="toggle(this,'pelage','Terne ou sec')"><span class="opt-check"></span><div><strong>Terne ou sec</strong><br><span style="font-size:12px;color:var(--honey)">Manque d'éclat</span></div></button>
+        <button class="opt cb" onclick="toggle(this,'pelage','Chute excessive')"><span class="opt-check"></span><div><strong>Chute excessive</strong><br><span style="font-size:12px;color:var(--honey)">Plus que la normale pour sa race</span></div></button>
+        <button class="opt cb" onclick="toggle(this,'pelage','Pellicules')"><span class="opt-check"></span><div><strong>Pellicules</strong><br><span style="font-size:12px;color:var(--honey)">Squames visibles</span></div></button>
+        <button class="opt cb" onclick="toggle(this,'pelage','Irritations ou rougeurs')"><span class="opt-check"></span><div><strong>Irritations ou rougeurs</strong><br><span style="font-size:12px;color:var(--honey)">Démangeaisons, zones irritées</span></div></button>
       </div>
     </div>
 
-    <!-- Q13: État des selles -->
-    <div class="question-card" data-step="13">
-      <div class="question-eyebrow">Bien-être</div>
-      <h2 class="question-title">État des selles<br>de <em><span class="dog-name-display" id="nameDisplay13">votre chien</span></em></h2>
-      <p class="question-subtitle">Les selles sont le meilleur indicateur de la santé digestive et de l'équilibre des fibres.</p>
-      <div class="options-grid cols-1">
-        <button class="option-btn" onclick="selectOption(this, 'selles', 'Normales — bien formées, régulières')">
-          <span class="option-check"></span>
-          <div><strong>Normales</strong><br><span style="font-size:12px;color:var(--honey)">Bien formées, régulières, faciles à ramasser</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'selles', 'Molles ou liquides')">
-          <span class="option-check"></span>
-          <div><strong>Molles ou liquides</strong><br><span style="font-size:12px;color:var(--honey)">Difficiles à ramasser, peu formées</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'selles', 'Dures ou sèches')">
-          <span class="option-check"></span>
-          <div><strong>Dures ou sèches</strong><br><span style="font-size:12px;color:var(--honey)">Effort pour déféquer, selles très fermes</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'selles', 'Irrégulières — variables')">
-          <span class="option-check"></span>
-          <div><strong>Irrégulières</strong><br><span style="font-size:12px;color:var(--honey)">Variables, alternance mou/dur</span></div>
-        </button>
+    <!-- Q12: Selles -->
+    <div class="q-card" data-step="12">
+      <div class="q-eyebrow">Bien-être</div>
+      <h2 class="q-title">L'état des selles de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Les selles sont le meilleur indicateur de la santé digestive et de l'équilibre des fibres.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'selles','Normales — bien formées et régulières')"><span class="opt-check"></span><div><strong>Normales</strong><br><span style="font-size:12px;color:var(--honey)">Bien formées, régulières, faciles à ramasser</span></div></button>
+        <button class="opt" onclick="pick(this,'selles','Molles ou liquides')"><span class="opt-check"></span><div><strong>Molles ou liquides</strong><br><span style="font-size:12px;color:var(--honey)">Difficiles à ramasser, peu formées</span></div></button>
+        <button class="opt" onclick="pick(this,'selles','Dures ou sèches')"><span class="opt-check"></span><div><strong>Dures ou sèches</strong><br><span style="font-size:12px;color:var(--honey)">Effort visible, selles très fermes</span></div></button>
+        <button class="opt" onclick="pick(this,'selles','Irrégulières')"><span class="opt-check"></span><div><strong>Irrégulières</strong><br><span style="font-size:12px;color:var(--honey)">Variables, alternance mou/dur</span></div></button>
       </div>
     </div>
 
-    <!-- Q14: Comportement alimentaire -->
-    <div class="question-card" data-step="14">
-      <div class="question-eyebrow">Comportement</div>
-      <h2 class="question-title">Comment mange<br><em><span class="dog-name-display" id="nameDisplay14">votre chien</span></em> ?</h2>
-      <p class="question-subtitle">Le comportement alimentaire influence la structure des repas et les compléments recommandés.</p>
-      <div class="options-grid cols-2">
-        <button class="option-btn" onclick="selectOption(this, 'comportAlim', 'Mange vite, tout d\'un coup')">
-          <span class="option-check"></span>
-          <div><strong>Mange très vite</strong><br><span style="font-size:12px;color:var(--honey)">Engloutit tout d'un coup</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'comportAlim', 'Mange lentement')">
-          <span class="option-check"></span>
-          <div><strong>Mange lentement</strong><br><span style="font-size:12px;color:var(--honey)">Prend son temps</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'comportAlim', 'Difficile — fait le difficile')">
-          <span class="option-check"></span>
-          <div><strong>Difficile</strong><br><span style="font-size:12px;color:var(--honey)">Sélectif, refuse souvent</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'comportAlim', 'Mange tout — même ce qu\'il ne devrait pas')">
-          <span class="option-check"></span>
-          <div><strong>Mange tout</strong><br><span style="font-size:12px;color:var(--honey)">Ramasse tout, très gourmand</span></div>
-        </button>
+    <!-- Q13: Odeurs -->
+    <div class="q-card" data-step="13">
+      <div class="q-eyebrow">Bien-être</div>
+      <h2 class="q-title">Les odeurs de<br><em><span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Les odeurs sont des indicateurs nutritionnels précis. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'odeurs','Aucune odeur particulière')"><span class="opt-check"></span>Aucune odeur</button>
+        <button class="opt cb" onclick="toggle(this,'odeurs','Mauvaise haleine')"><span class="opt-check"></span>Mauvaise haleine</button>
+        <button class="opt cb" onclick="toggle(this,'odeurs','Odeur corporelle forte')"><span class="opt-check"></span>Odeur corporelle</button>
+        <button class="opt cb" onclick="toggle(this,'odeurs','Oreilles malodorantes')"><span class="opt-check"></span>Oreilles malodorantes</button>
       </div>
     </div>
 
-    <!-- Q15: Troubles du comportement -->
-    <div class="question-card" data-step="15">
-      <div class="question-eyebrow">Comportement</div>
-      <h2 class="question-title"><em><span class="dog-name-display" id="nameDisplay15">Votre chien</span></em><br>a-t-il des troubles<br>du comportement ?</h2>
-      <p class="question-subtitle">Certains troubles sont liés à des carences nutritionnelles — magnésium, tryptophane, oméga-3.</p>
-      <div class="options-grid cols-2">
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'comportement', 'Hyperactivité')">
-          <span class="option-check"></span>Hyperactivité
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'comportement', 'Anxiété / Stress')">
-          <span class="option-check"></span>Anxiété / Stress
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'comportement', 'Agressivité envers les humains')">
-          <span class="option-check"></span>Agressivité envers humains
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'comportement', 'Agressivité envers les animaux')">
-          <span class="option-check"></span>Agressivité envers animaux
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'comportement', 'Peurs / Phobies')">
-          <span class="option-check"></span>Peurs / Phobies
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'comportement', 'Destruction / Ennui')">
-          <span class="option-check"></span>Destruction / Ennui
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'comportement', 'Aucun trouble')">
-          <span class="option-check"></span>Aucun trouble
-        </button>
-        <button class="option-btn checkbox" onclick="toggleOption(this, 'comportement', 'Autre')">
-          <span class="option-check"></span>Autre
-        </button>
+    <!-- Q14: Intolérances -->
+    <div class="q-card" data-step="14">
+      <div class="q-eyebrow">Alimentation</div>
+      <h2 class="q-title">Intolérances ou allergies<br><em>connues ?</em></h2>
+      <p class="q-sub">Ces éléments seront exclus des menus de <span class="dn">votre chien</span>. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'intol','Aucune connue')"><span class="opt-check"></span>Aucune connue</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Bœuf')"><span class="opt-check"></span>Bœuf</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Poulet')"><span class="opt-check"></span>Poulet</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Poisson')"><span class="opt-check"></span>Poisson</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Gluten / Blé')"><span class="opt-check"></span>Gluten / Blé</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Produits laitiers')"><span class="opt-check"></span>Produits laitiers</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Soja')"><span class="opt-check"></span>Soja</button>
+        <button class="opt cb" onclick="toggle(this,'intol','Autre',true)"><span class="opt-check"></span>Autre</button>
       </div>
-      <div id="comportementAutreWrap" style="display:none;margin-top:10px;">
-        <input type="text" class="input-field" id="comportementAutre" placeholder="Décrivez le trouble..." oninput="answers['comportementAutre']=this.value" />
+      <div class="autre-wrap" id="intolAutreWrap">
+        <input type="text" class="inp" id="intolAutre" placeholder="Précisez l'allergie ou intolérance..." oninput="A['intolAutre']=this.value" />
       </div>
     </div>
 
-    <!-- Q16: Ville ou campagne -->
-    <div class="question-card" data-step="16">
-      <div class="question-eyebrow">Environnement</div>
-      <h2 class="question-title">Où vit<br><em><span class="dog-name-display" id="nameDisplay16">votre chien</span></em> ?</h2>
-      <p class="question-subtitle">L'environnement influence l'exposition solaire, les besoins en hydratation et les risques parasitaires.</p>
-      <div class="options-grid cols-1">
-        <button class="option-btn" onclick="selectOption(this, 'environnement', 'Grande ville — appartement')">
-          <span class="option-check"></span>
-          <div><strong>Grande ville — appartement</strong><br><span style="font-size:12px;color:var(--honey)">Peu d'espace extérieur, trottoirs, bitume</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'environnement', 'Ville — avec jardin')">
-          <span class="option-check"></span>
-          <div><strong>Ville — avec jardin</strong><br><span style="font-size:12px;color:var(--honey)">Accès extérieur régulier</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'environnement', 'Campagne / nature')">
-          <span class="option-check"></span>
-          <div><strong>Campagne / nature</strong><br><span style="font-size:12px;color:var(--honey)">Grande liberté, espaces naturels</span></div>
-        </button>
+    <!-- Q15: Mode alimentaire souhaité -->
+    <div class="q-card" data-step="15">
+      <div class="q-eyebrow">Vos préférences</div>
+      <h2 class="q-title">Quel mode alimentaire<br><em>vous attire ?</em></h2>
+      <p class="q-sub">Le plan sera adapté à la méthode que vous êtes prêt(e) à mettre en place.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'modeAlim','Ration ménagère cuite')"><span class="opt-check"></span><div><strong>Ration ménagère cuite</strong><br><span style="font-size:12px;color:var(--honey)">Vous cuisinez pour lui — vapeur, mijotée</span></div></button>
+        <button class="opt" onclick="pick(this,'modeAlim','BARF — alimentation crue')"><span class="opt-check"></span><div><strong>BARF / Alimentation crue</strong><br><span style="font-size:12px;color:var(--honey)">Viande crue, os charnus, légumes mixés</span></div></button>
+        <button class="opt" onclick="pick(this,'modeAlim','Mixte — cuit et cru')"><span class="opt-check"></span><div><strong>Mixte — cuit et cru</strong><br><span style="font-size:12px;color:var(--honey)">Combinaison des deux approches</span></div></button>
+        <button class="opt" onclick="pick(this,'modeAlim','Je ne sais pas encore')"><span class="opt-check"></span><div><strong>Je ne sais pas encore</strong><br><span style="font-size:12px;color:var(--honey)">Kyno me guidera selon mon profil</span></div></button>
       </div>
     </div>
 
-    <!-- Q17: Objectif -->
-    <div class="question-card" data-step="17">
-      <div class="question-eyebrow">Objectif</div>
-      <h2 class="question-title">Quel est votre<br><em>objectif principal ?</em></h2>
-      <p class="question-subtitle">Cette information oriente la priorité nutritionnelle du plan de <span class="dog-name-display" id="nameDisplay17">votre chien</span>.</p>
-      <div class="options-grid cols-1">
-        <button class="option-btn" onclick="selectOption(this, 'objectif', 'Santé générale — alimentation équilibrée')">
-          <span class="option-check"></span>
-          <div><strong>Santé générale</strong><br><span style="font-size:12px;color:var(--honey)">Alimentation équilibrée et préventive</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'objectif', 'Perte de poids')">
-          <span class="option-check"></span>
-          <div><strong>Perte de poids</strong><br><span style="font-size:12px;color:var(--honey)">Réduction calorique adaptée</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'objectif', 'Prise de masse / développement musculaire')">
-          <span class="option-check"></span>
-          <div><strong>Prise de masse</strong><br><span style="font-size:12px;color:var(--honey)">Développement musculaire, chien de sport</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'objectif', 'Bien vieillir — chien senior')">
-          <span class="option-check"></span>
-          <div><strong>Bien vieillir</strong><br><span style="font-size:12px;color:var(--honey)">Nutrition adaptée au vieillissement</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'objectif', 'Problème spécifique à traiter')">
-          <span class="option-check"></span>
-          <div><strong>Problème spécifique</strong><br><span style="font-size:12px;color:var(--honey)">Cibler une pathologie ou un trouble</span></div>
-        </button>
+    <!-- Q16: Budget -->
+    <div class="q-card" data-step="16">
+      <div class="q-eyebrow">Vos préférences</div>
+      <h2 class="q-title">Votre budget<br><em>alimentation mensuel</em></h2>
+      <p class="q-sub">Nous orienterons les recommandations d'ingrédients vers ce qui est accessible pour vous.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'budget','Moins de 30€ / mois')"><span class="opt-check"></span><div><strong>Moins de 30€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Ingrédients économiques et accessibles</span></div></button>
+        <button class="opt" onclick="pick(this,'budget','30 à 60€ / mois')"><span class="opt-check"></span><div><strong>30 à 60€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Bon rapport qualité/prix</span></div></button>
+        <button class="opt" onclick="pick(this,'budget','60 à 100€ / mois')"><span class="opt-check"></span><div><strong>60 à 100€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Ingrédients premium</span></div></button>
+        <button class="opt" onclick="pick(this,'budget','Plus de 100€ / mois')"><span class="opt-check"></span><div><strong>Plus de 100€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Pas de contrainte, meilleure qualité</span></div></button>
       </div>
     </div>
 
-    <!-- Q18: Traitements en cours -->
-    <div class="question-card" data-step="18">
-      <div class="question-eyebrow">Santé</div>
-      <h2 class="question-title"><em><span class="dog-name-display" id="nameDisplay18">Votre chien</span></em><br>a-t-il un traitement<br>médical en cours ?</h2>
-      <p class="question-subtitle">Certains médicaments interagissent avec les nutriments. Ces informations nous permettent d'adapter le plan.</p>
-      <div class="options-grid cols-2" style="margin-bottom:12px;">
-        <button class="option-btn" onclick="selectOption(this, 'traitement', 'Non, aucun traitement');document.getElementById('traitementDetailWrap').style.display='none'">
-          <span class="option-check"></span><strong>Non, aucun</strong>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'traitement', 'Oui');document.getElementById('traitementDetailWrap').style.display='block'">
-          <span class="option-check"></span><strong>Oui</strong>
-        </button>
-      </div>
-      <div id="traitementDetailWrap" style="display:none;">
-        <textarea class="input-field" id="traitementDetail" placeholder="Décrivez le ou les traitements en cours — nom du médicament, raison, durée..." style="min-height:100px;resize:vertical;" oninput="answers['traitementDetail']=this.value"></textarea>
+    <!-- Q17: Équipement -->
+    <div class="q-card" data-step="17">
+      <div class="q-eyebrow">Vos préférences</div>
+      <h2 class="q-title">Votre équipement<br><em>de cuisine</em></h2>
+      <p class="q-sub">Les recettes seront adaptées à ce que vous avez à disposition. Plusieurs réponses possibles.</p>
+      <div class="opts grid2">
+        <button class="opt cb" onclick="toggle(this,'equip','Casserole / poêle classique')"><span class="opt-check"></span>Casserole/poêle</button>
+        <button class="opt cb" onclick="toggle(this,'equip','Cuiseur vapeur')"><span class="opt-check"></span>Cuiseur vapeur</button>
+        <button class="opt cb" onclick="toggle(this,'equip','Cocotte / mijoteuse')"><span class="opt-check"></span>Cocotte/mijoteuse</button>
+        <button class="opt cb" onclick="toggle(this,'equip','Four')"><span class="opt-check"></span>Four</button>
+        <button class="opt cb" onclick="toggle(this,'equip','Sous vide')"><span class="opt-check"></span>Sous vide</button>
+        <button class="opt cb" onclick="toggle(this,'equip','Mixeur / blender')"><span class="opt-check"></span>Mixeur/blender</button>
       </div>
     </div>
 
-    <!-- Q19: Antécédents médicaux -->
-    <div class="question-card" data-step="19">
-      <div class="question-eyebrow">Santé</div>
-      <h2 class="question-title">Antécédents médicaux<br>de <em><span class="dog-name-display" id="nameDisplay19">votre chien</span></em></h2>
-      <p class="question-subtitle">Chirurgies, maladies passées, hospitalisations — tout ce qui peut influencer sa nutrition aujourd'hui.</p>
-      <div class="options-grid cols-2" style="margin-bottom:12px;">
-        <button class="option-btn" onclick="selectOption(this, 'antecedents', 'Aucun antécédent notable');document.getElementById('antecedentsDetailWrap').style.display='none'">
-          <span class="option-check"></span><strong>Aucun antécédent</strong>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'antecedents', 'Oui');document.getElementById('antecedentsDetailWrap').style.display='block'">
-          <span class="option-check"></span><strong>Oui</strong>
-        </button>
-      </div>
-      <div id="antecedentsDetailWrap" style="display:none;">
-        <textarea class="input-field" id="antecedentsDetail" placeholder="Décrivez les antécédents médicaux — opérations, maladies passées, hospitalisations, accidents..." style="min-height:100px;resize:vertical;" oninput="answers['antecedentsDetail']=this.value"></textarea>
+    <!-- Q18: Temps -->
+    <div class="q-card" data-step="18">
+      <div class="q-eyebrow">Vos préférences</div>
+      <h2 class="q-title">Votre temps de préparation<br><em>par semaine</em></h2>
+      <p class="q-sub">On adapte la complexité des recettes et la fréquence de préparation à votre emploi du temps.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'temps','Moins de 30 min / semaine')"><span class="opt-check"></span><div><strong>Moins de 30 min</strong><br><span style="font-size:12px;color:var(--honey)">Recettes ultra-simples, batch cooking</span></div></button>
+        <button class="opt" onclick="pick(this,'temps','30 min à 1h / semaine')"><span class="opt-check"></span><div><strong>30 min à 1h</strong><br><span style="font-size:12px;color:var(--honey)">Recettes simples, préparation hebdomadaire</span></div></button>
+        <button class="opt" onclick="pick(this,'temps','1 à 2h / semaine')"><span class="opt-check"></span><div><strong>1 à 2h</strong><br><span style="font-size:12px;color:var(--honey)">Recettes variées, bonne organisation</span></div></button>
+        <button class="opt" onclick="pick(this,'temps','Plus de 2h / semaine')"><span class="opt-check"></span><div><strong>Plus de 2h</strong><br><span style="font-size:12px;color:var(--honey)">Recettes élaborées, passion culinaire</span></div></button>
       </div>
     </div>
 
-    <!-- Q20: Attentes -->
-    <div class="question-card" data-step="20">
-      <div class="question-eyebrow">Votre profil</div>
-      <h2 class="question-title">Quelles sont vos<br><em>attentes pour Kyno ?</em></h2>
-      <p class="question-subtitle">Ces informations nous permettent de personnaliser le ton et le niveau de détail de votre plan nutritionnel.</p>
-      <textarea class="input-field" id="attentes" placeholder="Ex : Je veux comprendre exactement ce que mange mon chien. Je cherche des recettes simples à préparer. Je veux améliorer son énergie et son pelage..." style="min-height:140px;resize:vertical;" oninput="answers['attentes']=this.value"></textarea>
-    </div>
-
-    <!-- Q21: Budget -->
-    <div class="question-card" data-step="21">
-      <div class="question-eyebrow">Votre profil</div>
-      <h2 class="question-title">Quel est votre budget<br><em>alimentation mensuel ?</em></h2>
-      <p class="question-subtitle">Cela nous permet d'orienter les recommandations d'ingrédients vers ce qui est accessible pour vous.</p>
-      <div class="options-grid cols-1">
-        <button class="option-btn" onclick="selectOption(this, 'budget', 'Moins de 30€ / mois')">
-          <span class="option-check"></span>
-          <div><strong>Moins de 30€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Budget serré, ingrédients économiques</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'budget', '30 à 60€ / mois')">
-          <span class="option-check"></span>
-          <div><strong>30 à 60€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Budget moyen, bon rapport qualité/prix</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'budget', '60 à 100€ / mois')">
-          <span class="option-check"></span>
-          <div><strong>60 à 100€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Budget confortable, ingrédients premium</span></div>
-        </button>
-        <button class="option-btn" onclick="selectOption(this, 'budget', 'Plus de 100€ / mois')">
-          <span class="option-check"></span>
-          <div><strong>Plus de 100€ / mois</strong><br><span style="font-size:12px;color:var(--honey)">Pas de contrainte, meilleure qualité</span></div>
-        </button>
+    <!-- Q19: Objectif -->
+    <div class="q-card" data-step="19">
+      <div class="q-eyebrow">Votre objectif</div>
+      <h2 class="q-title">Votre objectif principal<br><em>pour <span class="dn">votre chien</span></em></h2>
+      <p class="q-sub">Cette information oriente la priorité nutritionnelle du plan.</p>
+      <div class="opts">
+        <button class="opt" onclick="pick(this,'objectif','Santé générale et prévention')"><span class="opt-check"></span><div><strong>Santé générale et prévention</strong><br><span style="font-size:12px;color:var(--honey)">Alimentation équilibrée et préventive</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Perte de poids')"><span class="opt-check"></span><div><strong>Perte de poids</strong><br><span style="font-size:12px;color:var(--honey)">Réduction calorique adaptée et sécurisée</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Améliorer le pelage et la peau')"><span class="opt-check"></span><div><strong>Améliorer le pelage et la peau</strong><br><span style="font-size:12px;color:var(--honey)">Oméga-3, zinc, biotine ciblés</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Améliorer la digestion')"><span class="opt-check"></span><div><strong>Améliorer la digestion</strong><br><span style="font-size:12px;color:var(--honey)">Microbiote, fibres, probiotiques</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Chien de sport ou très actif')"><span class="opt-check"></span><div><strong>Chien de sport ou très actif</strong><br><span style="font-size:12px;color:var(--honey)">Énergie, récupération, performance</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Bien vieillir — chien senior')"><span class="opt-check"></span><div><strong>Bien vieillir — chien senior</strong><br><span style="font-size:12px;color:var(--honey)">Cognition, articulations, masse musculaire</span></div></button>
+        <button class="opt" onclick="pick(this,'objectif','Problème spécifique à traiter')"><span class="opt-check"></span><div><strong>Problème spécifique</strong><br><span style="font-size:12px;color:var(--honey)">Cibler une pathologie ou un trouble</span></div></button>
       </div>
     </div>
 
-    <!-- SCORE KYNO -->
-    <div class="question-card" data-step="22">
-      <div class="question-eyebrow">Résultat</div>
-      <h2 class="question-title">L'indice nutritionnel<br>de <em><span id="scoreName">votre chien</span></em></h2>
-      <p class="question-subtitle" style="margin-bottom:32px;">Calculé à partir de ses 21 réponses. Une estimation gratuite avant votre plan complet.</p>
+    <!-- Q20: Email -->
+    <div class="q-card" data-step="20">
+      <div class="q-eyebrow">Dernière étape</div>
+      <h2 class="q-title">Où envoyer le plan<br><em>nutritionnel de <span class="dn">votre chien</span> ?</em></h2>
+      <p class="q-sub">Nous enverrons le plan personnalisé à cette adresse. Aucun spam, promis.</p>
 
-      <div class="score-circle">
-        <div class="score-circle-num" id="scoreCircleVal">—</div>
-        <div class="score-circle-denom">/100</div>
-      </div>
-      <div class="score-label-badge" id="scoreLabel">—</div>
-
-      <div class="score-cols">
-        <div class="score-col good">
-          <div class="score-col-title">✓ Points forts</div>
-          <div id="scoreForces"></div>
-        </div>
-        <div class="score-col warn">
-          <div class="score-col-title">→ À améliorer</div>
-          <div id="scoreAmeliorations"></div>
-        </div>
+      <div class="email-block">
+        <div class="email-block-title">Votre adresse email</div>
+        <div class="email-block-sub">Le plan nutritionnel complet de <span class="dn">votre chien</span> vous sera envoyé dans les minutes qui suivent votre commande.</div>
+        <input type="email" class="inp" id="clientEmail" placeholder="votre@email.com" oninput="A['email']=this.value" autocomplete="email" />
       </div>
 
-      <div class="score-estim">
-        <div>
-          <div class="score-estim-label">Besoin calorique estimé</div>
-          <div class="score-estim-val" id="scoreKcal">—</div>
-        </div>
-        <div style="text-align:right;">
-          <div class="score-estim-label">Ration journalière</div>
-          <div class="score-estim-val" id="scoreRation">—</div>
-        </div>
-      </div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--tabac);margin-bottom:8px;">Choisissez votre formule</h3>
+      <p style="font-size:14px;color:var(--honey);margin-bottom:20px;">Recevez le plan nutritionnel de <span class="dn">votre chien</span> immédiatement après paiement.</p>
 
-      <div class="score-unlock">
-        <p>Pour connaître les <strong>ingrédients exacts</strong>, les <strong>quantités précises</strong>, les <strong>recettes adaptées</strong> et les <strong>compléments recommandés</strong> pour <span id="scoreEstimName">votre chien</span>, déverrouillez le plan complet.</p>
-      </div>
-    </div>
-
-    <!-- RÉSUMÉ + OFFRE -->
-    <div class="question-card" data-step="23">
-      <div class="question-eyebrow">Récapitulatif</div>
-      <h2 class="question-title">Le profil de<br><em><span class="dog-name-display" id="nameDisplaySummary">votre chien</span></em></h2>
-      <p class="question-subtitle">Vérifiez les informations avant de recevoir son plan nutritionnel personnalisé.</p>
-
-      <div class="summary-card">
-        <div class="summary-header">
-          <div class="summary-avatar">🐕</div>
-          <div>
-            <div class="summary-dog-name" id="summaryName">—</div>
-            <div class="summary-dog-sub" id="summarySubtitle">—</div>
+      <div class="offres-grid">
+        <div class="offre-card basic selected" onclick="selectOffre(this,'basic')">
+          <div class="offre-tag">Rapport unique</div>
+          <div class="offre-price">12<span style="font-size:20px">€</span></div>
+          <div class="offre-freq">paiement unique</div>
+          <div class="offre-name">Profil Essentiel</div>
+          <div class="offre-features">
+            <div class="offre-feat"><span class="feat-dot">·</span>Plan nutritionnel complet PDF</div>
+            <div class="offre-feat"><span class="feat-dot">·</span>Quantités journalières précises</div>
+            <div class="offre-feat"><span class="feat-dot">·</span>5 recettes adaptées à son profil</div>
+            <div class="offre-feat"><span class="feat-dot">·</span>Liste de compléments recommandés</div>
           </div>
         </div>
-        <div class="summary-body" id="summaryBody">
+        <div class="offre-card premium" onclick="selectOffre(this,'premium')">
+          <div class="offre-tag">Abonnement mensuel</div>
+          <div class="offre-price">9<span style="font-size:20px;color:var(--honey)">€</span></div>
+          <div class="offre-freq">/mois</div>
+          <div class="offre-name">Suivi Continu</div>
+          <div class="offre-features">
+            <div class="offre-feat"><span class="feat-dot">·</span>Tout le contenu Essentiel inclus</div>
+            <div class="offre-feat"><span class="feat-dot">·</span>Nouveau menu chaque mois</div>
+            <div class="offre-feat"><span class="feat-dot">·</span>Adaptation saisonnière automatique</div>
+            <div class="offre-feat"><span class="feat-dot">·</span>Conseiller personnalisé inclus</div>
+          </div>
         </div>
       </div>
 
-      <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--tabac);margin-bottom:8px;">Choisissez votre formule</h3>
-      <p style="font-size:14px;color:var(--honey);margin-bottom:24px;">Recevez le plan nutritionnel personnalisé de <span class="dog-name-display" id="nameDisplayOffer">votre chien</span> immédiatement.</p>
-
-      <div class="offer-choice">
-        <div class="offer-opt basic selected" onclick="selectOffer(this, 'basic')">
-          <div class="offer-opt-tag">Rapport unique</div>
-          <div class="offer-opt-price">12<span style="font-size:20px;">€</span></div>
-          <div class="offer-opt-freq">paiement unique</div>
-          <div class="offer-opt-name">Profil Essentiel</div>
-          <p class="offer-opt-desc">Plan nutritionnel complet, recettes, quantités, compléments.</p>
-        </div>
-        <div class="offer-opt premium" onclick="selectOffer(this, 'premium')">
-          <div class="offer-opt-tag">Abonnement</div>
-          <div class="offer-opt-price">9<span style="font-size:20px;color:var(--honey);">€</span></div>
-          <div class="offer-opt-freq">/mois</div>
-          <div class="offer-opt-name">Suivi Continu</div>
-          <p class="offer-opt-desc">Menus mensuels évolutifs, saisonniers, adaptés en temps réel.</p>
-        </div>
+      <div class="reassurance">
+        <div class="reassurance-item">🔒 Paiement sécurisé</div>
+        <div class="reassurance-item">✓ Sans engagement</div>
+        <div class="reassurance-item">↩ Annulation en 1 clic</div>
       </div>
     </div>
 
   </div>
 </main>
 
-<!-- BOTTOM NAV -->
+<!-- NAV BAS -->
 <div class="quiz-nav">
-  <button class="btn-prev" id="btnPrev" onclick="prevStep()" disabled>← Précédent</button>
-  <button class="btn-next" id="btnNext" onclick="nextStep()">
-    Suivant <span>→</span>
-  </button>
+  <button class="btn-prev" id="btnPrev" onclick="prev()" disabled>← Précédent</button>
+  <button class="btn-next" id="btnNext" onclick="next()">Suivant →</button>
 </div>
 
 <script>
-  let currentStep = 1;
-  const totalSteps = 21;
+  let step = 1;
+  const TOTAL = 20;
+  let A = {};
+  let MA = {};
   let dogName = '';
-  let answers = {};
-  let multiAnswers = {};
-  let selectedOffer = 'basic';
+  let selectedOffre = 'basic';
 
-  function updateDogName(val) {
-    dogName = val.trim() || 'votre chien';
-    document.querySelectorAll('.dog-name-display').forEach(el => {
-      el.textContent = dogName === 'votre chien' ? 'votre chien' : dogName;
-    });
-    answers['nom'] = val.trim();
+  function onNameInput(v) {
+    dogName = v.trim() || 'votre chien';
+    A['nom'] = v.trim();
+    document.querySelectorAll('.dn').forEach(el => el.textContent = dogName);
+    updateDogCard();
   }
 
-  function selectOption(btn, key, value) {
-    const card = btn.closest('.question-card');
-    card.querySelectorAll('.option-btn:not(.checkbox)').forEach(b => b.classList.remove('selected'));
+  function updateDogCard() {
+    const card = document.getElementById('dogCardFixed');
+    if (A['nom']) {
+      card.classList.add('visible');
+      document.getElementById('fixedName').textContent = A['nom'];
+      const infoParts = [];
+      if (A['race']) infoParts.push(A['race']);
+      if (A['age']) infoParts.push(A['age'].split(' — ')[0]);
+      if (A['poids']) infoParts.push(A['poids'] + ' kg');
+      document.getElementById('fixedInfo').textContent = infoParts.join(' · ') || '—';
+    }
+  }
+
+  function pick(btn, key, val) {
+    btn.closest('.q-card').querySelectorAll('.opt:not(.cb)').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
-    answers[key] = value;
+    A[key] = val;
   }
 
-  function toggleOption(btn, key, value) {
+  function toggle(btn, key, val, hasAutre) {
     btn.classList.toggle('selected');
-    if (!multiAnswers[key]) multiAnswers[key] = [];
+    if (!MA[key]) MA[key] = [];
     if (btn.classList.contains('selected')) {
-      if (!multiAnswers[key].includes(value)) multiAnswers[key].push(value);
+      if (!MA[key].includes(val)) MA[key].push(val);
     } else {
-      multiAnswers[key] = multiAnswers[key].filter(v => v !== value);
+      MA[key] = MA[key].filter(v => v !== val);
     }
-    answers[key] = multiAnswers[key].join(', ') || '';
-
-    // Show/hide "Autre" text fields
-    if (key === 'intolerance') {
-      const wrap = document.getElementById('intoleranceAutreWrap');
-      if (wrap) wrap.style.display = multiAnswers[key].includes('Autre') ? 'block' : 'none';
+    A[key] = MA[key].join(', ');
+    if (hasAutre) {
+      const wrapId = key + 'AutoreWrap' in document.getElementById(key + 'AutoreWrap') ? key + 'AutoreWrap' : key.charAt(0).toUpperCase() + key.slice(1) + 'AutoreWrap';
+      // handle both naming conventions
+      const wrap = document.getElementById(key + 'AutoreWrap') || document.getElementById(key.charAt(0).toUpperCase() + key.slice(1) + 'AutoreWrap');
     }
-    if (key === 'comportement') {
-      const wrap = document.getElementById('comportementAutreWrap');
-      if (wrap) wrap.style.display = multiAnswers[key].includes('Autre') ? 'block' : 'none';
+    // show/hide autre fields
+    if (key === 'sante') {
+      const w = document.getElementById('santeAutreWrap');
+      if (w) w.style.display = MA['sante'] && MA['sante'].includes('Autre') ? 'block' : 'none';
+    }
+    if (key === 'intol') {
+      const w = document.getElementById('intolAutreWrap');
+      if (w) w.style.display = MA['intol'] && MA['intol'].includes('Autre') ? 'block' : 'none';
     }
   }
 
-  function selectOffer(el, type) {
-    document.querySelectorAll('.offer-opt').forEach(o => o.classList.remove('selected'));
+  function showEl(id) { const el = document.getElementById(id); if(el) el.style.display = 'block'; }
+  function hideEl(id) { const el = document.getElementById(id); if(el) el.style.display = 'none'; }
+
+  function selectOffre(el, type) {
+    document.querySelectorAll('.offre-card').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
-    selectedOffer = type;
+    selectedOffre = type;
+    A['offre'] = type;
+    const btn = document.getElementById('btnNext');
+    btn.innerHTML = type === 'premium' ? '🎉 S\'abonner à 9€/mois →' : '🎉 Obtenir mon plan à 12€ →';
+    btn.style.background = type === 'premium' ? 'var(--honey)' : 'var(--sage)';
   }
 
   function updateProgress() {
-    const step = Math.min(currentStep, totalSteps);
-    const pct = Math.round((step / totalSteps) * 100);
+    const pct = Math.round((step / TOTAL) * 100);
     document.getElementById('progressFill').style.width = pct + '%';
     document.getElementById('stepPct').textContent = pct + '%';
-    if (currentStep <= totalSteps) {
-      document.getElementById('stepLabel').textContent = `Étape ${step} sur ${totalSteps}`;
-    } else {
-      document.getElementById('stepLabel').textContent = 'Récapitulatif';
-    }
+    document.getElementById('stepLabel').textContent = step <= TOTAL ? `Étape ${step} sur ${TOTAL}` : 'Récapitulatif';
   }
 
   function updateNav() {
-    document.getElementById('btnPrev').disabled = currentStep === 1;
+    document.getElementById('btnPrev').disabled = step === 1;
     const btn = document.getElementById('btnNext');
-    if (currentStep === 23) {
-      btn.innerHTML = '🎉 Recevoir mon plan →';
-      btn.style.background = 'var(--honey)';
-    } else if (currentStep === 22) {
-      btn.innerHTML = 'Voir mon plan →';
-      btn.style.background = 'var(--sage)';
-    } else if (currentStep === 21) {
-      btn.innerHTML = 'Voir mon score Kyno™ →';
-      btn.style.background = 'var(--sage)';
+    if (step === TOTAL) {
+      btn.innerHTML = selectedOffre === 'premium' ? '🎉 S\'abonner à 9€/mois →' : '🎉 Obtenir mon plan à 12€ →';
+      btn.style.background = selectedOffre === 'premium' ? 'var(--honey)' : 'var(--sage)';
     } else {
       btn.innerHTML = 'Suivant →';
       btn.style.background = 'var(--sage)';
     }
   }
 
-  function computeScore() {
-    let score = 70;
-    let forces = [];
-    let ameliorations = [];
-
-    // Activité
-    if (answers['activite'] && answers['activite'].includes('Très actif')) { score += 8; forces.push('Excellent niveau d\'activité physique'); }
-    else if (answers['activite'] && answers['activite'].includes('Actif')) { score += 5; forces.push('Bon niveau d\'activité physique'); }
-    else if (answers['activite'] && answers['activite'].includes('sédentaire')) { score -= 5; ameliorations.push('Activité physique insuffisante'); }
-
-    // Pelage
-    if (answers['pelage'] && answers['pelage'].includes('Brillant')) { score += 4; forces.push('Pelage brillant et sain'); }
-    if (answers['pelage'] && answers['pelage'].includes('Chute excessive')) { score -= 4; ameliorations.push('Chute de poils excessive — besoin en oméga-3 et zinc'); }
-    if (answers['pelage'] && answers['pelage'].includes('Pellicules')) { score -= 3; ameliorations.push('Pellicules — carence possible en acides gras essentiels'); }
-    if (answers['pelage'] && answers['pelage'].includes('Terne')) { score -= 3; ameliorations.push('Pelage terne — apport en biotine à renforcer'); }
-
-    // Selles
-    if (answers['selles'] && answers['selles'].includes('Normales')) { score += 5; forces.push('Transit digestif équilibré'); }
-    if (answers['selles'] && answers['selles'].includes('Molles')) { score -= 5; ameliorations.push('Selles molles — digestion sensible, fibres à rééquilibrer'); }
-    if (answers['selles'] && answers['selles'].includes('Dures')) { score -= 4; ameliorations.push('Selles dures — hydratation et fibres insuffisantes'); }
-    if (answers['selles'] && answers['selles'].includes('Irrégulières')) { score -= 3; ameliorations.push('Transit irrégulier — microbiote à rééquilibrer'); }
-
-    // Dents
-    if (answers['dents'] && answers['dents'].includes('Blanches')) { score += 3; forces.push('Bonne santé dentaire'); }
-    if (answers['dents'] && answers['dents'].includes('Tartre important')) { score -= 4; ameliorations.push('Tartre important — calcium/phosphore à rééquilibrer'); }
-
-    // Santé
-    if (answers['sante'] && answers['sante'].includes('Aucun')) { score += 6; forces.push('Aucun problème de santé connu'); }
-    if (answers['sante'] && answers['sante'].includes('articulaires')) { score -= 5; ameliorations.push('Problèmes articulaires — glucosamine et oméga-3 essentiels'); }
-    if (answers['sante'] && answers['sante'].includes('digestifs')) { score -= 4; ameliorations.push('Problèmes digestifs — probiotiques et fibres adaptées'); }
-    if (answers['sante'] && answers['sante'].includes('peau')) { score -= 3; ameliorations.push('Problèmes de peau — acides gras essentiels à augmenter'); }
-
-    // Troubles comportement
-    if (answers['comportement'] && answers['comportement'].includes('Aucun')) { score += 3; forces.push('Comportement équilibré'); }
-    if (answers['comportement'] && answers['comportement'].includes('Hyperactivité')) { score -= 3; ameliorations.push('Hyperactivité — magnésium et tryptophane à surveiller'); }
-    if (answers['comportement'] && answers['comportement'].includes('Anxiété')) { score -= 3; ameliorations.push('Anxiété — oméga-3 et vitamine B à renforcer'); }
-
-    // Alimentation actuelle
-    if (answers['alimentation'] && answers['alimentation'].includes('Fait maison')) { score += 4; forces.push('Déjà en alimentation maison — bonne base'); }
-    if (answers['alimentation'] && answers['alimentation'].includes('Croquettes uniquement')) { score -= 2; ameliorations.push('Alimentation ultra-transformée — transition vers le frais recommandée'); }
-
-    score = Math.max(30, Math.min(100, score));
-
-    // Estimation kcal
-    const poids = parseFloat(answers['poids']) || 15;
-    let facteur = 1.6;
-    if (answers['activite'] && answers['activite'].includes('sédentaire')) facteur = 1.2;
-    else if (answers['activite'] && answers['activite'].includes('Modéré')) facteur = 1.4;
-    else if (answers['activite'] && answers['activite'].includes('Très actif')) facteur = 2.0;
-    if (answers['sterilise'] === 'Oui') facteur *= 0.85;
-    const rer = 70 * Math.pow(poids, 0.75);
-    const kcal = Math.round(rer * facteur);
-    const rations = Math.round(kcal / 1.5);
-
-    return { score, forces: forces.slice(0, 4), ameliorations: ameliorations.slice(0, 4), kcal, rations };
-  }
-
-  function buildScore() {
-    const { score, forces, ameliorations, kcal, rations } = computeScore();
-    const name = answers['nom'] || 'votre chien';
-
-    // Score color
-    let scoreColor = score >= 80 ? '#5C7A5E' : score >= 60 ? '#C4A15A' : '#B05040';
-    let scoreLabel = score >= 80 ? 'Excellent' : score >= 65 ? 'Bon' : 'À améliorer';
-
-    document.getElementById('scoreName').textContent = name;
-    document.getElementById('scoreCircleVal').textContent = score;
-    document.getElementById('scoreCircleVal').style.color = scoreColor;
-    document.getElementById('scoreLabel').textContent = scoreLabel;
-    document.getElementById('scoreLabel').style.color = scoreColor;
-
-    // Forces
-    document.getElementById('scoreForces').innerHTML = forces.length
-      ? forces.map(f => `<div class="score-item score-good"><span class="score-dot-good">✓</span>${f}</div>`).join('')
-      : '<div class="score-item" style="color:var(--honey)">Complétez le profil pour voir vos points forts</div>';
-
-    // Améliorations
-    document.getElementById('scoreAmeliorations').innerHTML = ameliorations.length
-      ? ameliorations.map(a => `<div class="score-item score-warn"><span class="score-dot-warn">→</span>${a}</div>`).join('')
-      : '<div class="score-item" style="color:var(--sage)">Aucun point critique détecté 🎉</div>';
-
-    // Estimation
-    document.getElementById('scoreKcal').textContent = kcal.toLocaleString() + ' kcal / jour';
-    document.getElementById('scoreRation').textContent = '≈ ' + rations + ' g / jour';
-    document.getElementById('scoreEstimName').textContent = name;
-  }
-
-  function buildSummary() {
-    document.getElementById('summaryName').textContent = answers['nom'] || '—';
-    document.getElementById('nameDisplaySummary').textContent = answers['nom'] || 'votre chien';
-    document.getElementById('nameDisplayOffer').textContent = answers['nom'] || 'votre chien';
-    document.getElementById('summarySubtitle').textContent = [answers['race'], answers['age'], answers['poids'] ? answers['poids'] + ' kg' : ''].filter(Boolean).join(' · ');
-
-    const fields = [
-      { label: 'Race', key: 'race' },
-      { label: 'Âge', key: 'age' },
-      { label: 'Poids', key: 'poids', suffix: ' kg' },
-      { label: 'Sexe', key: 'sexe' },
-      { label: 'Stérilisé(e)', key: 'sterilise' },
-      { label: 'Activité', key: 'activite' },
-      { label: 'Alimentation actuelle', key: 'alimentation' },
-      { label: 'Intolérances', key: 'intolerance' },
-      { label: 'Détail allergies', key: 'intoleranceAutre' },
-      { label: 'Santé', key: 'sante' },
-      { label: 'Détail santé', key: 'santeDetail' },
-      { label: 'Pelage', key: 'pelage' },
-      { label: 'Dents', key: 'dents' },
-      { label: 'Selles', key: 'selles' },
-      { label: 'Comportement alimentaire', key: 'comportAlim' },
-      { label: 'Troubles', key: 'comportement' },
-      { label: 'Détail troubles', key: 'comportementAutre' },
-      { label: 'Traitement en cours', key: 'traitement' },
-      { label: 'Détail traitement', key: 'traitementDetail' },
-      { label: 'Antécédents', key: 'antecedents' },
-      { label: 'Détail antécédents', key: 'antecedentsDetail' },
-      { label: 'Environnement', key: 'environnement' },
-      { label: 'Objectif', key: 'objectif' },
-      { label: 'Budget mensuel', key: 'budget' },
-      { label: 'Attentes', key: 'attentes' },
-    ];
-
-    const body = document.getElementById('summaryBody');
-    body.innerHTML = fields.filter(f => answers[f.key]).map(f => `
-      <div class="summary-item">
-        <div class="summary-item-label">${f.label}</div>
-        <div class="summary-item-value">${(answers[f.key] || '—') + (f.suffix && answers[f.key] ? f.suffix : '')}</div>
-      </div>
-    `).join('');
-  }
-
-  function nextStep() {
-    if (currentStep === 23) {
-      alert('Merci ! Votre plan nutritionnel pour ' + (answers['nom'] || 'votre chien') + ' est en cours de génération. Vous allez être redirigé vers le paiement.');
+  function next() {
+    if (step === TOTAL) {
+      if (!A['email']) { alert('Veuillez entrer votre adresse email pour recevoir le plan.'); return; }
+      alert('Merci ! Le plan nutritionnel de ' + (A['nom'] || 'votre chien') + ' va être généré. Vous allez être redirigé vers le paiement sécurisé.');
       return;
     }
+    // save text inputs
+    if (step === 1) A['nom'] = (document.getElementById('dogName').value || '').trim();
+    if (step === 2) { A['race'] = (document.getElementById('dogRace').value || '').trim(); updateDogCard(); }
+    if (step === 4) { A['poids'] = document.getElementById('dogWeight').value; updateDogCard(); }
 
-    // Save text inputs
-    if (currentStep === 1) answers['nom'] = document.getElementById('dogName').value.trim();
-    if (currentStep === 2) answers['race'] = document.getElementById('dogRace').value.trim();
-    if (currentStep === 4) answers['poids'] = document.getElementById('dogWeight').value;
-
-    document.querySelector(`.question-card[data-step="${currentStep}"]`).classList.remove('active');
-    currentStep++;
-
-    if (currentStep === 22) buildScore();
-    if (currentStep === 23) buildSummary();
-
-    const nextCard = document.querySelector(`.question-card[data-step="${currentStep}"]`);
-    nextCard.classList.add('active');
-    nextCard.style.animation = 'none';
-    nextCard.offsetHeight;
-    nextCard.style.animation = '';
-
+    document.querySelector(`[data-step="${step}"]`).classList.remove('active');
+    step++;
+    const next = document.querySelector(`[data-step="${step}"]`);
+    next.classList.add('active');
+    next.style.animation = 'none';
+    next.offsetHeight;
+    next.style.animation = '';
     updateProgress();
     updateNav();
+    updateDogCard();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function prevStep() {
-    if (currentStep === 1) return;
-    document.querySelector(`.question-card[data-step="${currentStep}"]`).classList.remove('active');
-    currentStep--;
-    document.querySelector(`.question-card[data-step="${currentStep}"]`).classList.add('active');
+  function prev() {
+    if (step === 1) return;
+    document.querySelector(`[data-step="${step}"]`).classList.remove('active');
+    step--;
+    document.querySelector(`[data-step="${step}"]`).classList.add('active');
     updateProgress();
     updateNav();
     window.scrollTo({ top: 0, behavior: 'smooth' });
