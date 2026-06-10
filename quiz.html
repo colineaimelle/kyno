@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kyno — Créer le profil de mon chien</title>
+<meta name="description" content="Répondez à quelques questions sur votre chien et recevez son plan nutritionnel personnalisé gratuitement.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sage:#5C7A5E;--sage-l:#7D9B7F;--sage-mist:#EDF3ED;
+  --ecru:#F5F0E8;--sand:#E8E0D0;--honey:#C4A15A;
+  --tabac:#7B5C3E;--warm:#FAF8F4;--dark:#2A1F14;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--tabac);font-weight:300;min-height:100vh;}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:52px;background:rgba(250,248,244,0.95);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--sand);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;
+}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;color:var(--sage);text-decoration:none;}
+.nav-step{font-size:12px;color:var(--honey);letter-spacing:0.06em;}
+
+.progress-bar{position:fixed;top:52px;left:0;right:0;z-index:99;height:3px;background:var(--sand);}
+.progress-fill{height:100%;background:var(--sage);transition:width 0.4s ease;width:3%;}
+
+.wrap{max-width:600px;margin:0 auto;padding:100px 24px 80px;}
+
+.step{display:none;}
+.step.active{display:block;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+.step-num{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--sage-l);margin-bottom:12px;}
+.step-question{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:400;color:var(--tabac);line-height:1.15;margin-bottom:8px;}
+.step-question em{font-style:italic;color:var(--sage);}
+.step-hint{font-size:13px;color:var(--honey);margin-bottom:28px;line-height:1.6;}
+
+input[type=text],input[type=number],input[type=email],textarea{
+  width:100%;padding:14px 18px;
+  border:1px solid var(--sand);border-radius:4px;
+  background:white;color:var(--tabac);
+  font-family:'DM Sans',sans-serif;font-size:16px;font-weight:300;
+  outline:none;transition:border-color 0.2s;-webkit-appearance:none;
+}
+input:focus,textarea:focus{border-color:var(--sage);}
+textarea{resize:vertical;min-height:100px;}
+
+.options{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;}
+.opt{
+  padding:11px 18px;border-radius:6px;
+  border:1px solid var(--sand);background:white;
+  cursor:pointer;color:var(--tabac);
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;
+  transition:all 0.15s;user-select:none;line-height:1.4;
+}
+.opt:hover{border-color:var(--sage-l);}
+.opt.selected{background:var(--sage-mist);border-color:var(--sage);color:var(--sage);font-weight:400;}
+
+.step-nav{display:flex;gap:12px;margin-top:32px;align-items:center;}
+.btn-next{
+  flex:1;padding:15px;background:var(--sage);color:white;
+  border:none;border-radius:4px;
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+  letter-spacing:0.05em;cursor:pointer;transition:background 0.2s;
+}
+.btn-next:hover{background:var(--sage-l);}
+.btn-next:disabled{background:var(--sand);cursor:not-allowed;}
+.btn-back{
+  padding:15px 20px;background:transparent;color:var(--honey);
+  border:1px solid var(--sand);border-radius:4px;
+  font-family:'DM Sans',sans-serif;font-size:13px;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-back:hover{border-color:var(--honey);}
+
+.step-error{color:#cc3333;font-size:13px;margin-top:10px;}
+
+.section-title{
+  font-size:10px;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--sage);background:var(--sage-mist);
+  padding:6px 14px;border-radius:20px;
+  display:inline-block;margin-bottom:24px;
+}
+
+/* LOADING */
+.loading{display:none;text-align:center;padding:80px 24px;}
+.loading-ring{
+  width:52px;height:52px;border-radius:50%;
+  border:2px solid var(--sand);border-top-color:var(--sage);
+  animation:spin 1s linear infinite;margin:0 auto 20px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--tabac);margin-bottom:12px;}
+.loading p{font-size:14px;color:var(--honey);line-height:1.7;}
+
+/* SUCCESS */
+.success{display:none;text-align:center;padding:80px 24px;}
+.success-icon{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--sage-mist);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 24px;font-size:28px;
+}
+.success h2{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:400;color:var(--tabac);margin-bottom:16px;line-height:1.2;}
+.success h2 em{font-style:italic;color:var(--sage);}
+.success p{font-size:15px;color:var(--honey);line-height:1.8;max-width:440px;margin:0 auto 24px;}
+.success-note{
+  background:var(--ecru);border-radius:8px;padding:16px 20px;
+  font-size:13px;color:var(--tabac);line-height:1.7;
+  max-width:440px;margin:0 auto;
+}
+
+.error-msg{
+  display:none;background:#fff5f5;border:1px solid #ffcccc;
+  border-radius:6px;padding:12px 16px;
+  font-size:13px;color:#cc3333;margin-top:12px;
+}
+
+.beta-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--sage-mist);color:var(--sage);
+  font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+  padding:5px 12px;border-radius:20px;margin-bottom:24px;
+}
+.beta-dot{width:6px;height:6px;border-radius:50%;background:var(--sage);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">kyno</a>
+  <span class="nav-step" id="navStep">Question 1 / 35</span>
+</nav>
+
+<div class="progress-bar">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="wrap" id="quizWrap">
+
+  <!-- Q1 -->
+  <div class="step active" data-step="1">
+    <div class="beta-badge"><div class="beta-dot"></div>Bêta gratuite — 100 places</div>
+    <div class="step-num">Question 1 / 35</div>
+    <h2 class="step-question">Comment s'appelle<br><em>votre chien ?</em></h2>
+    <p class="step-hint">Son prénom apparaîtra dans tout son rapport nutritionnel personnalisé.</p>
+    <input type="text" id="q1" placeholder="Ex: Viva, Max, Luna..." autocomplete="off">
+    <div class="step-nav">
+      <button class="btn-next" onclick="next(1)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="step" data-step="2">
+    <div class="step-num">Question 2 / 35</div>
+    <h2 class="step-question">Quelle est<br><em>sa race ?</em></h2>
+    <p class="step-hint">Si croisé, indiquez le croisement principal. Chaque race a des prédispositions nutritionnelles spécifiques.</p>
+    <input type="text" id="q2" placeholder="Ex: Épagneul Breton, Labrador, Croisé Berger..." autocomplete="off">
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(2)">←</button>
+      <button class="btn-next" onclick="next(2)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="step" data-step="3">
+    <div class="step-num">Question 3 / 35</div>
+    <h2 class="step-question">Quel âge<br><em>a-t-il ?</em></h2>
+    <p class="step-hint">L'âge détermine ses besoins énergétiques et le ratio calcium/phosphore idéal.</p>
+    <div class="options" id="q3">
+      <div class="opt" onclick="radio('q3',this,'moins de 6 mois')">Moins de 6 mois</div>
+      <div class="opt" onclick="radio('q3',this,'6 mois à 1 an')">6 mois – 1 an</div>
+      <div class="opt" onclick="radio('q3',this,'1 à 3 ans')">1 – 3 ans</div>
+      <div class="opt" onclick="radio('q3',this,'3 à 7 ans')">3 – 7 ans</div>
+      <div class="opt" onclick="radio('q3',this,'7 à 10 ans')">7 – 10 ans</div>
+      <div class="opt" onclick="radio('q3',this,'plus de 10 ans')">Plus de 10 ans</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(3)">←</button>
+      <button class="btn-next" onclick="next(3)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="step" data-step="4">
+    <div class="step-num">Question 4 / 35</div>
+    <h2 class="step-question">Quel est<br><em>son poids ?</em></h2>
+    <p class="step-hint">En kilogrammes. C'est la base du calcul de ses besoins caloriques exacts selon la formule NRC.</p>
+    <input type="number" id="q4" placeholder="Ex: 14" min="0.5" max="100" step="0.1">
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(4)">←</button>
+      <button class="btn-next" onclick="next(4)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="step" data-step="5">
+    <div class="step-num">Question 5 / 35</div>
+    <h2 class="step-question">Son sexe<br><em>et statut ?</em></h2>
+    <p class="step-hint">La stérilisation réduit les besoins énergétiques de 20 à 30% — un ajustement crucial.</p>
+    <div class="options" id="q5">
+      <div class="opt" onclick="radio('q5',this,'mâle entier')">Mâle entier</div>
+      <div class="opt" onclick="radio('q5',this,'mâle stérilisé')">Mâle stérilisé</div>
+      <div class="opt" onclick="radio('q5',this,'femelle entière')">Femelle entière</div>
+      <div class="opt" onclick="radio('q5',this,'femelle stérilisée')">Femelle stérilisée</div>
+      <div class="opt" onclick="radio('q5',this,'femelle gestante')">Femelle gestante</div>
+      <div class="opt" onclick="radio('q5',this,'femelle allaitante')">Femelle allaitante</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(5)">←</button>
+      <button class="btn-next" onclick="next(5)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="step" data-step="6">
+    <div class="step-num">Question 6 / 35</div>
+    <h2 class="step-question">Son niveau<br><em>d'activité quotidien ?</em></h2>
+    <p class="step-hint">Un chien très actif peut avoir des besoins caloriques 2× supérieurs à un chien sédentaire.</p>
+    <div class="options" id="q6">
+      <div class="opt" onclick="radio('q6',this,'très sédentaire')">Très sédentaire<br><small style="font-size:11px;opacity:0.6">Peu de sorties, appartement</small></div>
+      <div class="opt" onclick="radio('q6',this,'modéré')">Modéré<br><small style="font-size:11px;opacity:0.6">1-2 balades / jour</small></div>
+      <div class="opt" onclick="radio('q6',this,'actif')">Actif<br><small style="font-size:11px;opacity:0.6">Sport régulier, jardin</small></div>
+      <div class="opt" onclick="radio('q6',this,'très actif')">Très actif<br><small style="font-size:11px;opacity:0.6">Chasse, agility, trail</small></div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(6)">←</button>
+      <button class="btn-next" onclick="next(6)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="step" data-step="7">
+    <div class="step-num">Question 7 / 35</div>
+    <h2 class="step-question">Où vit-il<br><em>au quotidien ?</em></h2>
+    <p class="step-hint">L'environnement influence les besoins en hydratation et en énergie thermique.</p>
+    <div class="options" id="q7">
+      <div class="opt" onclick="radio('q7',this,'grande ville appartement')">Grande ville / Appartement</div>
+      <div class="opt" onclick="radio('q7',this,'ville avec jardin')">Ville avec jardin</div>
+      <div class="opt" onclick="radio('q7',this,'campagne')">Campagne</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(7)">←</button>
+      <button class="btn-next" onclick="next(7)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="step" data-step="8">
+    <div class="step-num">Question 8 / 35</div>
+    <h2 class="step-question">Comment le<br><em>nourrissez-vous actuellement ?</em></h2>
+    <p class="step-hint">Avant tout changement — Kyno analysera ce qui manque dans son alimentation actuelle.</p>
+    <div class="options" id="q8">
+      <div class="opt" onclick="radio('q8',this,'croquettes')">Croquettes</div>
+      <div class="opt" onclick="radio('q8',this,'pâtée industrielle')">Pâtée industrielle</div>
+      <div class="opt" onclick="radio('q8',this,'mixte industriel')">Mixte industriel</div>
+      <div class="opt" onclick="radio('q8',this,'ration ménagère')">Ration ménagère</div>
+      <div class="opt" onclick="radio('q8',this,'BARF')">BARF (cru)</div>
+      <div class="opt" onclick="radio('q8',this,'mixte avec frais')">Mixte + frais maison</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(8)">←</button>
+      <button class="btn-next" onclick="next(8)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="step" data-step="9">
+    <div class="step-num">Question 9 / 35</div>
+    <h2 class="step-question">Des antécédents<br><em>médicaux ?</em></h2>
+    <p class="step-hint">Maladies diagnostiquées, chirurgies, hospitalisations. Ces infos permettent d'adapter le plan en sécurité.</p>
+    <textarea id="q9" placeholder="Ex: dysplasie de la hanche diagnostiquée à 2 ans, aucun antécédent, allergie cutanée..."></textarea>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(9)">←</button>
+      <button class="btn-next" onclick="next(9)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="step" data-step="10">
+    <div class="step-num">Question 10 / 35</div>
+    <h2 class="step-question">Des problèmes de santé<br><em>actuels ?</em></h2>
+    <p class="step-hint">Plusieurs choix possibles.</p>
+    <div class="options" id="q10">
+      <div class="opt" onclick="multi('q10',this,'aucun')">Aucun</div>
+      <div class="opt" onclick="multi('q10',this,'articulaires')">Articulaires</div>
+      <div class="opt" onclick="multi('q10',this,'digestifs')">Digestifs</div>
+      <div class="opt" onclick="multi('q10',this,'peau')">Peau</div>
+      <div class="opt" onclick="multi('q10',this,'rénaux')">Rénaux</div>
+      <div class="opt" onclick="multi('q10',this,'cardiaques')">Cardiaques</div>
+      <div class="opt" onclick="multi('q10',this,'surpoids')">Surpoids</div>
+      <div class="opt" onclick="multi('q10',this,'diabète')">Diabète</div>
+      <div class="opt" onclick="multi('q10',this,'autre')">Autre</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(10)">←</button>
+      <button class="btn-next" onclick="next(10)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="step" data-step="11">
+    <div class="step-num">Question 11 / 35</div>
+    <h2 class="step-question">Est-il sous<br><em>traitement ?</em></h2>
+    <p class="step-hint">Médicaments, antiparasitaires, compléments. Certains interagissent avec l'alimentation.</p>
+    <input type="text" id="q11" placeholder="Ex: antiparasitaire mensuel, Metacam, aucun...">
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(11)">←</button>
+      <button class="btn-next" onclick="next(11)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="step" data-step="12">
+    <div class="step-num">Question 12 / 35</div>
+    <h2 class="step-question">Comment est<br><em>son pelage ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Le pelage est un des meilleurs indicateurs de l'état nutritionnel.</p>
+    <div class="options" id="q12">
+      <div class="opt" onclick="multi('q12',this,'brillant')">Brillant et dense</div>
+      <div class="opt" onclick="multi('q12',this,'terne')">Terne</div>
+      <div class="opt" onclick="multi('q12',this,'chute excessive')">Chute excessive</div>
+      <div class="opt" onclick="multi('q12',this,'pellicules')">Pellicules</div>
+      <div class="opt" onclick="multi('q12',this,'irritations cutanées')">Irritations cutanées</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(12)">←</button>
+      <button class="btn-next" onclick="next(12)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="step" data-step="13">
+    <div class="step-num">Question 13 / 35</div>
+    <h2 class="step-question">Comment sont<br><em>ses selles ?</em></h2>
+    <p class="step-hint">Les selles révèlent la qualité de la digestion et l'assimilation des nutriments.</p>
+    <div class="options" id="q13">
+      <div class="opt" onclick="radio('q13',this,'normales')">Normales et moulées</div>
+      <div class="opt" onclick="radio('q13',this,'molles')">Souvent molles</div>
+      <div class="opt" onclick="radio('q13',this,'dures')">Souvent dures</div>
+      <div class="opt" onclick="radio('q13',this,'irrégulières')">Irrégulières</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(13)">←</button>
+      <button class="btn-next" onclick="next(13)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="step" data-step="14">
+    <div class="step-num">Question 14 / 35</div>
+    <h2 class="step-question">Des odeurs<br><em>inhabituelles ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Souvent liées à des déséquilibres nutritionnels ou digestifs.</p>
+    <div class="options" id="q14">
+      <div class="opt" onclick="multi('q14',this,'aucune')">Aucune odeur particulière</div>
+      <div class="opt" onclick="multi('q14',this,'haleine')">Haleine marquée</div>
+      <div class="opt" onclick="multi('q14',this,'corporelle')">Odeur corporelle forte</div>
+      <div class="opt" onclick="multi('q14',this,'oreilles')">Odeur des oreilles</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(14)">←</button>
+      <button class="btn-next" onclick="next(14)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="step" data-step="15">
+    <div class="step-num">Question 15 / 35</div>
+    <h2 class="step-question">Son comportement<br><em>alimentaire ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Révèle des habitudes digestives et des besoins spécifiques.</p>
+    <div class="options" id="q15">
+      <div class="opt" onclick="multi('q15',this,'mange vite')">Mange très vite</div>
+      <div class="opt" onclick="multi('q15',this,'mange lentement')">Mange lentement</div>
+      <div class="opt" onclick="multi('q15',this,'difficile')">Difficile / capricieux</div>
+      <div class="opt" onclick="multi('q15',this,'mange tout')">Mange absolument tout</div>
+      <div class="opt" onclick="multi('q15',this,'vole la nourriture')">Vole la nourriture</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(15)">←</button>
+      <button class="btn-next" onclick="next(15)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="step" data-step="16">
+    <div class="step-num">Question 16 / 35</div>
+    <h2 class="step-question">Des troubles<br><em>du comportement ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Certains comportements sont liés à des carences nutritionnelles.</p>
+    <div class="options" id="q16">
+      <div class="opt" onclick="multi('q16',this,'aucun')">Aucun</div>
+      <div class="opt" onclick="multi('q16',this,'hyperactivité')">Hyperactivité</div>
+      <div class="opt" onclick="multi('q16',this,'anxiété')">Anxiété</div>
+      <div class="opt" onclick="multi('q16',this,'agressivité')">Agressivité</div>
+      <div class="opt" onclick="multi('q16',this,'peurs')">Peurs / phobies</div>
+      <div class="opt" onclick="multi('q16',this,'destruction')">Comportements destructeurs</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(16)">←</button>
+      <button class="btn-next" onclick="next(16)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="step" data-step="17">
+    <div class="step-num">Question 17 / 35</div>
+    <h2 class="step-question">État de<br><em>ses dents ?</em></h2>
+    <p class="step-hint">La santé dentaire influence directement la capacité à mastiquer et assimiler les aliments.</p>
+    <div class="options" id="q17">
+      <div class="opt" onclick="radio('q17',this,'blanches et propres')">Blanches et propres</div>
+      <div class="opt" onclick="radio('q17',this,'tartre léger')">Tartre léger</div>
+      <div class="opt" onclick="radio('q17',this,'tartre important')">Tartre important</div>
+      <div class="opt" onclick="radio('q17',this,'haleine sévère')">Haleine sévère</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(17)">←</button>
+      <button class="btn-next" onclick="next(17)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="step" data-step="18">
+    <div class="step-num">Question 18 / 35</div>
+    <h2 class="step-question">Personnes vulnérables<br><em>dans le foyer ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Important pour adapter les recommandations sanitaires (BARF notamment).</p>
+    <div class="options" id="q18">
+      <div class="opt" onclick="multi('q18',this,'aucune')">Aucune</div>
+      <div class="opt" onclick="multi('q18',this,'enfants moins de 5 ans')">Enfants &lt; 5 ans</div>
+      <div class="opt" onclick="multi('q18',this,'personnes âgées')">Personnes âgées</div>
+      <div class="opt" onclick="multi('q18',this,'femme enceinte')">Femme enceinte</div>
+      <div class="opt" onclick="multi('q18',this,'immunodéprimé')">Personne immunodéprimée</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(18)">←</button>
+      <button class="btn-next" onclick="next(18)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="step" data-step="19">
+    <div class="step-num">Question 19 / 35</div>
+    <h2 class="step-question">Des réactions allergiques<br><em>dans le passé ?</em></h2>
+    <p class="step-hint">Cutanées, digestives ou les deux.</p>
+    <div class="options" id="q19">
+      <div class="opt" onclick="radio('q19',this,'jamais')">Jamais</div>
+      <div class="opt" onclick="radio('q19',this,'cutanée')">Cutanée (démangeaisons, rougeurs)</div>
+      <div class="opt" onclick="radio('q19',this,'digestive')">Digestive (vomissements, diarrhée)</div>
+      <div class="opt" onclick="radio('q19',this,'les deux')">Les deux</div>
+      <div class="opt" onclick="radio('q19',this,'je ne sais pas')">Je ne sais pas</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(19)">←</button>
+      <button class="btn-next" onclick="next(19)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="step" data-step="20">
+    <div class="step-num">Question 20 / 35</div>
+    <h2 class="step-question">Des intolérances<br><em>alimentaires connues ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Ces aliments seront exclus de tous ses menus.</p>
+    <div class="options" id="q20">
+      <div class="opt" onclick="multi('q20',this,'aucune')">Aucune connue</div>
+      <div class="opt" onclick="multi('q20',this,'bœuf')">Bœuf</div>
+      <div class="opt" onclick="multi('q20',this,'poulet')">Poulet</div>
+      <div class="opt" onclick="multi('q20',this,'poisson')">Poisson</div>
+      <div class="opt" onclick="multi('q20',this,'gluten')">Gluten / céréales</div>
+      <div class="opt" onclick="multi('q20',this,'laitages')">Laitages</div>
+      <div class="opt" onclick="multi('q20',this,'soja')">Soja</div>
+      <div class="opt" onclick="multi('q20',this,'autre')">Autre</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(20)">←</button>
+      <button class="btn-next" onclick="next(20)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="step" data-step="21">
+    <div class="step-num">Question 21 / 35</div>
+    <h2 class="step-question">Des problèmes<br><em>d'oreilles ?</em></h2>
+    <p class="step-hint">Les otites chroniques sont souvent liées à des déséquilibres nutritionnels ou des allergies alimentaires.</p>
+    <div class="options" id="q21">
+      <div class="opt" onclick="radio('q21',this,'non')">Aucun problème</div>
+      <div class="opt" onclick="radio('q21',this,'otites régulières')">Otites régulières</div>
+      <div class="opt" onclick="radio('q21',this,'odeur forte')">Odeur forte des oreilles</div>
+      <div class="opt" onclick="radio('q21',this,'grattage fréquent')">Se gratte fréquemment les oreilles</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(21)">←</button>
+      <button class="btn-next" onclick="next(21)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="step" data-step="22">
+    <div class="step-num">Question 22 / 35</div>
+    <h2 class="step-question">Des problèmes<br><em>de glandes anales ?</em></h2>
+    <p class="step-hint">Directement lié à la qualité des fibres dans l'alimentation.</p>
+    <div class="options" id="q22">
+      <div class="opt" onclick="radio('q22',this,'aucun')">Aucun problème</div>
+      <div class="opt" onclick="radio('q22',this,'scooting')">Scooting (se traîne les fesses)</div>
+      <div class="opt" onclick="radio('q22',this,'expressions fréquentes')">Expressions fréquentes chez le vétérinaire</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(22)">←</button>
+      <button class="btn-next" onclick="next(22)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="step" data-step="23">
+    <div class="step-num">Question 23 / 35</div>
+    <h2 class="step-question">Des calculs<br><em>urinaires ?</em></h2>
+    <p class="step-hint">Chaque type de calcul nécessite une adaptation nutritionnelle spécifique.</p>
+    <div class="options" id="q23">
+      <div class="opt" onclick="radio('q23',this,'non')">Non</div>
+      <div class="opt" onclick="radio('q23',this,'struvite')">Oui — struvite</div>
+      <div class="opt" onclick="radio('q23',this,'oxalate')">Oui — oxalate de calcium</div>
+      <div class="opt" onclick="radio('q23',this,'inconnu')">Oui — type inconnu</div>
+      <div class="opt" onclick="radio('q23',this,'infections récurrentes')">Infections urinaires récurrentes</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(23)">←</button>
+      <button class="btn-next" onclick="next(23)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="step" data-step="24">
+    <div class="step-num">Question 24 / 35</div>
+    <h2 class="step-question">Son niveau<br><em>de stress général ?</em></h2>
+    <p class="step-hint">Le stress chronique impacte le microbiote intestinal et les besoins en certains nutriments.</p>
+    <div class="options" id="q24">
+      <div class="opt" onclick="radio('q24',this,'très calme')">Très calme et serein</div>
+      <div class="opt" onclick="radio('q24',this,'légèrement anxieux')">Légèrement anxieux</div>
+      <div class="opt" onclick="radio('q24',this,'anxieux')">Anxieux</div>
+      <div class="opt" onclick="radio('q24',this,'très anxieux')">Très anxieux</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(24)">←</button>
+      <button class="btn-next" onclick="next(24)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="step" data-step="25">
+    <div class="step-num">Question 25 / 35</div>
+    <h2 class="step-question">Quel mode alimentaire<br><em>vous attire ?</em></h2>
+    <p class="step-hint">Les menus seront entièrement adaptés à votre choix et vos contraintes.</p>
+    <div class="options" id="q25">
+      <div class="opt" onclick="radio('q25',this,'ration cuite')">Ration ménagère cuite</div>
+      <div class="opt" onclick="radio('q25',this,'BARF')">BARF (cru)</div>
+      <div class="opt" onclick="radio('q25',this,'mixte')">Mixte cuit + cru</div>
+      <div class="opt" onclick="radio('q25',this,'je ne sais pas')">Je ne sais pas encore</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(25)">←</button>
+      <button class="btn-next" onclick="next(25)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="step" data-step="26">
+    <div class="step-num">Question 26 / 35</div>
+    <h2 class="step-question">Quel budget mensuel<br><em>pour son alimentation ?</em></h2>
+    <p class="step-hint">Pour les ingrédients frais — hors croquettes actuelles.</p>
+    <div class="options" id="q26">
+      <div class="opt" onclick="radio('q26',this,'moins de 30€')">Moins de 30 €</div>
+      <div class="opt" onclick="radio('q26',this,'30 à 60€')">30 – 60 €</div>
+      <div class="opt" onclick="radio('q26',this,'60 à 100€')">60 – 100 €</div>
+      <div class="opt" onclick="radio('q26',this,'plus de 100€')">Plus de 100 €</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(26)">←</button>
+      <button class="btn-next" onclick="next(26)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="step" data-step="27">
+    <div class="step-num">Question 27 / 35</div>
+    <h2 class="step-question">Quel équipement<br><em>en cuisine ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Les recettes s'adapteront à ce que vous avez.</p>
+    <div class="options" id="q27">
+      <div class="opt" onclick="multi('q27',this,'casserole')">Casserole</div>
+      <div class="opt" onclick="multi('q27',this,'vapeur')">Cuiseur vapeur</div>
+      <div class="opt" onclick="multi('q27',this,'cocotte')">Cocotte / Mijoteuse</div>
+      <div class="opt" onclick="multi('q27',this,'four')">Four</div>
+      <div class="opt" onclick="multi('q27',this,'sous vide')">Sous vide</div>
+      <div class="opt" onclick="multi('q27',this,'mixeur')">Mixeur / Blender</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(27)">←</button>
+      <button class="btn-next" onclick="next(27)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="step" data-step="28">
+    <div class="step-num">Question 28 / 35</div>
+    <h2 class="step-question">Combien de temps<br><em>pour cuisiner par semaine ?</em></h2>
+    <p class="step-hint">Honnêtement — les menus seront adaptés à votre réalité, pas à un idéal.</p>
+    <div class="options" id="q28">
+      <div class="opt" onclick="radio('q28',this,'moins de 30 min')">Moins de 30 min</div>
+      <div class="opt" onclick="radio('q28',this,'30 min à 1h')">30 min – 1h</div>
+      <div class="opt" onclick="radio('q28',this,'1h à 2h')">1h – 2h</div>
+      <div class="opt" onclick="radio('q28',this,'plus de 2h')">Plus de 2h</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(28)">←</button>
+      <button class="btn-next" onclick="next(28)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="step" data-step="29">
+    <div class="step-num">Question 29 / 35</div>
+    <h2 class="step-question">Vos connaissances<br><em>en nutrition canine ?</em></h2>
+    <p class="step-hint">Le rapport sera adapté à votre niveau — plus ou moins technique.</p>
+    <div class="options" id="q29">
+      <div class="opt" onclick="radio('q29',this,'aucune')">Aucune — je pars de zéro</div>
+      <div class="opt" onclick="radio('q29',this,'quelques bases')">Quelques bases</div>
+      <div class="opt" onclick="radio('q29',this,'formé')">Formé(e) / documenté(e)</div>
+      <div class="opt" onclick="radio('q29',this,'expert')">Expert(e)</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(29)">←</button>
+      <button class="btn-next" onclick="next(29)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="step" data-step="30">
+    <div class="step-num">Question 30 / 35</div>
+    <h2 class="step-question">Où faites-vous<br><em>vos courses ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Les ingrédients recommandés tiendront compte de vos habitudes.</p>
+    <div class="options" id="q30">
+      <div class="opt" onclick="multi('q30',this,'supermarché')">Supermarché</div>
+      <div class="opt" onclick="multi('q30',this,'marché local')">Marché local</div>
+      <div class="opt" onclick="multi('q30',this,'boucherie')">Boucherie</div>
+      <div class="opt" onclick="multi('q30',this,'drive')">Drive / Livraison</div>
+      <div class="opt" onclick="multi('q30',this,'mixte')">Un peu de tout</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(30)">←</button>
+      <button class="btn-next" onclick="next(30)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q31 -->
+  <div class="step" data-step="31">
+    <div class="step-num">Question 31 / 35</div>
+    <h2 class="step-question">D'autres animaux<br><em>à la maison ?</em></h2>
+    <p class="step-hint">Peut influencer certaines recommandations sanitaires.</p>
+    <div class="options" id="q31">
+      <div class="opt" onclick="multi('q31',this,'aucun')">Aucun</div>
+      <div class="opt" onclick="multi('q31',this,'autre chien')">Autre chien</div>
+      <div class="opt" onclick="multi('q31',this,'chat')">Chat</div>
+      <div class="opt" onclick="multi('q31',this,'autres')">Autres animaux</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(31)">←</button>
+      <button class="btn-next" onclick="next(31)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q32 -->
+  <div class="step" data-step="32">
+    <div class="step-num">Question 32 / 35</div>
+    <h2 class="step-question">À quelle fréquence<br><em>souhaitez-vous les menus ?</em></h2>
+    <p class="step-hint">Le suivi mensuel s'adaptera à votre rythme.</p>
+    <div class="options" id="q32">
+      <div class="opt" onclick="radio('q32',this,'chaque semaine')">Chaque semaine</div>
+      <div class="opt" onclick="radio('q32',this,'toutes les 2 semaines')">Toutes les 2 semaines</div>
+      <div class="opt" onclick="radio('q32',this,'chaque mois')">Chaque mois</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(32)">←</button>
+      <button class="btn-next" onclick="next(32)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q33 -->
+  <div class="step" data-step="33">
+    <div class="step-num">Question 33 / 35</div>
+    <h2 class="step-question">Quel est votre<br><em>objectif principal ?</em></h2>
+    <p class="step-hint">Ce qui vous a amené à chercher une meilleure alimentation pour votre chien.</p>
+    <div class="options" id="q33">
+      <div class="opt" onclick="radio('q33',this,'santé générale')">Santé générale</div>
+      <div class="opt" onclick="radio('q33',this,'perte de poids')">Perte de poids</div>
+      <div class="opt" onclick="radio('q33',this,'pelage et peau')">Pelage et peau</div>
+      <div class="opt" onclick="radio('q33',this,'digestion')">Digestion</div>
+      <div class="opt" onclick="radio('q33',this,'sport et performance')">Sport et performance</div>
+      <div class="opt" onclick="radio('q33',this,'senior et longévité')">Senior et longévité</div>
+      <div class="opt" onclick="radio('q33',this,'problème spécifique')">Problème spécifique</div>
+    </div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(33)">←</button>
+      <button class="btn-next" onclick="next(33)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q34 -->
+  <div class="step" data-step="34">
+    <div class="step-num">Question 34 / 35</div>
+    <h2 class="step-question">Vos attentes<br><em>libres ?</em></h2>
+    <p class="step-hint">Ce que vous n'avez pas pu exprimer dans les questions précédentes. Optionnel.</p>
+    <textarea id="q34" placeholder="Ex: mon chien a tendance à vomir le matin à jeun, je cherche des recettes simples avec peu d'ingrédients..."></textarea>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(34)">←</button>
+      <button class="btn-next" onclick="next(34)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- Q35 — EMAIL -->
+  <div class="step" data-step="35">
+    <div class="step-num">Dernière question</div>
+    <h2 class="step-question">Où envoyer<br><em>le plan de votre chien ?</em></h2>
+    <p class="step-hint">Le rapport nutritionnel complet + le menu du premier mois seront envoyés gratuitement à cette adresse dans les prochaines minutes.</p>
+    <input type="email" id="q35" placeholder="votre@email.com">
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="step-nav">
+      <button class="btn-back" onclick="prev(35)">←</button>
+      <button class="btn-next" id="submitBtn" onclick="submitQuiz()">Recevoir mon plan gratuitement →</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- LOADING -->
+<div class="loading" id="loadingScreen">
+  <div class="loading-ring"></div>
+  <h2>Kyno analyse<br>le profil de <span id="loadingName">votre chien</span>…</h2>
+  <p>Notre IA nutritionniste calcule ses besoins énergétiques,<br>analyse ses prédispositions raciales et compose<br>son menu de saison. Environ 30 secondes.</p>
+</div>
+
+<!-- SUCCÈS -->
+<div class="success" id="successScreen">
+  <div class="success-icon">✦</div>
+  <h2>Le plan de <em><span id="successName">votre chien</span></em><br>est en route !</h2>
+  <p>Vérifiez votre boîte email dans les prochaines minutes.<br>Pensez à regarder vos spams si vous ne le voyez pas.</p>
+  <div class="success-note">
+    Vous faites partie des 100 premiers bêta testeurs Kyno.<br>
+    Dans 2 semaines, nous vous demanderons vos retours<br>
+    pour améliorer le service avant son lancement officiel.
+  </div>
+</div>
+
+<script>
+const answers = {};
+let current = 1;
+const total = 35;
+
+function radio(id, el, val) {
+  document.querySelectorAll(`#${id} .opt`).forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[id] = val;
+}
+
+function multi(id, el, val) {
+  const noneVals = ['aucun','aucune'];
+  if (noneVals.includes(val)) {
+    document.querySelectorAll(`#${id} .opt`).forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    answers[id] = [val];
+    return;
+  }
+  document.querySelectorAll(`#${id} .opt`).forEach(o => {
+    const v = o.getAttribute('onclick').match(/'([^']+)'\)$/)?.[1];
+    if (noneVals.includes(v)) o.classList.remove('selected');
+  });
+  el.classList.toggle('selected');
+  answers[id] = [...document.querySelectorAll(`#${id} .opt.selected`)]
+    .map(o => o.getAttribute('onclick').match(/'([^']+)'\)$/)?.[1])
+    .filter(Boolean);
+}
+
+function next(step) {
+  if (!validate(step)) return;
+  saveText(step);
+  if (step === 1) {
+    const name = answers.q1 || 'votre chien';
+    document.getElementById('loadingName').textContent = name;
+    document.getElementById('successName').textContent = name;
+  }
+  current = step + 1;
+  show(current);
+}
+
+function prev(step) {
+  current = step - 1;
+  show(current);
+}
+
+function show(step) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.querySelector(`[data-step="${step}"]`)?.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  const pct = Math.round((step / total) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('navStep').textContent = `Question ${step} / ${total}`;
+}
+
+function saveText(step) {
+  const el = document.getElementById(`q${step}`);
+  if (el) answers[`q${step}`] = el.value.trim();
+}
+
+function validate(step) {
+  clearErrors(step);
+  // Champs texte obligatoires
+  if ([1,2,4].includes(step)) {
+    const val = document.getElementById(`q${step}`)?.value.trim();
+    if (!val) { showErr(step,'Ce champ est requis.'); return false; }
+    if (step===4 && (isNaN(val)||val<=0||val>100)) { showErr(step,'Poids valide entre 0.5 et 100 kg.'); return false; }
+  }
+  // Radio obligatoires
+  const radioSteps = [3,5,6,7,8,13,17,19,21,22,23,24,25,26,28,29,32,33];
+  if (radioSteps.includes(step) && !answers[`q${step}`]) {
+    showErr(step,'Veuillez sélectionner une option.'); return false;
+  }
+  // Multi obligatoires
+  const multiSteps = [10,12,14,15,16,18,20,27,30,31];
+  if (multiSteps.includes(step) && (!answers[`q${step}`]||answers[`q${step}`].length===0)) {
+    showErr(step,'Veuillez sélectionner au moins une option.'); return false;
+  }
+  // Email
+  if (step===35) {
+    const email = document.getElementById('q35')?.value.trim();
+    if (!email||!email.includes('@')||!email.includes('.')) {
+      document.getElementById('errorMsg').textContent = 'Entrez une adresse email valide.';
+      document.getElementById('errorMsg').style.display = 'block';
+      return false;
+    }
+    answers.q35 = email;
+  }
+  return true;
+}
+
+function showErr(step, msg) {
+  const err = document.createElement('p');
+  err.className = 'step-error';
+  err.textContent = msg;
+  document.querySelector(`[data-step="${step}"] .step-nav`).before(err);
+  setTimeout(()=>err.remove(), 3000);
+}
+
+function clearErrors(step) {
+  document.querySelector(`[data-step="${step}"] .step-error`)?.remove();
+  const em = document.getElementById('errorMsg');
+  if (em) em.style.display = 'none';
+}
+
+async function submitQuiz() {
+  if (!validate(35)) return;
+
+  const quizData = {
+    prenom:        answers.q1||'',
+    race:          answers.q2||'',
+    age:           answers.q3||'',
+    poids:         parseFloat(answers.q4)||null,
+    sexe:          answers.q5||'',
+    activite:      answers.q6||'',
+    environnement: answers.q7||'',
+    alimentation:  answers.q8||'',
+    antecedents:   answers.q9||'',
+    sante:         answers.q10||[],
+    traitements:   answers.q11||'',
+    pelage:        answers.q12||[],
+    selles:        answers.q13||'',
+    odeurs:        answers.q14||[],
+    comportementAlimentaire: answers.q15||[],
+    troublesComportement:    answers.q16||[],
+    etatDents:     answers.q17||'',
+    personnesVulnerables: answers.q18||[],
+    reactionsAllergiques: answers.q19||'',
+    intolerances:  answers.q20||[],
+    problemesOreilles: answers.q21||'',
+    glandesAnales: answers.q22||'',
+    calculsUrinaires: answers.q23||'',
+    stress:        answers.q24||'',
+    modeAlimentaire: answers.q25||'',
+    budget:        answers.q26||'',
+    equipement:    answers.q27||[],
+    tempsPrep:     answers.q28||'',
+    connaissances: answers.q29||'',
+    coursesOu:     answers.q30||[],
+    autresAnimaux: answers.q31||[],
+    frequenceMenus: answers.q32||'',
+    objectif:      answers.q33||'',
+    attentes:      answers.q34||'',
+    email:         answers.q35||'',
+    plan:          'beta',
+  };
+
+  document.getElementById('quizWrap').style.display = 'none';
+  document.getElementById('loadingScreen').style.display = 'block';
+
+  try {
+    const res = await fetch('/api/generate', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(quizData)
+    });
+    if (!res.ok) throw new Error('Erreur serveur');
+    const result = await res.json();
+    if (result.success) {
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+    } else {
+      throw new Error(result.error||'Erreur inconnue');
+    }
+  } catch(err) {
+    console.error(err);
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('quizWrap').style.display = 'block';
+    document.getElementById('errorMsg').textContent = 'Une erreur est survenue. Réessayez dans quelques secondes.';
+    document.getElementById('errorMsg').style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
