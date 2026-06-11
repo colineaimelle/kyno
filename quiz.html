@@ -789,6 +789,7 @@ function next(step) {
     document.getElementById('successName').textContent = name;
   }
   current = step + 1;
+  if (current > total) return;
   show(current);
 }
 
@@ -808,7 +809,7 @@ function show(step) {
 
 function saveText(step) {
   const el = document.getElementById(`q${step}`);
-  if (el) answers[`q${step}`] = el.value.trim();
+  if (el && el.tagName !== 'DIV') answers[`q${step}`] = el.value.trim();
 }
 
 function validate(step) {
