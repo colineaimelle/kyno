@@ -1,35 +1,23 @@
 // api/generate.js
-// Vercel Serverless Function — Kyno
-// Reçoit les données du quiz, appelle l'API Anthropic, retourne le rapport
-
 export default async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
 
   try {
     const data = req.body;
-
-    if (!data.prenom || !data.race) {
-      return res.status(400).json({ error: 'Données du quiz incomplètes' });
-    }
+    if (!data.prenom || !data.race) return res.status(400).json({ error: 'Données incomplètes' });
 
     const plan = data.plan || 'beta';
     const saison = getSaison();
     const pm = data.poids ? Math.pow(data.poids, 0.75).toFixed(2) : 'à calculer';
 
-    const systemPrompt = buildPrompt(data, plan, saison, pm);
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    // ── APPEL 1 : RAPPORT ────────────────────────────────
+    const rapportResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -38,75 +26,63 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 1500,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: 'Génère le rapport nutritionnel personnalisé pour ce chien.'
-          }
-        ]
+        max_tokens: 4000,
+        system: buildRapportPrompt(data, saison, pm),
+        messages: [{ role: 'user', content: 'Génère le rapport nutritionnel.' }]
       })
     });
 
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error?.message || 'Erreur API Anthropic');
+    if (!rapportResponse.ok) {
+      const err = await rapportResponse.json();
+      throw new Error(err.error?.message || 'Erreur API Anthropic rapport');
     }
 
-    const result = await response.json();
-    const rapport = result.content[0].text;
+    const rapportResult = await rapportResponse.json();
+    const rapport = rapportResult.content[0].text;
 
-    // ── ENVOI EMAIL BREVO ─────────────────────────────────
+    // ── EMAIL 1 : RAPPORT ────────────────────────────────
     if (data.email) {
-      await sendBrevoEmail(data.email, data.prenom, rapport);
+      await sendEmailRapport(data.email, data.prenom, rapport);
     }
 
-    return res.status(200).json({
-      success: true,
-      rapport: rapport,
-      prenom: data.prenom
-    });
+    // ── APPEL 2 : MENU (bêta uniquement) ─────────────────
+    if (plan === 'beta' && data.email) {
+      const menuResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 4000,
+          system: buildMenuPrompt(data, saison, pm),
+          messages: [{ role: 'user', content: 'Génère le menu de la semaine.' }]
+        })
+      });
+
+      if (menuResponse.ok) {
+        const menuResult = await menuResponse.json();
+        const menu = menuResult.content[0].text;
+        await sendEmailMenu(data.email, data.prenom, menu);
+      }
+    }
+
+    return res.status(200).json({ success: true, prenom: data.prenom });
 
   } catch (error) {
     console.error('Erreur generate.js:', error);
-    return res.status(500).json({
-      error: 'Erreur lors de la génération du rapport',
-      message: error.message
-    });
+    return res.status(500).json({ error: 'Erreur serveur', message: error.message });
   }
 }
 
-// ── BUILD PROMPT ─────────────────────────────────────────
-function buildPrompt(data, plan, saison, pm) {
+// ── PROMPT RAPPORT ────────────────────────────────────────
+function buildRapportPrompt(data, saison, pm) {
   const sante = Array.isArray(data.sante) ? data.sante.filter(v => v !== 'aucun') : [];
   const pelage = Array.isArray(data.pelage) ? data.pelage.filter(v => v !== 'brillant') : [];
   const odeurs = Array.isArray(data.odeurs) ? data.odeurs.filter(v => v !== 'aucune') : [];
   const intolerances = Array.isArray(data.intolerances) ? data.intolerances.filter(v => v !== 'aucune') : [];
-  const equipement = Array.isArray(data.equipement) ? data.equipement : [];
-
-  const moduleRecettes = plan === 'beta' || plan === 'complet' ? `
-## MODULE RECETTES — ACTIF
-
-Génère un menu complet pour la première semaine incluant :
-1. Le détail de chaque repas (ingrédients + quantités en grammes)
-2. La méthode de cuisson recommandée (vapeur prioritaire)
-3. Le planning batch cooking (2 sessions maximum par semaine)
-4. Les conseils de conservation (48h frigo, 3 mois congélateur)
-5. Le coût estimé à la semaine selon le budget : ${data.budget}
-6. Rappel CMV obligatoire (Vit'i5 ou équivalent)
-7. Ajouter l'huile froide dans la gamelle au moment du service uniquement
-
-Intolérances à exclure absolument : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
-Mode alimentaire souhaité : ${data.modeAlimentaire}
-Équipement disponible : ${equipement.join(', ')}
-Temps de préparation disponible : ${data.tempsPrep}
-` : `
-## MODULE RECETTES — NON ACTIF
-
-Ne génère pas de recettes ni de quantités précises.
-Mentionne à la fin que les menus mensuels avec quantités exactes sont disponibles dans l'abonnement à 19€/mois.
-`;
 
   return `Tu es Kyno, expert en nutrition canine individualisée basé sur les références NRC 2006 et FEDIAF 2023. Tu génères des rapports nutritionnels personnalisés pour des propriétaires de chiens en France. Ton ton est chaleureux, expert et direct. Tu vouvoies le propriétaire et parles du chien par son prénom.
 
@@ -119,86 +95,101 @@ Mentionne à la fin que les menus mensuels avec quantités exactes sont disponib
 - Sexe/Statut : ${data.sexe}
 - Niveau d'activité : ${data.activite}
 - Environnement : ${data.environnement}
-- Saison actuelle en France : ${saison}
+- Saison actuelle : ${saison}
 
-## SANTÉ ET ALIMENTATION
+## SANTÉ
 - Alimentation actuelle : ${data.alimentation}
-- Problèmes de santé : ${sante.length > 0 ? sante.join(', ') : 'aucun déclaré'}
-- Traitements en cours : ${data.traitements || 'aucun'}
-- État du pelage : ${pelage.length > 0 ? pelage.join(', ') : 'bon état général'}
-- Qualité des selles : ${data.selles}
+- Problèmes de santé : ${sante.length > 0 ? sante.join(', ') : 'aucun'}
+- Traitements : ${data.traitements || 'aucun'}
+- Pelage : ${pelage.length > 0 ? pelage.join(', ') : 'bon état'}
+- Selles : ${data.selles}
 - Odeurs : ${odeurs.length > 0 ? odeurs.join(', ') : 'aucune'}
-- Intolérances connues : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
+- Intolérances : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
 
-## PROJET ALIMENTAIRE
+## PROJET
 - Mode souhaité : ${data.modeAlimentaire}
-- Budget mensuel : ${data.budget}
-- Objectif principal : ${data.objectif}
+- Budget : ${data.budget}
+- Objectif : ${data.objectif}
 
 ## CALCUL BEE
-Calcule BEE = 110 × (${data.poids})^0.75 et applique le coefficient :
-- Stérilisé(e) sédentaire : × 0.9-1.0
-- Entier(e) modéré : × 1.2-1.4
-- Actif : × 1.6-1.8
-- Très actif : × 2.0-2.5
-Explique le résultat simplement au propriétaire.
+Calcule BEE = 110 × (${data.poids})^0.75 et applique le coefficient selon l'activité.
 
 ## PRÉDISPOSITIONS RACIALES
-Identifie les alertes nutritionnelles pour la race "${data.race}" :
-- DCM/taurine : Golden Retriever, Boxer, Doberman, Cocker, Terre-Neuve
-- Cuivre : Bedlington, Labrador, Westie
-- MDR1 : Border Collie, Berger Australien, Colley, Shetland
-- Obésité : Labrador, Golden, Basset
-- EPI/digestif : Berger Allemand
-- Brachycéphales : Bouledogue, Carlin, Boxer
-- Épagneul Breton : articulations, tendons, énergie élevée
-Si aucune prédisposition connue, ne pas inventer.
+Identifie les alertes pour "${data.race}" parmi : DCM/taurine, cuivre, MDR1, obésité, EPI, brachycéphales, épagneul breton (articulations/tendons).
 
 ## AJUSTEMENT SAISONNIER — ${saison.toUpperCase()}
-${saison === 'Printemps' ? 'Mue intense : renforcer acides aminés soufrés, zinc, biotine, oméga-3. Aliments de saison : agneau, maquereau, haricots verts, carottes primeurs.' : ''}
-${saison === 'Été' ? 'Hydratation prioritaire — besoin hydrique peut doubler. Alimentation humide recommandée. Repas aux heures fraîches. Aliments : sardines fraîches, dinde, courgettes, concombre.' : ''}
-${saison === 'Automne' ? 'Renforcement immunitaire : zinc, oméga-3, probiotiques. Aliments : hareng, porc, courge, carottes, panais. Gibier toujours cuit à cœur.' : ''}
-${saison === 'Hiver' ? 'Chien intérieur : rations stables. Chien actif extérieur : +10-20% calories si perte de poids. Aliments : bœuf, dinde, courge butternut, patate douce, cabillaud. Repas tièdes.' : ''}
-
-${moduleRecettes}
+${saison === 'Printemps' ? 'Mue intense : oméga-3, zinc, biotine. Aliments : agneau, maquereau, haricots verts.' : ''}
+${saison === 'Été' ? 'Hydratation prioritaire. Repas aux heures fraîches. Aliments : sardines, dinde, courgettes.' : ''}
+${saison === 'Automne' ? 'Renforcement immunitaire : zinc, oméga-3. Aliments : hareng, courge, carottes.' : ''}
+${saison === 'Hiver' ? 'Chien actif : +10-20% calories. Aliments : bœuf, dinde, patate douce.' : ''}
 
 ## COMPLÉMENTS PRIORITAIRES
-Identifie les 3-5 compléments les plus importants pour ce profil.
-Explique pourquoi en termes simples.
-${plan === 'beta' || plan === 'complet' ? 'Inclus les dosages calculés selon le poids métabolique.' : 'Ne pas donner les dosages exacts — réservés à l\'abonnement.'}
-Rappeler toujours : oméga-3 + vitamine E ensemble, CMV obligatoire en ration ménagère.
+Les 3-5 compléments clés avec dosages selon le poids métabolique.
+Rappel : oméga-3 + vitamine E ensemble, CMV obligatoire.
 
 ## ALERTES
-- Aliments interdits : raisin, oignon/ail/poireau, chocolat, xylitol, os cuits, avocat, macadamia
-- Interactions médicaments si traitements déclarés : ${data.traitements || 'aucun'}
-- Signaux d'alerte vétérinaire pertinents pour ce profil
+Aliments interdits, interactions médicaments, signaux vétérinaires.
 
-## FORMAT DU RAPPORT (600-900 mots)
-
-Structure :
-1. Titre accrocheur personnalisé avec le prénom
-2. Résumé percutant du profil en 3-4 lignes
-3. BEE calculé expliqué simplement
-4. Analyse de l'alimentation actuelle et ce qui manque
+## FORMAT (500-700 mots)
+1. Titre accrocheur avec le prénom
+2. Résumé du profil (3-4 lignes)
+3. BEE calculé et expliqué simplement
+4. Ce qui manque dans l'alimentation actuelle
 5. Besoins nutritionnels spécifiques
-6. Alertes raciales si pertinent pour "${data.race}"
-7. Ajustement saisonnier ${saison}
-${plan === 'beta' || plan === 'complet' ? '8. Menu complet de la première semaine avec quantités\n9. Planning batch cooking\n10. Compléments avec dosages\n11. Aliments à éviter\n12. Ce que ça va changer en 4-6 semaines' : '8. Les 3-5 compléments prioritaires expliqués simplement\n9. Aliments à éviter absolument\n10. Ce que ça va changer en 4-6 semaines\n11. Section "Et maintenant ?" — menus mensuels disponibles en abonnement à 19€/mois'}
+6. Alertes raciales si pertinent
+7. Ajustement saisonnier
+8. Compléments prioritaires avec dosages
+9. Aliments à éviter absolument
+10. Ce que ça va changer en 4-6 semaines
+11. Phrase finale : "Votre menu de la semaine arrive dans quelques instants dans un second email."
 
-Note légale finale : Ce rapport est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consulter un vétérinaire avant tout changement alimentaire.`;
+Note légale : Ce rapport est éducatif et ne remplace pas un avis vétérinaire.`;
 }
 
-// ── SAISON AUTOMATIQUE ───────────────────────────────────
-function getSaison() {
-  const m = new Date().getMonth() + 1;
-  if (m >= 3 && m <= 5) return 'Printemps';
-  if (m >= 6 && m <= 8) return 'Été';
-  if (m >= 9 && m <= 11) return 'Automne';
-  return 'Hiver';
+// ── PROMPT MENU ───────────────────────────────────────────
+function buildMenuPrompt(data, saison, pm) {
+  const intolerances = Array.isArray(data.intolerances) ? data.intolerances.filter(v => v !== 'aucune') : [];
+  const equipement = Array.isArray(data.equipement) ? data.equipement : [];
+
+  return `Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires ultra-personnalisés basés sur NRC 2006 et FEDIAF 2023. Ton ton est pratique, précis et chaleureux.
+
+## PROFIL
+- Prénom : ${data.prenom}
+- Race : ${data.race}
+- Poids : ${data.poids} kg — Poids métabolique : ${pm} kg PM
+- Activité : ${data.activite}
+- Saison : ${saison}
+- Mode alimentaire : ${data.modeAlimentaire}
+- Budget : ${data.budget}
+- Équipement : ${equipement.join(', ')}
+- Temps préparation : ${data.tempsPrep}
+- Intolérances à exclure absolument : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
+
+## MENU SEMAINE 1 — FORMAT REQUIS
+
+Génère un menu complet pour 7 jours incluant :
+
+1. **Quantité journalière totale** en grammes (basée sur le BEE calculé)
+2. **Répartition** matin/soir en %
+3. **Menu jour par jour** (lundi → dimanche) avec :
+   - Ingrédients précis en grammes
+   - Méthode de cuisson
+   - Temps de préparation
+4. **Planning batch cooking** : 2 sessions max par semaine, ce qu'on prépare à l'avance
+5. **Liste de courses** groupée par catégorie (viandes, légumes, compléments)
+6. **Coût estimé** à la semaine selon le budget ${data.budget}
+7. **CMV recommandé** : Vit'i5 ou équivalent, dosage selon le poids
+8. **Rappel** : huile froide (oméga-3) toujours ajoutée dans la gamelle au moment du service, jamais chauffée
+
+Intolérances à exclure : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
+Saison : adapter les légumes et protéines à ${saison}
+
+## FORMAT
+Clair, structuré, pratique. Le propriétaire doit pouvoir suivre le menu sans se poser de questions. Utilise des tableaux si pertinent. Commence par : "Voici le menu de la semaine de [prénom] !"`;
 }
 
-// ── BREVO EMAIL ──────────────────────────────────────────
-async function sendBrevoEmail(email, prenom, rapport) {
+// ── EMAIL RAPPORT ─────────────────────────────────────────
+async function sendEmailRapport(email, prenom, rapport) {
   const htmlRapport = rapport
     .replace(/\n\n/g, '</p><p style="margin:0 0 16px;">')
     .replace(/\n/g, '<br>')
@@ -214,64 +205,94 @@ async function sendBrevoEmail(email, prenom, rapport) {
     },
     body: JSON.stringify({
       sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
-      to: [{ email: email, name: prenom }],
-      subject: `Le plan nutritionnel de ${prenom} est prêt ✦`,
-      htmlContent: `<!DOCTYPE html>
+      to: [{ email, name: prenom }],
+      subject: `Le rapport nutritionnel de ${prenom} est prêt ✦`,
+      htmlContent: buildEmailHtml(prenom, htmlRapport, 'rapport')
+    })
+  });
+}
+
+// ── EMAIL MENU ────────────────────────────────────────────
+async function sendEmailMenu(email, prenom, menu) {
+  const htmlMenu = menu
+    .replace(/\n\n/g, '</p><p style="margin:0 0 16px;">')
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#2B3A2E;font-weight:600;">$1</strong>')
+    .replace(/^/, '<p style="margin:0 0 16px;">')
+    .replace(/$/, '</p>');
+
+  await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': process.env.BREVO_API_KEY
+    },
+    body: JSON.stringify({
+      sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
+      to: [{ email, name: prenom }],
+      subject: `Le menu de la semaine de ${prenom} ✦`,
+      htmlContent: buildEmailHtml(prenom, htmlMenu, 'menu')
+    })
+  });
+}
+
+// ── TEMPLATE EMAIL ────────────────────────────────────────
+function buildEmailHtml(prenom, htmlContent, type) {
+  const isMenu = type === 'menu';
+  const title = isMenu
+    ? `Le menu de la semaine de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em>`
+    : `Le rapport nutritionnel de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em> est prêt`;
+  const subtitle = isMenu
+    ? 'Menu personnalisé — semaine 1'
+    : 'Rapport personnalisé';
+  const intro = isMenu
+    ? `Voici le menu détaillé de la première semaine pour <strong style="color:#2B3A2E;">${prenom}</strong>. Quantités précises, batch cooking et liste de courses inclus.`
+    : `Voici le rapport nutritionnel ultra-personnalisé que Kyno a généré pour <strong style="color:#2B3A2E;">${prenom}</strong>. Basé sur les références NRC 2006 et FEDIAF 2023.`;
+  const ctaText = isMenu
+    ? `Continuer avec Kyno — menus chaque mois →`
+    : `Voir le menu de la semaine dans le prochain email`;
+
+  return `<!DOCTYPE html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Rapport Kyno</title>
-</head>
-<body style="margin:0;padding:0;background:#E4F4E8;font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#E4F4E8;font-family:Arial,Helvetica,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#E4F4E8;padding:40px 20px;">
     <tr><td align="center">
     <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
 
-      <!-- HEADER -->
       <tr>
         <td style="background:#2B3A2E;border-radius:16px 16px 0 0;padding:36px 48px;text-align:center;border-bottom:3px solid #EC6592;">
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td align="center">
-                <div style="display:inline-block;width:44px;height:44px;border-radius:50%;border:2px solid #2FA35E;text-align:center;line-height:40px;margin-bottom:12px;">
-                  <span style="font-size:22px;font-weight:700;color:#2FA35E;">K</span>
-                </div>
-                <p style="margin:0;font-size:24px;font-weight:700;color:#FBFDF7;letter-spacing:0.06em;">kyno</p>
-                <p style="margin:6px 0 0;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);">Nutrition Canine Individualisée</p>
-              </td>
-            </tr>
-          </table>
+          <div style="display:inline-block;width:44px;height:44px;border-radius:50%;border:2px solid #2FA35E;text-align:center;line-height:40px;margin-bottom:12px;">
+            <span style="font-size:22px;font-weight:700;color:#2FA35E;">K</span>
+          </div>
+          <p style="margin:0;font-size:24px;font-weight:700;color:#FBFDF7;letter-spacing:0.06em;">kyno</p>
+          <p style="margin:6px 0 0;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);">Nutrition Canine Individualisée</p>
         </td>
       </tr>
 
-      <!-- HERO BAND -->
       <tr>
         <td style="background:#2FA35E;padding:20px 48px;border-bottom:3px solid #F2843C;">
-          <p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Rapport personnalisé</p>
-          <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FBFDF7;letter-spacing:-0.01em;">Le plan nutritionnel de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em> est prêt</p>
+          <p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">${subtitle}</p>
+          <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FBFDF7;">${title}</p>
         </td>
       </tr>
 
-      <!-- INTRO -->
       <tr>
         <td style="background:#FBFDF7;padding:40px 48px 0;">
-          <p style="margin:0 0 8px;font-size:15px;color:#2B3A2E;line-height:1.7;">Bonjour,</p>
-          <p style="margin:0 0 32px;font-size:14px;color:#7E8C80;line-height:1.8;">Voici le rapport nutritionnel ultra-personnalisé que Kyno a généré pour <strong style="color:#2B3A2E;">${prenom}</strong>. Il est basé sur les références NRC 2006 et FEDIAF 2023 — adapté à sa race, son âge, sa saison et son profil de santé.</p>
+          <p style="margin:0 0 8px;font-size:15px;color:#2B3A2E;">Bonjour,</p>
+          <p style="margin:0 0 32px;font-size:14px;color:#7E8C80;line-height:1.8;">${intro}</p>
           <div style="height:3px;background:linear-gradient(to right,#2FA35E,#EC6592,#FFCE2E);margin-bottom:32px;border-radius:2px;"></div>
         </td>
       </tr>
 
-      <!-- RAPPORT -->
       <tr>
         <td style="background:#FBFDF7;padding:0 48px;">
-          <div style="background:white;border-radius:12px;padding:36px;border:1px solid #DDE8DA;border-left:4px solid #2FA35E;font-size:14px;line-height:1.85;color:#2B3A2E;">
-            ${htmlRapport}
+          <div style="background:white;border-radius:12px;padding:36px;border:1px solid #DDE8DA;border-left:4px solid ${isMenu ? '#EC6592' : '#2FA35E'};font-size:14px;line-height:1.85;color:#2B3A2E;">
+            ${htmlContent}
           </div>
         </td>
       </tr>
 
-      <!-- BADGES -->
       <tr>
         <td style="background:#FBFDF7;padding:32px 48px;">
           <table width="100%" cellpadding="0" cellspacing="0">
@@ -299,27 +320,24 @@ async function sendBrevoEmail(email, prenom, rapport) {
         </td>
       </tr>
 
-      <!-- CTA -->
       <tr>
         <td style="background:#FBFDF7;padding:0 48px 40px;">
           <div style="background:#2B3A2E;border-radius:14px;padding:36px;text-align:center;border:3px solid #F2843C;">
             <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.4);">Chaque mois</p>
-            <p style="margin:0 0 16px;font-size:22px;font-weight:700;color:#FBFDF7;line-height:1.3;">Un nouveau menu pour <span style="color:#2FA35E;">${prenom}</span><br><span style="font-size:15px;font-weight:400;color:rgba(245,240,232,0.5);">adapté à la saison et à son évolution</span></p>
-            <a href="https://project-jlc6z.vercel.app" style="display:inline-block;background:#2FA35E;color:white;padding:16px 32px;border-radius:4px;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.04em;border:2px solid #F2843C;">Continuer avec Kyno →</a>
+            <p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#FBFDF7;line-height:1.3;">Un nouveau menu pour <span style="color:#2FA35E;">${prenom}</span><br><span style="font-size:14px;font-weight:400;color:rgba(245,240,232,0.5);">adapté à la saison et à son évolution</span></p>
+            <a href="https://project-jlc6z.vercel.app" style="display:inline-block;background:#2FA35E;color:white;padding:16px 32px;border-radius:4px;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.04em;border:2px solid #F2843C;">${ctaText}</a>
           </div>
         </td>
       </tr>
 
-      <!-- NOTE LEGALE -->
       <tr>
         <td style="background:#FBFDF7;padding:0 48px 32px;">
           <div style="border-top:1px solid #DDE8DA;padding-top:24px;">
-            <p style="margin:0;font-size:11px;color:#7E8C80;line-height:1.7;">⚠ Ce rapport est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou de traitement en cours, consultez votre vétérinaire avant tout changement alimentaire.</p>
+            <p style="margin:0;font-size:11px;color:#7E8C80;line-height:1.7;">⚠ Ce rapport est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consultez votre vétérinaire avant tout changement alimentaire.</p>
           </div>
         </td>
       </tr>
 
-      <!-- FOOTER -->
       <tr>
         <td style="background:#233028;border-radius:0 0 16px 16px;padding:28px 48px;border-top:3px solid #EC6592;">
           <table width="100%" cellpadding="0" cellspacing="0">
@@ -341,7 +359,14 @@ async function sendBrevoEmail(email, prenom, rapport) {
     </td></tr>
   </table>
 </body>
-</html>`
-    })
-  });
+</html>`;
+}
+
+// ── SAISON ────────────────────────────────────────────────
+function getSaison() {
+  const m = new Date().getMonth() + 1;
+  if (m >= 3 && m <= 5) return 'Printemps';
+  if (m >= 6 && m <= 8) return 'Été';
+  if (m >= 9 && m <= 11) return 'Automne';
+  return 'Hiver';
 }
