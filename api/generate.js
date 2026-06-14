@@ -83,8 +83,9 @@ function buildRapportPrompt(data, saison, pm) {
   const pelage = Array.isArray(data.pelage) ? data.pelage.filter(v => v !== 'brillant') : [];
   const odeurs = Array.isArray(data.odeurs) ? data.odeurs.filter(v => v !== 'aucune') : [];
   const intolerances = Array.isArray(data.intolerances) ? data.intolerances.filter(v => v !== 'aucune') : [];
+  const comportement = Array.isArray(data.troublesComportement) ? data.troublesComportement.filter(v => v !== 'aucun') : [];
 
-  return `Tu es Kyno, expert en nutrition canine individualisée basé sur les références NRC 2006 et FEDIAF 2023. Tu génères des rapports nutritionnels personnalisés pour des propriétaires de chiens en France. Ton ton est chaleureux, expert et direct. Tu vouvoies le propriétaire et parles du chien par son prénom.
+  return `Tu es Kyno, expert en nutrition canine individualisée basé sur les références NRC 2006 et FEDIAF 2023. Ton ton est chaleureux, expert et direct. Tu vouvoies le propriétaire et parles du chien par son prénom. Tu ne donnes JAMAIS de quantités en grammes dans ce rapport — uniquement dans le menu séparé.
 
 ## PROFIL DE ${data.prenom.toUpperCase()}
 - Prénom : ${data.prenom}
@@ -96,6 +97,7 @@ function buildRapportPrompt(data, saison, pm) {
 - Niveau d'activité : ${data.activite}
 - Environnement : ${data.environnement}
 - Saison actuelle : ${saison}
+- Niveau de stress : ${data.stress || 'non renseigné'}
 
 ## SANTÉ
 - Alimentation actuelle : ${data.alimentation}
@@ -105,43 +107,66 @@ function buildRapportPrompt(data, saison, pm) {
 - Selles : ${data.selles}
 - Odeurs : ${odeurs.length > 0 ? odeurs.join(', ') : 'aucune'}
 - Intolérances : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
+- Troubles du comportement : ${comportement.length > 0 ? comportement.join(', ') : 'aucun'}
 
 ## PROJET
 - Mode souhaité : ${data.modeAlimentaire}
 - Budget : ${data.budget}
 - Objectif : ${data.objectif}
+- Attentes libres : ${data.attentes || 'aucune'}
 
 ## CALCUL BEE
 Calcule BEE = 110 × (${data.poids})^0.75 et applique le coefficient selon l'activité.
+Exprime le résultat en kcal/jour de façon simple et compréhensible.
+Ne donne pas de quantités en grammes ici.
 
 ## PRÉDISPOSITIONS RACIALES
 Identifie les alertes pour "${data.race}" parmi : DCM/taurine, cuivre, MDR1, obésité, EPI, brachycéphales, épagneul breton (articulations/tendons).
+Si aucune prédisposition connue, ne pas inventer.
 
 ## AJUSTEMENT SAISONNIER — ${saison.toUpperCase()}
-${saison === 'Printemps' ? 'Mue intense : oméga-3, zinc, biotine. Aliments : agneau, maquereau, haricots verts.' : ''}
-${saison === 'Été' ? 'Hydratation prioritaire. Repas aux heures fraîches. Aliments : sardines, dinde, courgettes.' : ''}
-${saison === 'Automne' ? 'Renforcement immunitaire : zinc, oméga-3. Aliments : hareng, courge, carottes.' : ''}
-${saison === 'Hiver' ? 'Chien actif : +10-20% calories. Aliments : bœuf, dinde, patate douce.' : ''}
+${saison === 'Printemps' ? 'Mue intense : oméga-3, zinc, biotine. Aliments de saison recommandés.' : ''}
+${saison === 'Été' ? 'Hydratation prioritaire. Repas aux heures fraîches. Aliments frais et humides.' : ''}
+${saison === 'Automne' ? 'Renforcement immunitaire : zinc, oméga-3, probiotiques.' : ''}
+${saison === 'Hiver' ? 'Adapter les apports selon le niveau d\'activité et l\'environnement.' : ''}
 
 ## COMPLÉMENTS PRIORITAIRES
 Les 3-5 compléments clés avec dosages selon le poids métabolique.
-Rappel : oméga-3 + vitamine E ensemble, CMV obligatoire.
+Rappel : oméga-3 + vitamine E ensemble, CMV obligatoire en ration ménagère.
+
+## NUTRITION & COMPORTEMENT
+${comportement.length > 0 || data.stress !== 'très calme' ? `
+Analyse les liens entre nutrition et comportement pour ce profil :
+- Troubles déclarés : ${comportement.length > 0 ? comportement.join(', ') : 'aucun'}
+- Niveau de stress : ${data.stress || 'non renseigné'}
+
+Explique quels aliments et compléments peuvent agir positivement sur :
+- L'anxiété et le stress : tryptophane (dinde, œuf), magnésium, oméga-3, probiotiques
+- L'hyperactivité : réduire les glucides rapides, augmenter les protéines de qualité, magnésium
+- L'agressivité : oméga-3 DHA (action sur le système nerveux), tryptophane
+- Les peurs : vitamine B6, magnésium, ashwagandha (si adapté au chien)
+Sois concret et pratique — quels aliments intégrer, lesquels éviter.
+` : 'Le comportement de ce chien ne nécessite pas d\'ajustements nutritionnels spécifiques.'}
 
 ## ALERTES
-Aliments interdits, interactions médicaments, signaux vétérinaires.
+- Aliments interdits : raisin, oignon/ail/poireau, chocolat, xylitol, os cuits, avocat, macadamia
+- Interactions médicaments si traitements : ${data.traitements || 'aucun'}
+- Signaux d'alerte vétérinaire pertinents pour ce profil
 
-## FORMAT (500-700 mots)
-1. Titre accrocheur avec le prénom
-2. Résumé du profil (3-4 lignes)
-3. BEE calculé et expliqué simplement
+## FORMAT DU RAPPORT (600-800 mots)
+Structure :
+1. Titre accrocheur personnalisé avec le prénom
+2. Résumé du profil en 3-4 lignes percutantes
+3. BEE calculé et expliqué simplement (sans grammes)
 4. Ce qui manque dans l'alimentation actuelle
-5. Besoins nutritionnels spécifiques
+5. Besoins nutritionnels spécifiques (sans grammes)
 6. Alertes raciales si pertinent
-7. Ajustement saisonnier
-8. Compléments prioritaires avec dosages
-9. Aliments à éviter absolument
-10. Ce que ça va changer en 4-6 semaines
-11. Phrase finale : "Votre menu de la semaine arrive dans quelques instants dans un second email."
+7. Ajustement saisonnier ${saison}
+8. Nutrition & comportement (si pertinent)
+9. Compléments prioritaires avec dosages
+10. Aliments à éviter absolument
+11. Ce que ça va changer en 4-6 semaines
+12. Phrase finale : "Votre menu de la semaine arrive dans quelques instants."
 
 Note légale : Ce rapport est éducatif et ne remplace pas un avis vétérinaire.`;
 }
@@ -151,7 +176,7 @@ function buildMenuPrompt(data, saison, pm) {
   const intolerances = Array.isArray(data.intolerances) ? data.intolerances.filter(v => v !== 'aucune') : [];
   const equipement = Array.isArray(data.equipement) ? data.equipement : [];
 
-  return `Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires ultra-personnalisés basés sur NRC 2006 et FEDIAF 2023. Ton ton est pratique, précis et chaleureux.
+  return `Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023.
 
 ## PROFIL
 - Prénom : ${data.prenom}
@@ -165,27 +190,63 @@ function buildMenuPrompt(data, saison, pm) {
 - Temps préparation : ${data.tempsPrep}
 - Intolérances à exclure absolument : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
 
-## MENU SEMAINE 1 — FORMAT REQUIS
+## CONCEPT DU MENU
+Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
+- 2 recettes uniquement : une pour le repas du MATIN, une pour le repas du SOIR
+- Les recettes sont cuisinées en grande quantité pour toute la semaine
+- Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur en portions
+- Les portions sont décongelées la veille au frigo
 
-Génère un menu complet pour 7 jours incluant :
+## FORMAT REQUIS
 
-1. **Quantité journalière totale** en grammes (basée sur le BEE calculé)
-2. **Répartition** matin/soir en %
-3. **Menu jour par jour** (lundi → dimanche) avec :
-   - Ingrédients précis en grammes
-   - Méthode de cuisson
-   - Temps de préparation
-4. **Planning batch cooking** : 2 sessions max par semaine, ce qu'on prépare à l'avance
-5. **Liste de courses** groupée par catégorie (viandes, légumes, compléments)
-6. **Coût estimé** à la semaine selon le budget ${data.budget}
-7. **CMV recommandé** : Vit'i5 ou équivalent, dosage selon le poids
-8. **Rappel** : huile froide (oméga-3) toujours ajoutée dans la gamelle au moment du service, jamais chauffée
+### 1. QUANTITÉ JOURNALIÈRE
+- Total en grammes par jour pour ${data.prenom}
+- Répartition : matin (40%) / soir (60%)
 
+### 2. RECETTE MATIN — [nom de la recette]
+Ingrédients pour 7 jours au total (en grammes) :
+- Protéine principale : X g
+- Légume 1 : X g
+- Légume 2 : X g
+- Complément : X g
+- Huile oméga-3 : X ml (à ajouter FROIDE dans la gamelle, jamais chauffée)
+
+Préparation (étapes simples) :
+1. ...
+2. ...
+3. ...
+
+### 3. RECETTE SOIR — [nom de la recette]
+Même format que la recette matin.
+
+### 4. SESSION BATCH COOKING
+Jour recommandé : dimanche (ou autre)
+Durée estimée : X minutes
+Étapes dans l'ordre :
+1. ...
+2. ...
+
+### 5. CONDITIONNEMENT
+- Portions jours 1-2-3 → réfrigérateur (boîtes hermétiques)
+- Portions jours 4-5-6-7 → congélateur (sachets ou boîtes)
+- Décongélation : la veille au soir au réfrigérateur
+- Ne jamais réchauffer au micro-ondes — tiède à l'eau chaude
+
+### 6. LISTE DE COURSES
+Viandes & poissons :
+- ...
+Légumes :
+- ...
+Compléments & huiles :
+- ...
+CMV : Vit'i5 ou équivalent — dosage selon le poids de ${data.prenom}
+
+### 7. COÛT ESTIMÉ
+Total semaine : environ X€ (adapté au budget ${data.budget})
+
+Commence par : "Voici le menu de la semaine de ${data.prenom} !"
 Intolérances à exclure : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
-Saison : adapter les légumes et protéines à ${saison}
-
-## FORMAT
-Clair, structuré, pratique. Le propriétaire doit pouvoir suivre le menu sans se poser de questions. Utilise des tableaux si pertinent. Commence par : "Voici le menu de la semaine de [prénom] !"`;
+Adapte les légumes et protéines à la saison : ${saison}`;
 }
 
 // ── EMAIL RAPPORT ─────────────────────────────────────────
