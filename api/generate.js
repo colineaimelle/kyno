@@ -1,4 +1,32 @@
 // api/generate.js
+
+// ── SUPABASE ──────────────────────────────────────────────
+async function saveToSupabase(data, statut) {
+  const url = `${process.env.SUPABASE_URL}/rest/v1/user`;
+  await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': process.env.SUPABASE_SERVICE_KEY,
+      'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({
+      email: data.email,
+      prenom: data.prenom,
+      prenom_chien: data.prenom,
+      race: data.race,
+      poids: data.poids,
+      plan: data.plan || 'beta',
+      statut: statut,
+      rapport_envoye: true,
+      menu_envoye: statut === 'beta'
+    })
+  });
+}
+
+export default async function handler(req, res) {
+  // ... reste du code
 export default async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -69,6 +97,11 @@ export default async function handler(req, res) {
       }
     }
 
+    // ── SAUVEGARDE SUPABASE ───────────────────────────────────
+    if (data.email) {
+      const statut = data.plan === 'beta' ? 'beta' : 'waitlist';
+      await saveToSupabase(data, statut);
+    }
     return res.status(200).json({ success: true, prenom: data.prenom });
 
   } catch (error) {
