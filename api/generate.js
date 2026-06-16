@@ -41,9 +41,14 @@ module.exports = async function handler(req, res) {
     const plan = data.plan || 'beta';
     const saison = getSaison();
     const pm = data.poids ? Math.pow(data.poids, 0.75).toFixed(2) : 'à calculer';
+    const genereMenu = plan === 'beta' && data.email;
 
-    // ── APPEL 1 : RAPPORT ────────────────────────────────
-    const rapportResponse = await fetch('https://api.anthropic.com/v1/messages', {
+    // ── APPELS CLAUDE EN PARALLÈLE (rapport + menu) ──────
+    // Le menu ne dépend pas du rapport : on lance les deux requêtes
+    // en même temps plutôt que l'une après l'autre, ce qui réduit
+    // le temps total d'environ moitié (deux générations longues
+    // en série étaient la cause principale de la lenteur perçue).
+    const callClaude = (systemPrompt, userMsg) => fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,10 +58,15 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 4000,
-        system: buildRapportPrompt(data, saison, pm),
-        messages: [{ role: 'user', content: 'Génère le rapport nutritionnel.' }]
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMsg }]
       })
     });
+
+    const [rapportResponse, menuResponse] = await Promise.all([
+      callClaude(buildRapportPrompt(data, saison, pm), 'Génère le rapport nutritionnel.'),
+      genereMenu ? callClaude(buildMenuPrompt(data, saison, pm), 'Génère le menu de la semaine.') : Promise.resolve(null)
+    ]);
 
     if (!rapportResponse.ok) {
       const err = await rapportResponse.json();
@@ -66,40 +76,22 @@ module.exports = async function handler(req, res) {
     const rapportResult = await rapportResponse.json();
     const rapport = rapportResult.content[0].text;
 
-    // ── EMAIL 1 : RAPPORT ────────────────────────────────
-    if (data.email) {
-      await sendEmailRapport(data.email, data.prenom, rapport);
+    let menu = null;
+    if (menuResponse && menuResponse.ok) {
+      const menuResult = await menuResponse.json();
+      menu = menuResult.content[0].text;
     }
 
-    // ── APPEL 2 : MENU (bêta uniquement) ─────────────────
-    if (plan === 'beta' && data.email) {
-      const menuResponse = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-5',
-          max_tokens: 4000,
-          system: buildMenuPrompt(data, saison, pm),
-          messages: [{ role: 'user', content: 'Génère le menu de la semaine.' }]
-        })
-      });
-
-      if (menuResponse.ok) {
-        const menuResult = await menuResponse.json();
-        const menu = menuResult.content[0].text;
-        await sendEmailMenu(data.email, data.prenom, menu);
-      }
-    }
-
-    // ── SAUVEGARDE SUPABASE ───────────────────────────────────
+    // ── ENVOIS EN PARALLÈLE (emails + Supabase) ──────────
+    const tasks = [];
     if (data.email) {
+      tasks.push(sendEmailRapport(data.email, data.prenom, rapport));
+      if (menu) tasks.push(sendEmailMenu(data.email, data.prenom, menu));
       const statut = data.plan === 'beta' ? 'beta' : 'waitlist';
-      await saveToSupabase(data, statut);
+      tasks.push(saveToSupabase(data, statut));
     }
+    await Promise.all(tasks);
+
     return res.status(200).json({ success: true, prenom: data.prenom });
 
   } catch (error) {
