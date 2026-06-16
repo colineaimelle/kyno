@@ -108,13 +108,29 @@ module.exports = async function handler(req, res) {
   }
 }
 
+// ── HELPER : fusionner un tableau de valeurs avec un champ "autre" ──
+function mergeAutre(arr, autre, excludeVals = []) {
+  const base = Array.isArray(arr) ? arr.filter(v => !excludeVals.includes(v) && v !== 'autre' && v !== 'autres') : [];
+  if (autre && autre.trim()) base.push(autre.trim());
+  return base;
+}
+
 // ── PROMPT RAPPORT ────────────────────────────────────────
 function buildRapportPrompt(data, saison, pm) {
+  const alimentation = mergeAutre(data.alimentation, data.alimentationAutre);
   const sante = Array.isArray(data.sante) ? data.sante.filter(v => v !== 'aucun') : [];
   const pelage = Array.isArray(data.pelage) ? data.pelage.filter(v => v !== 'brillant') : [];
   const odeurs = Array.isArray(data.odeurs) ? data.odeurs.filter(v => v !== 'aucune') : [];
-  const intolerances = Array.isArray(data.intolerances) ? data.intolerances.filter(v => v !== 'aucune') : [];
-  const comportement = Array.isArray(data.troublesComportement) ? data.troublesComportement.filter(v => v !== 'aucun') : [];
+  const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
+  const comportement = mergeAutre(data.troublesComportement, data.troublesComportementAutre, ['aucun']);
+  const oreilles = mergeAutre(data.problemesOreilles, data.problemesOreillesAutre, ['non']);
+  const environnement = data.environnement === 'autre' && data.environnementAutre
+    ? data.environnementAutre
+    : data.environnement;
+  const reactionsAllergiques = data.reactionsAllergiques === 'autre' && data.reactionsAllergiquesAutre
+    ? data.reactionsAllergiquesAutre
+    : data.reactionsAllergiques;
+  const objectif = mergeAutre(data.objectif, data.objectifAutre);
 
   return `Tu es Kyno, expert en nutrition canine individualisée basé sur les références NRC 2006 et FEDIAF 2023. Ton ton est chaleureux, expert et direct. Tu vouvoies le propriétaire et parles du chien par son prénom. Tu ne donnes JAMAIS de quantités en grammes dans ce rapport — uniquement dans le menu séparé.
 
@@ -126,24 +142,26 @@ function buildRapportPrompt(data, saison, pm) {
 - Poids métabolique : ${pm} kg PM
 - Sexe/Statut : ${data.sexe}
 - Niveau d'activité : ${data.activite}
-- Environnement : ${data.environnement}
+- Environnement : ${environnement}
 - Saison actuelle : ${saison}
 - Niveau de stress : ${data.stress || 'non renseigné'}
 
 ## SANTÉ
-- Alimentation actuelle : ${data.alimentation}
+- Alimentation actuelle : ${alimentation.length > 0 ? alimentation.join(', ') : 'non renseigné'}
 - Problèmes de santé : ${sante.length > 0 ? sante.join(', ') : 'aucun'}
 - Traitements : ${data.traitements || 'aucun'}
 - Pelage : ${pelage.length > 0 ? pelage.join(', ') : 'bon état'}
 - Selles : ${data.selles}
 - Odeurs : ${odeurs.length > 0 ? odeurs.join(', ') : 'aucune'}
+- Réactions allergiques passées : ${reactionsAllergiques || 'aucune'}
 - Intolérances : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
+- Problèmes d'oreilles : ${oreilles.length > 0 ? oreilles.join(', ') : 'aucun'}
 - Troubles du comportement : ${comportement.length > 0 ? comportement.join(', ') : 'aucun'}
 
 ## PROJET
 - Mode souhaité : ${data.modeAlimentaire}
 - Budget : ${data.budget}
-- Objectif : ${data.objectif}
+- Objectif : ${objectif.length > 0 ? objectif.join(', ') : 'non renseigné'}
 - Attentes libres : ${data.attentes || 'aucune'}
 
 ## CALCUL BEE
@@ -182,6 +200,8 @@ Sois concret et pratique — quels aliments intégrer, lesquels éviter.
 ## ALERTES
 - Aliments interdits : raisin, oignon/ail/poireau, chocolat, xylitol, os cuits, avocat, macadamia
 - Interactions médicaments si traitements : ${data.traitements || 'aucun'}
+${oreilles.length > 0 ? `- Problèmes d'oreilles signalés (${oreilles.join(', ')}) : évoque le lien possible avec une intolérance alimentaire ou un déséquilibre, et recommande un avis vétérinaire si récurrent.` : ''}
+${reactionsAllergiques && reactionsAllergiques !== 'jamais' ? `- Antécédent allergique signalé (${reactionsAllergiques}) : reste prudent sur les nouveaux ingrédients introduits.` : ''}
 - Signaux d'alerte vétérinaire pertinents pour ce profil
 
 ## FORMAT DU RAPPORT (600-800 mots)
@@ -204,7 +224,7 @@ Note légale : Ce rapport est éducatif et ne remplace pas un avis vétérinaire
 
 // ── PROMPT MENU ───────────────────────────────────────────
 function buildMenuPrompt(data, saison, pm) {
-  const intolerances = Array.isArray(data.intolerances) ? data.intolerances.filter(v => v !== 'aucune') : [];
+  const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
   const equipement = Array.isArray(data.equipement) ? data.equipement : [];
 
   return `Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023.
