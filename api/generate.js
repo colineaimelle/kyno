@@ -123,6 +123,10 @@ function buildRapportPrompt(data, saison, pm) {
     ? data.reactionsAllergiquesAutre
     : data.reactionsAllergiques;
   const objectif = mergeAutre(data.objectif, data.objectifAutre);
+  // ── Nouveaux champs intégrés : courses, glandes anales, antécédents ──
+  const coursesOu = mergeAutre(data.coursesOu, data.coursesOuAutre);
+  const glandesAnales = data.glandesAnales && data.glandesAnales !== 'aucun' ? data.glandesAnales : null;
+  const antecedents = data.antecedents && data.antecedents.trim() ? data.antecedents.trim() : null;
 
   return `Tu es Kyno, expert en nutrition canine individualisée basé sur les références NRC 2006 et FEDIAF 2023. Ton ton est chaleureux, expert et direct. Tu vouvoies le propriétaire et parles du chien par son prénom. Tu ne donnes JAMAIS de quantités en grammes dans ce rapport — uniquement dans le menu séparé.
 
@@ -140,6 +144,7 @@ function buildRapportPrompt(data, saison, pm) {
 
 ## SANTÉ
 - Alimentation actuelle : ${alimentation.length > 0 ? alimentation.join(', ') : 'non renseigné'}
+- Antécédents médicaux : ${antecedents || 'aucun antécédent particulier signalé'}
 - Problèmes de santé : ${sante.length > 0 ? sante.join(', ') : 'aucun'}
 - Traitements : ${data.traitements || 'aucun'}
 - Pelage : ${pelage.length > 0 ? pelage.join(', ') : 'bon état'}
@@ -148,11 +153,13 @@ function buildRapportPrompt(data, saison, pm) {
 - Réactions allergiques passées : ${reactionsAllergiques || 'aucune'}
 - Intolérances : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
 - Problèmes d'oreilles : ${oreilles.length > 0 ? oreilles.join(', ') : 'aucun'}
+- Glandes anales : ${glandesAnales || 'aucun problème signalé'}
 - Troubles du comportement : ${comportement.length > 0 ? comportement.join(', ') : 'aucun'}
 
 ## PROJET
 - Mode souhaité : ${data.modeAlimentaire}
 - Budget : ${data.budget}
+- Lieux de courses habituels : ${coursesOu.length > 0 ? coursesOu.join(', ') : 'non renseigné'}
 - Objectif : ${objectif.length > 0 ? objectif.join(', ') : 'non renseigné'}
 - Attentes libres : ${data.attentes || 'aucune'}
 
@@ -174,6 +181,7 @@ ${saison === 'Hiver' ? 'Adapter les apports selon le niveau d\'activité et l\'e
 ## COMPLÉMENTS PRIORITAIRES
 Les 3-5 compléments clés avec dosages selon le poids métabolique.
 Rappel : oméga-3 + vitamine E ensemble, CMV obligatoire en ration ménagère.
+${glandesAnales ? `Si pertinent, mentionne l'apport en fibres (citrouille, psyllium) pour soutenir la fonction des glandes anales (signalé : ${glandesAnales}).` : ''}
 
 ## NUTRITION & COMPORTEMENT
 ${comportement.length > 0 || data.stress !== 'très calme' ? `
@@ -194,6 +202,7 @@ Sois concret et pratique — quels aliments intégrer, lesquels éviter.
 - Interactions médicaments si traitements : ${data.traitements || 'aucun'}
 ${oreilles.length > 0 ? `- Problèmes d'oreilles signalés (${oreilles.join(', ')}) : évoque le lien possible avec une intolérance alimentaire ou un déséquilibre, et recommande un avis vétérinaire si récurrent.` : ''}
 ${reactionsAllergiques && reactionsAllergiques !== 'jamais' ? `- Antécédent allergique signalé (${reactionsAllergiques}) : reste prudent sur les nouveaux ingrédients introduits.` : ''}
+${antecedents ? `- Antécédents médicaux signalés (${antecedents}) : prends-en compte dans les recommandations et reste prudent sur les changements brusques d'alimentation.` : ''}
 - Signaux d'alerte vétérinaire pertinents pour ce profil
 
 ## FORMAT DU RAPPORT (600-800 mots)
@@ -218,6 +227,8 @@ Note légale : Ce rapport est éducatif et ne remplace pas un avis vétérinaire
 function buildMenuPrompt(data, saison, pm) {
   const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
   const equipement = Array.isArray(data.equipement) ? data.equipement : [];
+  // ── Nouveau champ intégré : lieux de courses habituels ──
+  const coursesOu = mergeAutre(data.coursesOu, data.coursesOuAutre);
 
   return `Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023.
 
@@ -231,6 +242,7 @@ function buildMenuPrompt(data, saison, pm) {
 - Budget : ${data.budget}
 - Équipement : ${equipement.join(', ')}
 - Temps préparation : ${data.tempsPrep}
+- Lieux de courses habituels : ${coursesOu.length > 0 ? coursesOu.join(', ') : 'non renseigné'}
 - Intolérances à exclure absolument : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
 
 ## CONCEPT DU MENU
@@ -276,6 +288,7 @@ Durée estimée : X minutes
 - Ne jamais réchauffer au micro-ondes — tiède à l'eau chaude
 
 ### 6. LISTE DE COURSES
+Adapte les suggestions de provenance des ingrédients aux lieux de courses habituels (${coursesOu.length > 0 ? coursesOu.join(', ') : 'non renseigné'}) quand c'est pertinent.
 Viandes & poissons :
 - ...
 Légumes :
@@ -415,8 +428,8 @@ function buildEmailHtml(prenom, htmlContent, type) {
               </td>
               <td width="33%" style="padding:0 0 0 6px;text-align:center;">
                 <div style="background:#FFF1BF;border-radius:10px;padding:16px 12px;">
-                  <p style="margin:0;font-size:20px;font-weight:700;color:#2B3A2E;">12×</p>
-                  <p style="margin:4px 0 0;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7E8C80;">Menus / an</p>
+                  <p style="margin:0;font-size:20px;font-weight:700;color:#2B3A2E;">4×</p>
+                  <p style="margin:4px 0 0;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7E8C80;">Menus / mois</p>
                 </div>
               </td>
             </tr>
