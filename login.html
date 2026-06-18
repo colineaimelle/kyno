@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kyno — Connexion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sage:#2FA35E;
+    --sage-l:#7CCB95;
+    --sage-mist:#E4F4E8;
+    --ecru:#FBFDF7;
+    --sand:#DDE8DA;
+    --honey:#7E8C80;
+    --tabac:#2B3A2E;
+    --warm:#FCFDF8;
+    --dark:#233028;
+    --peach:#EC6592;
+    --banana:#FFCE2E;
+    --banana-soft:#FFF1BF;
+    --blue:#3E8FC4;
+    --blue-soft:#DEEBF7;
+    --pink:#EC6592;
+    --pink-soft:#FBE2EB;
+    --orange:#F2843C;
+    --display:"Syne",system-ui,sans-serif;
+    --body:"Manrope",system-ui,sans-serif;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  body{
+    font-family:var(--body);
+    background:var(--sage-mist);
+    color:var(--tabac);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 20px;
+    position:relative;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .deco{position:fixed;border-radius:50%;z-index:0;pointer-events:none;}
+  .deco-1{width:420px;height:420px;background:var(--blue-soft);opacity:0.55;top:-150px;right:-130px;}
+  .deco-2{width:300px;height:300px;background:var(--banana-soft);opacity:0.6;bottom:-110px;left:-90px;}
+  .deco-3{width:170px;height:170px;background:var(--pink-soft);opacity:0.7;bottom:60px;right:7%;}
+  .deco-4{width:110px;height:110px;background:#fff;opacity:0.5;top:11%;left:9%;}
+
+  .card{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:452px;
+    background:#fff;
+    border:2.5px solid var(--pink);
+    border-radius:20px;
+    box-shadow:0 32px 72px rgba(42,31,20,0.1);
+    padding:44px 42px 40px;
+    text-align:center;
+    animation:fadeUp 0.8s cubic-bezier(.22,.61,.36,1) both;
+  }
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+
+  .nav-logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:30px;}
+  .logo-mark{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--sage);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .logo-mark span{font-family:var(--display);font-weight:600;font-size:21px;color:var(--sage);line-height:1;margin-top:-1px;}
+  .logo-word{font-family:var(--display);font-weight:600;font-size:24px;letter-spacing:0.04em;color:var(--tabac);}
+
+  .eyebrow{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--peach);display:inline-flex;align-items:center;gap:14px;font-weight:600;margin-bottom:18px;}
+  .eyebrow::before,.eyebrow::after{content:'';width:28px;height:1px;background:var(--peach);flex-shrink:0;}
+
+  h1{font-family:var(--display);font-weight:600;font-size:34px;line-height:1.08;letter-spacing:-0.02em;color:var(--tabac);margin-bottom:14px;text-wrap:balance;}
+  h1 em{font-style:normal;color:var(--sage);}
+  .subtitle{font-size:15px;line-height:1.7;color:var(--honey);font-weight:300;max-width:340px;margin:0 auto 30px;}
+
+  .field{text-align:left;margin-bottom:16px;}
+  .field label{display:block;font-family:var(--body);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--honey);margin-bottom:8px;}
+  .input-wrap{position:relative;}
+  .input-wrap svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);transition:stroke .2s ease;pointer-events:none;}
+  input[type="email"]{width:100%;font-family:var(--body);font-size:15px;font-weight:400;color:var(--tabac);background:var(--warm);border:1.5px solid var(--sand);border-radius:4px;padding:15px 16px 15px 46px;outline:none;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease;}
+  input[type="email"]::placeholder{color:var(--honey);opacity:0.6;font-weight:300;}
+  input[type="email"]:focus{border-color:var(--sage);background:#fff;box-shadow:0 0 0 3px rgba(47,163,94,0.14);}
+  .input-wrap:focus-within svg{stroke:var(--sage);}
+
+  .btn-main{font-family:var(--display);width:100%;background:var(--sage);color:#fff;padding:16px 26px;border-radius:4px;font-size:14px;font-weight:600;letter-spacing:0.03em;border:2px solid var(--orange);cursor:pointer;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .2s ease,transform .15s ease;}
+  .btn-main:hover{background:var(--sage-l);transform:translateY(-1px);}
+  .btn-main:active{transform:translateY(0);}
+  .btn-main:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+  .btn-main .arrow{transition:transform .2s cubic-bezier(.22,.61,.36,1);}
+  .btn-main:hover .arrow{transform:translateX(3px);}
+
+  .error{display:none;align-items:center;gap:9px;text-align:left;background:var(--pink-soft);border:1.5px solid var(--pink);border-radius:4px;padding:11px 14px;margin-top:16px;font-size:13.5px;font-weight:500;color:#C44B78;}
+  .error svg{flex-shrink:0;}
+
+  .footnote{margin-top:26px;font-size:11.5px;color:var(--honey);line-height:1.6;font-weight:400;letter-spacing:0.01em;}
+  .footnote strong{color:var(--tabac);font-weight:600;}
+
+  .confirm{display:none;text-align:center;animation:fadeUp 0.6s cubic-bezier(.22,.61,.36,1) both;}
+  .confirm-icon{width:92px;height:92px;margin:4px auto 28px;border-radius:50%;background:var(--sage-mist);display:flex;align-items:center;justify-content:center;position:relative;}
+  .confirm-check{position:absolute;width:34px;height:34px;right:-2px;bottom:-2px;border-radius:50%;background:var(--sage);border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;animation:popIn 0.4s 0.25s cubic-bezier(.22,.61,.36,1) both;}
+  @keyframes popIn{from{transform:scale(0);}to{transform:scale(1);}}
+  .confirm h2{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.1;letter-spacing:-0.02em;color:var(--tabac);margin-bottom:14px;text-wrap:balance;}
+  .confirm h2 em{font-style:normal;color:var(--sage);}
+  .confirm p{font-size:15px;line-height:1.7;color:var(--honey);font-weight:300;max-width:330px;margin:0 auto;}
+  .confirm p .email-hl{color:var(--sage);font-weight:600;}
+  .spam-note{display:flex;align-items:flex-start;gap:11px;text-align:left;background:var(--sage-mist);border:1.5px solid var(--sage-l);border-radius:4px;padding:13px 15px;margin-top:28px;font-size:13px;line-height:1.5;color:var(--tabac);font-weight:400;}
+  .spam-note svg{flex-shrink:0;margin-top:1px;}
+  .spam-note strong{font-weight:600;}
+  .resend{margin-top:24px;font-size:13px;color:var(--honey);font-weight:400;}
+  .resend button{font-family:var(--body);font-weight:600;font-size:13px;color:var(--sage);background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+
+  @media(max-width:480px){
+    .card{padding:36px 26px 32px;}
+    h1{font-size:28px;}
+    .deco-3,.deco-4{display:none;}
+  }
+</style>
+</head>
+<body>
+  <div class="deco deco-1"></div>
+  <div class="deco deco-2"></div>
+  <div class="deco deco-3"></div>
+  <div class="deco deco-4"></div>
+
+  <main class="card">
+    <a href="index.html" class="nav-logo">
+      <span class="logo-mark"><span>K</span></span>
+      <span class="logo-word">kyno</span>
+    </a>
+
+    <!-- État 1 — Formulaire -->
+    <div id="loginForm">
+      <div class="eyebrow">Espace personnel</div>
+      <h1>Accède à l'espace de <em>ton chien</em></h1>
+      <p class="subtitle">On t'envoie un lien de connexion par email. Pas de mot de passe à retenir — un clic et c'est ouvert.</p>
+
+      <div class="field">
+        <label for="loginEmail">Ton email</label>
+        <div class="input-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7E8C80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          </svg>
+          <input type="email" id="loginEmail" placeholder="ton@email.com" autocomplete="email" inputmode="email">
+        </div>
+      </div>
+
+      <button class="btn-main" id="loginSubmitBtn" onclick="handleLogin()">
+        <span>Recevoir mon lien de connexion</span>
+        <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>
+        </svg>
+      </button>
+
+      <div class="error" id="loginError">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C44B78" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path>
+        </svg>
+        <span id="loginErrorText">Oups, cette adresse email n'est pas valide.</span>
+      </div>
+
+      <p class="footnote">En continuant, tu acceptes nos <strong>conditions</strong> et notre <strong>politique de confidentialité</strong>.</p>
+    </div>
+
+    <!-- État 2 — Confirmation -->
+    <div class="confirm" id="loginConfirm">
+      <div class="confirm-icon">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#2B3A2E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+        </svg>
+        <div class="confirm-check">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6 9 17l-5-5"></path>
+          </svg>
+        </div>
+      </div>
+      <h2>C'est <em>envoyé</em></h2>
+      <p>Un lien de connexion vient de partir vers <span class="email-hl" id="confirmEmail">ton adresse</span>. Clique dessus pour accéder à l'espace de ton chien.</p>
+      <div class="spam-note">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2FA35E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 9v4"></path><path d="M12 17h.01"></path>
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        </svg>
+        <span>Tu ne le vois pas ? Pense à vérifier tes <strong>spams</strong> ou ton onglet promotions.</span>
+      </div>
+      <p class="resend">Pas reçu ? <button type="button" onclick="showFormState()">Renvoyer le lien</button></p>
+    </div>
+  </main>
+
+  <!-- SDK Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // ── Config Supabase ──────────────────────────────────────
+    const SUPABASE_URL = 'https://peexewhsnewjkpyhzuen.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_diGOGSUwIR3dHuLUcsni0g_XbfDdbo9';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ── Gestion du lien magique au chargement ─────────────────
+    // Quand le client clique sur le lien reçu par email, Supabase
+    // redirige vers cette page avec un token dans l'URL. On le
+    // détecte ici et on redirige vers l'espace client.
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // Connexion réussie → rediriger vers l'espace client
+        window.location.href = 'espace-client.html';
+      }
+    });
+
+    // ── Envoi du lien magique ──────────────────────────────────
+    async function handleLogin() {
+      hideError();
+
+      const email = document.getElementById('loginEmail').value.trim();
+
+      // Validation basique de l'email
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        showError('Entre une adresse email valide.');
+        return;
+      }
+
+      // Désactiver le bouton pendant l'envoi
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = true;
+      btn.querySelector('span').textContent = 'Envoi en cours…';
+
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          email: email,
+          options: {
+            // Redirection après clic sur le lien dans l'email
+            emailRedirectTo: window.location.origin + '/login.html'
+          }
+        });
+
+        if (error) throw error;
+
+        // Succès → afficher l'état de confirmation
+        showConfirmState();
+
+      } catch (err) {
+        console.error('Erreur connexion:', err);
+        showError('Une erreur est survenue. Réessaie dans quelques instants.');
+        btn.disabled = false;
+        btn.querySelector('span').textContent = 'Recevoir mon lien de connexion';
+      }
+    }
+
+    // ── Helpers UI ────────────────────────────────────────────
+    function showConfirmState() {
+      const email = document.getElementById('loginEmail').value.trim();
+      if (email) document.getElementById('confirmEmail').textContent = email;
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('loginConfirm').style.display = 'block';
+    }
+
+    function showFormState() {
+      document.getElementById('loginConfirm').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'block';
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = false;
+      btn.querySelector('span').textContent = 'Recevoir mon lien de connexion';
+    }
+
+    function showError(message) {
+      const box = document.getElementById('loginError');
+      if (message) document.getElementById('loginErrorText').textContent = message;
+      box.style.display = 'flex';
+    }
+
+    function hideError() {
+      document.getElementById('loginError').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
