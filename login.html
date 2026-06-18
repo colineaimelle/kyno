@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --sage:#2FA35E;
@@ -194,13 +195,10 @@
     </div>
   </main>
 
-  <!-- SDK Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
     // ── Config Supabase ──────────────────────────────────────
     const SUPABASE_URL = 'https://peexewhsnewjkpyhzuen.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_diGOGSUwIR3dHuLUcsni0g_XbfDdbo9';
+    const SUPABASE_ANON_KEY = 'REMPLACE_PAR_TA_CLE_ANON_PUBLIQUE';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ── Gestion du lien magique au chargement ─────────────────
