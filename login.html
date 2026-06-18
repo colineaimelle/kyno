@@ -199,13 +199,13 @@
     // ── Config Supabase ──────────────────────────────────────
     const SUPABASE_URL = 'https://peexewhsnewjkpyhzuen.supabase.co';
     const SUPABASE_ANON_KEY = 'REMPLACE_PAR_TA_CLE_ANON_PUBLIQUE';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ── Gestion du lien magique au chargement ─────────────────
     // Quand le client clique sur le lien reçu par email, Supabase
     // redirige vers cette page avec un token dans l'URL. On le
     // détecte ici et on redirige vers l'espace client.
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         // Connexion réussie → rediriger vers l'espace client
         window.location.href = 'espace-client.html';
@@ -230,7 +230,7 @@
       btn.querySelector('span').textContent = 'Envoi en cours…';
 
       try {
-        const { error } = await supabase.auth.signInWithOtp({
+        const { error } = await supabaseClient.auth.signInWithOtp({
           email: email,
           options: {
             // Redirection après clic sur le lien dans l'email
