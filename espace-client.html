@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kyno — Espace client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --sage:#2FA35E;
+    --sage-l:#7CCB95;
+    --sage-mist:#E4F4E8;
+    --ecru:#FBFDF7;
+    --sand:#DDE8DA;
+    --honey:#7E8C80;
+    --tabac:#2B3A2E;
+    --warm:#FCFDF8;
+    --dark:#233028;
+    --peach:#EC6592;
+    --banana:#FFCE2E;
+    --banana-soft:#FFF1BF;
+    --orange:#F2843C;
+    --display:"Syne",system-ui,sans-serif;
+    --body:"Manrope",system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{font-family:var(--body);background:var(--sage-mist);color:var(--tabac);-webkit-font-smoothing:antialiased;line-height:1.5;}
+
+  /* NAV */
+  .nav{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:rgba(252,253,248,0.86);backdrop-filter:saturate(140%) blur(12px);-webkit-backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid var(--sand);}
+  .logo{display:flex;align-items:center;gap:11px;text-decoration:none;}
+  .logo-mark{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--sage);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .logo-mark span{font-family:var(--display);font-weight:700;font-size:18px;color:var(--sage);line-height:1;margin-top:-1px;}
+  .logo-word{font-family:var(--display);font-weight:600;font-size:21px;letter-spacing:0.04em;color:var(--tabac);}
+  .nav-right{display:flex;align-items:center;gap:18px;}
+  #headerDogName{font-family:var(--display);font-weight:600;font-size:13px;color:var(--sage);letter-spacing:0.01em;}
+  .btn-logout{font-family:var(--display);background:transparent;color:var(--tabac);padding:9px 18px;border-radius:4px;font-size:12px;font-weight:600;letter-spacing:0.04em;border:1.5px solid var(--sand);cursor:pointer;transition:border-color 0.2s,color 0.2s,background 0.2s;}
+  .btn-logout:hover{border-color:var(--sage);color:var(--sage);background:var(--sage-mist);}
+
+  /* LAYOUT */
+  .shell{max-width:1240px;margin:0 auto;padding:96px 28px 40px;display:grid;grid-template-columns:380px 1fr;gap:28px;align-items:start;}
+  .zone-title{font-family:var(--display);font-weight:700;font-size:21px;color:var(--tabac);letter-spacing:-0.01em;line-height:1.2;margin-bottom:16px;}
+
+  /* PROFIL */
+  .profile{position:sticky;top:96px;}
+  .profile-card{background:var(--warm);border:2.5px solid var(--orange);border-radius:14px;padding:26px;box-shadow:8px 8px 0 var(--banana-soft);}
+  .card-head{display:flex;align-items:center;gap:13px;margin-bottom:22px;}
+  .card-av{width:54px;height:54px;border-radius:50%;background:var(--sage-mist);border:2px solid var(--tabac);overflow:hidden;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center;}
+  .card-av svg{width:100%;height:100%;display:block;}
+  .card-head-meta .nm{font-family:var(--display);font-weight:700;font-size:18px;color:var(--tabac);}
+  .card-head-meta .sub{font-size:12px;color:var(--honey);letter-spacing:0.02em;margin-top:1px;}
+  .info-list{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--sand);}
+  .info-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--sand);}
+  .info-row dt{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--honey);flex-shrink:0;}
+  .info-row dd{font-family:var(--display);font-weight:600;font-size:14px;color:var(--tabac);text-align:right;}
+  .badge-gen{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:9px 15px;border-radius:999px;background:var(--sage-mist);border:1px solid rgba(47,163,94,0.32);color:var(--sage);font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;}
+  .badge-gen .dot{width:7px;height:7px;border-radius:50%;background:var(--sage);flex-shrink:0;}
+
+  /* CHAT */
+  .chat{display:flex;flex-direction:column;}
+  .chat-card{background:var(--warm);border:1px solid var(--sand);border-radius:14px;box-shadow:0 18px 48px -24px rgba(43,58,46,0.4);overflow:hidden;display:flex;flex-direction:column;}
+  .chat-messages{height:440px;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;background:radial-gradient(circle at 1px 1px,rgba(43,58,46,0.04) 1px,transparent 0) 0 0/22px 22px,var(--ecru);}
+  .chat-messages::-webkit-scrollbar{width:8px;}
+  .chat-messages::-webkit-scrollbar-thumb{background:var(--sand);border-radius:8px;}
+  .msg{display:flex;max-width:78%;}
+  .msg .bubble{padding:13px 17px;font-size:14px;line-height:1.55;}
+  .msg .meta{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--honey);font-weight:600;margin-bottom:5px;}
+  .msg-ia{align-self:flex-start;flex-direction:column;}
+  .msg-ia .bubble{background:var(--warm);border:1.5px solid var(--sand);border-radius:4px 16px 16px 16px;color:var(--tabac);}
+  .msg-user{align-self:flex-end;flex-direction:column;align-items:flex-end;}
+  .msg-user .bubble{background:var(--sage);border:2px solid var(--orange);border-radius:16px 4px 16px 16px;color:#fff;}
+  .chat-input-row{display:flex;align-items:center;gap:12px;padding:16px;border-top:1px solid var(--sand);background:var(--warm);}
+  #chatInput{flex:1;font-family:var(--body);font-size:14px;color:var(--tabac);padding:14px 16px;background:var(--ecru);border:1.5px solid var(--sand);border-radius:10px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+  #chatInput::placeholder{color:var(--honey);}
+  #chatInput:focus{border-color:var(--sage);box-shadow:0 0 0 3px rgba(47,163,94,0.16);}
+  #chatSendBtn{width:48px;height:48px;flex-shrink:0;border:2px solid var(--orange);background:var(--sage);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s,transform 0.15s;}
+  #chatSendBtn:hover{background:var(--sage-l);transform:translateY(-1px);}
+  #chatSendBtn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+  #chatSendBtn svg{width:20px;height:20px;stroke:#fff;}
+  #chatStatus{display:none;align-items:center;gap:10px;margin-top:14px;padding:11px 16px;background:var(--banana-soft);border:1px solid var(--banana);border-radius:10px;font-size:13px;font-weight:500;color:var(--tabac);}
+  #chatStatus .spinner{width:14px;height:14px;flex-shrink:0;border:2px solid rgba(43,58,46,0.25);border-top-color:var(--tabac);border-radius:50%;animation:spin 0.8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* Bulle typing */
+  .typing-bubble{display:flex;align-items:center;gap:5px;padding:13px 17px;}
+  .typing-bubble span{width:7px;height:7px;border-radius:50%;background:var(--honey);animation:bounce 1.2s infinite;}
+  .typing-bubble span:nth-child(2){animation-delay:0.2s;}
+  .typing-bubble span:nth-child(3){animation-delay:0.4s;}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+  @media(max-width:860px){
+    .shell{grid-template-columns:1fr;padding:84px 18px 32px;gap:22px;}
+    .profile{position:static;}
+    .chat-messages{height:50vh;min-height:320px;}
+  }
+</style>
+</head>
+<body>
+
+  <header class="nav">
+    <a class="logo" href="index.html" aria-label="Kyno">
+      <span class="logo-mark"><span>K</span></span>
+      <span class="logo-word">kyno</span>
+    </a>
+    <div class="nav-right">
+      <span id="headerDogName">Espace de …</span>
+      <button id="logoutBtn" class="btn-logout" onclick="handleLogout()">Se déconnecter</button>
+    </div>
+  </header>
+
+  <main class="shell">
+
+    <section class="profile">
+      <h1 id="profileDogName" class="zone-title">Le profil de …</h1>
+      <div class="profile-card">
+        <div class="card-head">
+          <div class="card-av">
+            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+              <path d="M30 14 q19 0 23.6 15.6 q-14 4.8 -23.6 2.8 q-9.6 -2 -23.6 2.8 q4.6 -15.6 23.6 -21.2 Z" fill="#BE6B41" stroke="#2B3A2E" stroke-width="2.4" stroke-linejoin="round"></path>
+              <ellipse cx="12" cy="30" rx="9" ry="12" fill="#BE6B41" stroke="#2B3A2E" stroke-width="2.4"></ellipse>
+              <ellipse cx="48" cy="30" rx="9" ry="12" fill="#BE6B41" stroke="#2B3A2E" stroke-width="2.4"></ellipse>
+              <circle cx="22" cy="33" r="3" fill="#2B3A2E"></circle>
+              <circle cx="38" cy="33" r="3" fill="#2B3A2E"></circle>
+              <ellipse cx="30" cy="42" rx="3.4" ry="3" fill="#2E211A"></ellipse>
+            </svg>
+          </div>
+          <div class="card-head-meta">
+            <div class="nm" id="profilePrenomChien">…</div>
+            <div class="sub">Membre Kyno</div>
+          </div>
+        </div>
+        <dl class="info-list">
+          <div class="info-row"><dt>Race</dt><dd id="profileRace">…</dd></div>
+          <div class="info-row"><dt>Poids</dt><dd id="profilePoids">…</dd></div>
+          <div class="info-row"><dt>Plan</dt><dd id="profilePlan">…</dd></div>
+          <div class="info-row"><dt>Statut</dt><dd id="profileStatut">…</dd></div>
+        </dl>
+        <span class="badge-gen" id="profileDerniereGeneration">
+          <span class="dot"></span>Chargement…
+        </span>
+      </div>
+    </section>
+
+    <section class="chat">
+      <h2 id="chatTitle" class="zone-title">Parle-moi des changements chez …</h2>
+      <div class="chat-card">
+        <div id="chatMessages" class="chat-messages"></div>
+        <div class="chat-input-row">
+          <input id="chatInput" type="text" placeholder="Ex: il a eu des selles molles cette semaine…" autocomplete="off">
+          <button id="chatSendBtn" onclick="handleSend()" aria-label="Envoyer">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div id="chatStatus">
+        <span class="spinner"></span>Nouveau menu en cours de génération…
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ── Config Supabase ──────────────────────────────────────────
+    const SUPABASE_URL = 'https://peexewhsnewjkpyhzuen.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_diGOGSUwIR3dHuLUcsni0g_XbfDdbo9';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ── État global ──────────────────────────────────────────────
+    let currentUser = null;
+    let userProfile = null;
+    let chatHistory = []; // historique pour l'API Anthropic
+
+    // ── Init : vérifier la session au chargement ─────────────────
+    (async function init() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        // Pas connecté → rediriger vers login
+        window.location.href = 'login.html';
+        return;
+      }
+      currentUser = session.user;
+      await loadProfile();
+      await loadChatHistory();
+    })();
+
+    // ── Déconnexion ──────────────────────────────────────────────
+    async function handleLogout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    }
+
+    // ── Charger le profil depuis Supabase ────────────────────────
+    async function loadProfile() {
+      const { data, error } = await supabaseClient
+        .from('user')
+        .select('*')
+        .eq('email', currentUser.email)
+        .single();
+
+      if (error || !data) {
+        console.error('Profil non trouvé:', error);
+        return;
+      }
+
+      userProfile = data;
+      const nom = data.prenom_chien || data.prenom || 'ton chien';
+
+      // Mettre à jour l'interface
+      document.getElementById('headerDogName').textContent = `Espace de ${nom}`;
+      document.getElementById('profileDogName').textContent = `Le profil de ${nom}`;
+      document.getElementById('profilePrenomChien').textContent = nom;
+      document.getElementById('chatTitle').textContent = `Parle-moi des changements chez ${nom}`;
+      document.getElementById('profileRace').textContent = data.race || '—';
+      document.getElementById('profilePoids').textContent = data.poids ? `${data.poids} kg` : '—';
+      document.getElementById('profilePlan').textContent = data.plan || '—';
+      document.getElementById('profileStatut').textContent = data.statut || '—';
+      document.getElementById('profileDerniereGeneration').innerHTML =
+        `<span class="dot"></span>Membre depuis le ${new Date(data.created_at || Date.now()).toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'})}`;
+
+      // Message d'accueil personnalisé si chat vide
+      addMessage('ia', `Bonjour ! Dis-moi tout ce qui a changé chez ${nom} — appétit, selles, activité, poids. Je recalcule sa ration au gramme près si besoin.`);
+    }
+
+    // ── Charger l'historique du chat depuis Supabase ─────────────
+    async function loadChatHistory() {
+      if (!userProfile) return;
+
+      // On cherche d'abord le dog_profile lié
+      const { data: dogProfiles } = await supabaseClient
+        .from('dog_profile')
+        .select('id')
+        .eq('user_id', userProfile.id);
+
+      if (!dogProfiles || dogProfiles.length === 0) return;
+
+      const dogProfileId = dogProfiles[0].id;
+
+      const { data: history } = await supabaseClient
+        .from('chat_history')
+        .select('*')
+        .eq('dog_profile_id', dogProfileId)
+        .order('created_at', { ascending: true })
+        .limit(50);
+
+      if (!history || history.length === 0) return;
+
+      // Vider le message d'accueil par défaut et afficher l'historique
+      document.getElementById('chatMessages').innerHTML = '';
+      history.forEach(msg => {
+        addMessage(msg.role === 'user' ? 'user' : 'ia', msg.content);
+        chatHistory.push({ role: msg.role, content: msg.content });
+      });
+    }
+
+    // ── Envoyer un message ───────────────────────────────────────
+    async function handleSend() {
+      const input = document.getElementById('chatInput');
+      const message = input.value.trim();
+      if (!message) return;
+
+      // Afficher le message utilisateur
+      addMessage('user', message);
+      input.value = '';
+      document.getElementById('chatSendBtn').disabled = true;
+
+      // Ajouter à l'historique local
+      chatHistory.push({ role: 'user', content: message });
+
+      // Sauvegarder dans Supabase si on a un dog_profile
+      await saveChatMessage('user', message);
+
+      // Afficher la bulle "typing"
+      showTyping();
+
+      try {
+        // Appel à l'API Anthropic via notre fonction Vercel
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: chatHistory,
+            profile: userProfile,
+            email: currentUser.email
+          })
+        });
+
+        const result = await response.json();
+        removeTyping();
+
+        if (!result.success) throw new Error(result.error);
+
+        // Afficher la réponse de l'IA
+        addMessage('ia', result.reply);
+        chatHistory.push({ role: 'assistant', content: result.reply });
+        await saveChatMessage('assistant', result.reply);
+
+        // Si l'IA a généré un nouveau menu → afficher le statut
+        if (result.menuGenere) {
+          document.getElementById('chatStatus').style.display = 'flex';
+          setTimeout(() => {
+            document.getElementById('chatStatus').style.display = 'none';
+            addMessage('ia', `Le nouveau menu de ${userProfile.prenom_chien || 'ton chien'} vient de partir par email ✦`);
+          }, 3000);
+        }
+
+      } catch (err) {
+        removeTyping();
+        console.error('Erreur chat:', err);
+        addMessage('ia', 'Une erreur est survenue. Réessaie dans quelques instants.');
+      }
+
+      document.getElementById('chatSendBtn').disabled = false;
+    }
+
+    // ── Sauvegarder un message dans Supabase ─────────────────────
+    async function saveChatMessage(role, content) {
+      if (!userProfile) return;
+      try {
+        const { data: dogProfiles } = await supabaseClient
+          .from('dog_profile')
+          .select('id')
+          .eq('user_id', userProfile.id);
+        if (!dogProfiles || dogProfiles.length === 0) return;
+
+        await supabaseClient.from('chat_history').insert({
+          dog_profile_id: dogProfiles[0].id,
+          role: role,
+          content: content
+        });
+      } catch (e) {
+        console.error('Erreur sauvegarde message:', e);
+      }
+    }
+
+    // ── Helpers UI ────────────────────────────────────────────────
+    function addMessage(type, text) {
+      const zone = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.className = `msg msg-${type === 'ia' ? 'ia' : 'user'}`;
+      div.innerHTML = `
+        <span class="meta">${type === 'ia' ? 'Kyno' : 'Toi'}</span>
+        <div class="bubble">${escapeHtml(text)}</div>
+      `;
+      zone.appendChild(div);
+      zone.scrollTop = zone.scrollHeight;
+    }
+
+    function showTyping() {
+      const zone = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.className = 'msg msg-ia';
+      div.id = 'typingBubble';
+      div.innerHTML = `
+        <span class="meta">Kyno</span>
+        <div class="bubble typing-bubble">
+          <span></span><span></span><span></span>
+        </div>
+      `;
+      zone.appendChild(div);
+      zone.scrollTop = zone.scrollHeight;
+    }
+
+    function removeTyping() {
+      document.getElementById('typingBubble')?.remove();
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+    }
+
+    // Envoyer avec la touche Entrée
+    document.getElementById('chatInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+  </script>
+</body>
+</html>
