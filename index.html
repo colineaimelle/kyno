@@ -54,6 +54,8 @@ nav{
 .nav-links a:hover{opacity:1;}
 .nav-cta{font-family:var(--display);background:var(--sage);color:white;padding:10px 22px;border-radius:4px;font-size:12px;font-weight:600;letter-spacing:0.08em;text-decoration:none;transition:background 0.2s;border:2px solid var(--orange);nd 0.2s;opacity:1!important;}
 .nav-cta:hover{background:var(--sage-l);}
+.nav-espace{font-size:12px;letter-spacing:0.06em;color:var(--sage);text-decoration:none;font-weight:600;padding:8px 16px;border-radius:4px;border:1.5px solid var(--sage-l);transition:all 0.2s;font-family:var(--display);}
+.nav-espace:hover{background:var(--sage-mist);border-color:var(--sage);}
 
 /* HERO */
 .hero{min-height:100vh;padding-top:56px;display:grid;grid-template-columns:1fr 1fr;position:relative;overflow:hidden;}
@@ -237,7 +239,7 @@ h2 em{font-style:normal;color:var(--sage);}
 .wl-success{display:none;font-family:var(--display);font-size:20px;font-style:normal;color:var(--sage-l);font-weight:500;}
 
 /* FULL SECTION WAITLIST ALTERNATIVE (places épuisées) */
-.s-waitlist-full{padding:120px 64px;background:var(--tabac);text-align:center;display:none;flex-direction:column;align-items:center;gap:32px;}
+.s-waitlist-full{padding:120px 64px;background:var(--tabac);text-align:center;display:flex;flex-direction:column;align-items:center;gap:32px;}
 .wl-full-tag{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--honey);background:rgba(196,161,90,0.15);padding:6px 14px;border-radius:20px;font-weight:600;}
 .wl-full-title{font-family:var(--display);font-size:54px;font-weight:600;color:var(--ecru);line-height:1.1;max-width:600px;letter-spacing:-0.02em;}
 .wl-full-title em{font-style:normal;color:var(--sage-l);}
@@ -366,6 +368,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
     <a href="#difference">Le concept</a>
     <a href="#comment">Comment ça marche</a>
     <a href="#offres">Tarifs</a>
+    <a href="login.html" class="nav-espace">Mon espace</a>
     <a href="quiz.html" class="nav-cta">Commencer →</a>
   </div>
 </nav>
@@ -623,11 +626,11 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   <p class="wl-note">Premier mois offert · sans engagement · résiliable à tout moment</p>
 </section>
 
-<!-- WAITLIST — places épuisées -->
+<!-- WAITLIST — offre publique / places épuisées (texte adapté dynamiquement par le script) -->
 <section class="s-waitlist-full" id="waitlist-full">
-  <div class="wl-full-tag">Tarif de lancement — 100 / 100 places</div>
-  <h2 class="wl-full-title">Les places de lancement<br>sont <em>épuisées.</em></h2>
-  <p class="wl-full-desc">Laisse ton email pour être prévenu à l'ouverture officielle. Tu recevras une offre exclusive.</p>
+  <div class="wl-full-tag" id="wlFullTag">Tarif public — à l'ouverture</div>
+  <h2 class="wl-full-title" id="wlFullTitle">Sois prévenu·e<br>à <em>l'ouverture.</em></h2>
+  <p class="wl-full-desc" id="wlFullDesc">Laisse ton email pour être prévenu à l'ouverture officielle. Tu recevras une offre exclusive.</p>
   <div class="wl-form" id="wl-form-full">
     <input class="wl-input" type="email" placeholder="ton@email.com" id="wl-email-full">
     <button class="wl-btn" onclick="submitWaitlistFull()">Me prévenir →</button>
@@ -677,10 +680,11 @@ const BETA_COMPLETE = PLACES_RESTANTES <= 0;
 document.getElementById('placesLeft').textContent = PLACES_RESTANTES;
 document.getElementById('placesLeftOffers').textContent = PLACES_RESTANTES;
 
-// Si bêta complète : afficher waitlist, masquer CTA principal
+// Si bêta complète : afficher waitlist en avant, masquer CTA principal
+// Sinon : la section waitlist-full reste visible mais avec un texte adapté
+// (elle sert de page "offre publique" tant que la bêta tourne)
 if (BETA_COMPLETE) {
   document.querySelector('.s-waitlist').style.display = 'none';
-  document.querySelector('.s-waitlist-full').style.display = 'flex';
   // Mettre à jour les CTA
   document.querySelectorAll('a[href="quiz.html"]').forEach(a => {
     a.href = '#waitlist-full';
@@ -690,6 +694,8 @@ if (BETA_COMPLETE) {
     a.innerHTML = a.innerHTML.replace('à vie · offre de lancement', 'ouverture publique');
   });
   document.querySelector('.early-bird-badge').innerHTML = '<div class="eb-dot"></div>Places de lancement complètes — 100/100';
+  document.getElementById('wlFullTag').textContent = 'Tarif de lancement — 100 / 100 places';
+  document.getElementById('wlFullTitle').innerHTML = 'Les places de lancement<br>sont <em>épuisées.</em>';
 }
 
 // ── WAITLIST PLACES ÉPUISÉES ──────────────────────────────
