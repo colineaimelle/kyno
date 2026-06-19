@@ -1,9 +1,10 @@
-// api/generate.js
+// api/generate.js — v2
+// Nouveau parcours : rapport seul → bouton "Accéder à mon espace" → lien magique + menu
 
 // ── SUPABASE ──────────────────────────────────────────────
 async function saveToSupabase(data, statut) {
   const url = `${process.env.SUPABASE_URL}/rest/v1/user`;
-  await fetch(url, {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -20,9 +21,10 @@ async function saveToSupabase(data, statut) {
       plan: data.plan || 'beta',
       statut: statut,
       rapport_envoye: true,
-      menu_envoye: statut === 'beta'
+      menu_envoye: false // le menu sera envoyé après connexion
     })
   });
+  return response;
 }
 
 module.exports = async function handler(req, res) {
@@ -38,17 +40,11 @@ module.exports = async function handler(req, res) {
     const data = req.body;
     if (!data.prenom || !data.race) return res.status(400).json({ error: 'Données incomplètes' });
 
-    const plan = data.plan || 'beta';
     const saison = getSaison();
     const pm = data.poids ? Math.pow(data.poids, 0.75).toFixed(2) : 'à calculer';
-    const genereMenu = plan === 'beta' && data.email;
 
-    // ── APPELS CLAUDE EN PARALLÈLE (rapport + menu) ──────
-    // Le menu ne dépend pas du rapport : on lance les deux requêtes
-    // en même temps plutôt que l'une après l'autre, ce qui réduit
-    // le temps total d'environ moitié (deux générations longues
-    // en série étaient la cause principale de la lenteur perçue).
-    const callClaude = (systemPrompt, userMsg) => fetch('https://api.anthropic.com/v1/messages', {
+    // ── GÉNÉRATION DU RAPPORT UNIQUEMENT ─────────────────
+    const rapportResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,15 +54,10 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
         max_tokens: 4000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userMsg }]
+        system: buildRapportPrompt(data, saison, pm),
+        messages: [{ role: 'user', content: 'Génère le rapport nutritionnel.' }]
       })
     });
-
-    const [rapportResponse, menuResponse] = await Promise.all([
-      callClaude(buildRapportPrompt(data, saison, pm), 'Génère le rapport nutritionnel.'),
-      genereMenu ? callClaude(buildMenuPrompt(data, saison, pm), 'Génère le menu de la semaine.') : Promise.resolve(null)
-    ]);
 
     if (!rapportResponse.ok) {
       const err = await rapportResponse.json();
@@ -76,29 +67,23 @@ module.exports = async function handler(req, res) {
     const rapportResult = await rapportResponse.json();
     const rapport = rapportResult.content[0].text;
 
-    let menu = null;
-    if (menuResponse && menuResponse.ok) {
-      const menuResult = await menuResponse.json();
-      menu = menuResult.content[0].text;
-    }
+    // ── SAUVEGARDE SUPABASE + ENVOI EMAIL RAPPORT ────────
+    // Les deux en parallèle pour la vitesse
+    const prenomChien = data.prenom || 'ton chien';
+    const statut = data.plan === 'beta' ? 'beta' : 'waitlist';
 
-    // ── ENVOIS EN PARALLÈLE (emails + Supabase) ──────────
-    const tasks = [];
-    if (data.email) {
-      tasks.push(sendEmailRapport(data.email, data.prenom, rapport));
-      if (menu) tasks.push(sendEmailMenu(data.email, data.prenom, menu));
-      const statut = data.plan === 'beta' ? 'beta' : 'waitlist';
-      tasks.push(saveToSupabase(data, statut));
-    }
-    await Promise.all(tasks);
+    await Promise.all([
+      data.email ? sendEmailRapport(data.email, prenomChien, rapport, data) : Promise.resolve(),
+      data.email ? saveToSupabase(data, statut) : Promise.resolve()
+    ]);
 
-    return res.status(200).json({ success: true, prenom: data.prenom });
+    return res.status(200).json({ success: true, prenom: prenomChien });
 
   } catch (error) {
     console.error('Erreur generate.js:', error);
     return res.status(500).json({ error: 'Erreur serveur', message: error.message });
   }
-}
+};
 
 // ── HELPER : fusionner un tableau de valeurs avec un champ "autre" ──
 function mergeAutre(arr, autre, excludeVals = []) {
@@ -116,19 +101,14 @@ function buildRapportPrompt(data, saison, pm) {
   const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
   const comportement = mergeAutre(data.troublesComportement, data.troublesComportementAutre, ['aucun']);
   const oreilles = mergeAutre(data.problemesOreilles, data.problemesOreillesAutre, ['non']);
-  const environnement = data.environnement === 'autre' && data.environnementAutre
-    ? data.environnementAutre
-    : data.environnement;
-  const reactionsAllergiques = data.reactionsAllergiques === 'autre' && data.reactionsAllergiquesAutre
-    ? data.reactionsAllergiquesAutre
-    : data.reactionsAllergiques;
+  const environnement = data.environnement === 'autre' && data.environnementAutre ? data.environnementAutre : data.environnement;
+  const reactionsAllergiques = data.reactionsAllergiques === 'autre' && data.reactionsAllergiquesAutre ? data.reactionsAllergiquesAutre : data.reactionsAllergiques;
   const objectif = mergeAutre(data.objectif, data.objectifAutre);
-  // ── Nouveaux champs intégrés : courses, glandes anales, antécédents ──
   const coursesOu = mergeAutre(data.coursesOu, data.coursesOuAutre);
   const glandesAnales = data.glandesAnales && data.glandesAnales !== 'aucun' ? data.glandesAnales : null;
   const antecedents = data.antecedents && data.antecedents.trim() ? data.antecedents.trim() : null;
 
-  return `Tu es Kyno, expert en nutrition canine individualisée basé sur les références NRC 2006 et FEDIAF 2023. Ton ton est chaleureux, expert et direct. Tu vouvoies le propriétaire et parles du chien par son prénom. Tu ne donnes JAMAIS de quantités en grammes dans ce rapport — uniquement dans le menu séparé.
+  return `Tu es Kyno, expert en nutrition canine individualisée basé sur les références NRC 2006 et FEDIAF 2023. Ton ton est chaleureux, expert et direct. Tu tutoies le propriétaire et parles du chien par son prénom. Tu ne donnes JAMAIS de quantités en grammes dans ce rapport — uniquement dans le menu séparé.
 
 ## PROFIL DE ${data.prenom.toUpperCase()}
 - Prénom : ${data.prenom}
@@ -176,7 +156,7 @@ Si aucune prédisposition connue, ne pas inventer.
 ${saison === 'Printemps' ? 'Mue intense : oméga-3, zinc, biotine. Aliments de saison recommandés.' : ''}
 ${saison === 'Été' ? 'Hydratation prioritaire. Repas aux heures fraîches. Aliments frais et humides.' : ''}
 ${saison === 'Automne' ? 'Renforcement immunitaire : zinc, oméga-3, probiotiques.' : ''}
-${saison === 'Hiver' ? 'Adapter les apports selon le niveau d\'activité et l\'environnement.' : ''}
+${saison === 'Hiver' ? "Adapter les apports selon le niveau d'activité et l'environnement." : ''}
 
 ## COMPLÉMENTS PRIORITAIRES
 Les 3-5 compléments clés avec dosages selon le poids métabolique.
@@ -185,25 +165,17 @@ ${glandesAnales ? `Si pertinent, mentionne l'apport en fibres (citrouille, psyll
 
 ## NUTRITION & COMPORTEMENT
 ${comportement.length > 0 || data.stress !== 'très calme' ? `
-Analyse les liens entre nutrition et comportement pour ce profil :
-- Troubles déclarés : ${comportement.length > 0 ? comportement.join(', ') : 'aucun'}
-- Niveau de stress : ${data.stress || 'non renseigné'}
-
-Explique quels aliments et compléments peuvent agir positivement sur :
-- L'anxiété et le stress : tryptophane (dinde, œuf), magnésium, oméga-3, probiotiques
-- L'hyperactivité : réduire les glucides rapides, augmenter les protéines de qualité, magnésium
-- L'agressivité : oméga-3 DHA (action sur le système nerveux), tryptophane
-- Les peurs : vitamine B6, magnésium, ashwagandha (si adapté au chien)
+Analyse les liens entre nutrition et comportement pour ce profil.
+Troubles déclarés : ${comportement.length > 0 ? comportement.join(', ') : 'aucun'}
+Niveau de stress : ${data.stress || 'non renseigné'}
 Sois concret et pratique — quels aliments intégrer, lesquels éviter.
 ` : 'Le comportement de ce chien ne nécessite pas d\'ajustements nutritionnels spécifiques.'}
 
 ## ALERTES
 - Aliments interdits : raisin, oignon/ail/poireau, chocolat, xylitol, os cuits, avocat, macadamia
 - Interactions médicaments si traitements : ${data.traitements || 'aucun'}
-${oreilles.length > 0 ? `- Problèmes d'oreilles signalés (${oreilles.join(', ')}) : évoque le lien possible avec une intolérance alimentaire ou un déséquilibre, et recommande un avis vétérinaire si récurrent.` : ''}
-${reactionsAllergiques && reactionsAllergiques !== 'jamais' ? `- Antécédent allergique signalé (${reactionsAllergiques}) : reste prudent sur les nouveaux ingrédients introduits.` : ''}
-${antecedents ? `- Antécédents médicaux signalés (${antecedents}) : prends-en compte dans les recommandations et reste prudent sur les changements brusques d'alimentation.` : ''}
-- Signaux d'alerte vétérinaire pertinents pour ce profil
+${oreilles.length > 0 ? `- Problèmes d'oreilles signalés (${oreilles.join(', ')}) : évoque le lien possible avec une intolérance alimentaire.` : ''}
+${antecedents ? `- Antécédents médicaux signalés (${antecedents}) : prends-en compte dans les recommandations.` : ''}
 
 ## FORMAT DU RAPPORT (600-800 mots)
 Structure :
@@ -218,101 +190,22 @@ Structure :
 9. Compléments prioritaires avec dosages
 10. Aliments à éviter absolument
 11. Ce que ça va changer en 4-6 semaines
-12. Phrase finale : "Votre menu de la semaine arrive dans quelques instants."
+12. Phrase finale : "Ton menu de la semaine t'attend dans ton espace Kyno."
 
 Note légale : Ce rapport est éducatif et ne remplace pas un avis vétérinaire.`;
 }
 
-// ── PROMPT MENU ───────────────────────────────────────────
-function buildMenuPrompt(data, saison, pm) {
-  const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
-  const equipement = Array.isArray(data.equipement) ? data.equipement : [];
-  // ── Nouveau champ intégré : lieux de courses habituels ──
-  const coursesOu = mergeAutre(data.coursesOu, data.coursesOuAutre);
-
-  return `Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023.
-
-## PROFIL
-- Prénom : ${data.prenom}
-- Race : ${data.race}
-- Poids : ${data.poids} kg — Poids métabolique : ${pm} kg PM
-- Activité : ${data.activite}
-- Saison : ${saison}
-- Mode alimentaire : ${data.modeAlimentaire}
-- Budget : ${data.budget}
-- Équipement : ${equipement.join(', ')}
-- Temps préparation : ${data.tempsPrep}
-- Lieux de courses habituels : ${coursesOu.length > 0 ? coursesOu.join(', ') : 'non renseigné'}
-- Intolérances à exclure absolument : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
-
-## CONCEPT DU MENU
-Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
-- 2 recettes uniquement : une pour le repas du MATIN, une pour le repas du SOIR
-- Les recettes sont cuisinées en grande quantité pour toute la semaine
-- Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur en portions
-- Les portions sont décongelées la veille au frigo
-
-## FORMAT REQUIS
-
-### 1. QUANTITÉ JOURNALIÈRE
-- Total en grammes par jour pour ${data.prenom}
-- Répartition : matin (40%) / soir (60%)
-
-### 2. RECETTE MATIN — [nom de la recette]
-Ingrédients pour 7 jours au total (en grammes) :
-- Protéine principale : X g
-- Légume 1 : X g
-- Légume 2 : X g
-- Complément : X g
-- Huile oméga-3 : X ml (à ajouter FROIDE dans la gamelle, jamais chauffée)
-
-Préparation (étapes simples) :
-1. ...
-2. ...
-3. ...
-
-### 3. RECETTE SOIR — [nom de la recette]
-Même format que la recette matin.
-
-### 4. SESSION BATCH COOKING
-Jour recommandé : dimanche (ou autre)
-Durée estimée : X minutes
-Étapes dans l'ordre :
-1. ...
-2. ...
-
-### 5. CONDITIONNEMENT
-- Portions jours 1-2-3 → réfrigérateur (boîtes hermétiques)
-- Portions jours 4-5-6-7 → congélateur (sachets ou boîtes)
-- Décongélation : la veille au soir au réfrigérateur
-- Ne jamais réchauffer au micro-ondes — tiède à l'eau chaude
-
-### 6. LISTE DE COURSES
-Adapte les suggestions de provenance des ingrédients aux lieux de courses habituels (${coursesOu.length > 0 ? coursesOu.join(', ') : 'non renseigné'}) quand c'est pertinent.
-Viandes & poissons :
-- ...
-Légumes :
-- ...
-Compléments & huiles :
-- ...
-CMV : Vit'i5 ou équivalent — dosage selon le poids de ${data.prenom}
-
-### 7. COÛT ESTIMÉ
-Total semaine : environ X€ (adapté au budget ${data.budget})
-
-Commence par : "Voici le menu de la semaine de ${data.prenom} !"
-Intolérances à exclure : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
-Adapte les légumes et protéines à la saison : ${saison}`;
-}
-
 // ── EMAIL RAPPORT ─────────────────────────────────────────
-async function sendEmailRapport(email, prenom, rapport) {
+async function sendEmailRapport(email, prenom, rapport, data) {
   const htmlRapport = rapport
     .replace(/\n\n/g, '</p><p style="margin:0 0 16px;">')
     .replace(/\n/g, '<br>')
     .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#2B3A2E;font-weight:600;">$1</strong>')
     .replace(/^/, '<p style="margin:0 0 16px;">')
     .replace(/$/, '</p>');
+
+  // URL vers la page d'accès avec l'email pré-rempli
+  const accessUrl = `https://project-jlc6z.vercel.app/acces.html?email=${encodeURIComponent(email)}`;
 
   await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
@@ -324,51 +217,13 @@ async function sendEmailRapport(email, prenom, rapport) {
       sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
       to: [{ email, name: prenom }],
       subject: `Le rapport nutritionnel de ${prenom} est prêt ✦`,
-      htmlContent: buildEmailHtml(prenom, htmlRapport, 'rapport')
+      htmlContent: buildEmailHtml(prenom, htmlRapport, accessUrl)
     })
   });
 }
 
-// ── EMAIL MENU ────────────────────────────────────────────
-async function sendEmailMenu(email, prenom, menu) {
-  const htmlMenu = menu
-    .replace(/\n\n/g, '</p><p style="margin:0 0 16px;">')
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#2B3A2E;font-weight:600;">$1</strong>')
-    .replace(/^/, '<p style="margin:0 0 16px;">')
-    .replace(/$/, '</p>');
-
-  await fetch('https://api.brevo.com/v3/smtp/email', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'api-key': process.env.BREVO_API_KEY
-    },
-    body: JSON.stringify({
-      sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
-      to: [{ email, name: prenom }],
-      subject: `Le menu de la semaine de ${prenom} ✦`,
-      htmlContent: buildEmailHtml(prenom, htmlMenu, 'menu')
-    })
-  });
-}
-
-// ── TEMPLATE EMAIL ────────────────────────────────────────
-function buildEmailHtml(prenom, htmlContent, type) {
-  const isMenu = type === 'menu';
-  const title = isMenu
-    ? `Le menu de la semaine de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em>`
-    : `Le rapport nutritionnel de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em> est prêt`;
-  const subtitle = isMenu
-    ? 'Menu personnalisé — semaine 1'
-    : 'Rapport personnalisé';
-  const intro = isMenu
-    ? `Voici le menu détaillé de la première semaine pour <strong style="color:#2B3A2E;">${prenom}</strong>. Quantités précises, batch cooking et liste de courses inclus.`
-    : `Voici le rapport nutritionnel ultra-personnalisé que Kyno a généré pour <strong style="color:#2B3A2E;">${prenom}</strong>. Basé sur les références NRC 2006 et FEDIAF 2023.`;
-  const ctaText = isMenu
-    ? `Continuer avec Kyno — menus chaque mois →`
-    : `Voir le menu de la semaine dans le prochain email`;
-
+// ── TEMPLATE EMAIL RAPPORT ────────────────────────────────
+function buildEmailHtml(prenom, htmlContent, accessUrl) {
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -389,60 +244,38 @@ function buildEmailHtml(prenom, htmlContent, type) {
 
       <tr>
         <td style="background:#2FA35E;padding:20px 48px;border-bottom:3px solid #F2843C;">
-          <p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">${subtitle}</p>
-          <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FBFDF7;">${title}</p>
+          <p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Rapport personnalisé</p>
+          <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FBFDF7;">Le rapport nutritionnel de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em> est prêt</p>
         </td>
       </tr>
 
       <tr>
         <td style="background:#FBFDF7;padding:40px 48px 0;">
-          <p style="margin:0 0 8px;font-size:15px;color:#2B3A2E;">Bonjour,</p>
-          <p style="margin:0 0 32px;font-size:14px;color:#7E8C80;line-height:1.8;">${intro}</p>
+          <p style="margin:0 0 8px;font-size:15px;color:#2B3A2E;">Bonjour !</p>
+          <p style="margin:0 0 32px;font-size:14px;color:#7E8C80;line-height:1.8;">Voici le rapport nutritionnel ultra-personnalisé que Kyno a généré pour <strong style="color:#2B3A2E;">${prenom}</strong>. Basé sur les références NRC 2006 et FEDIAF 2023.</p>
           <div style="height:3px;background:linear-gradient(to right,#2FA35E,#EC6592,#FFCE2E);margin-bottom:32px;border-radius:2px;"></div>
         </td>
       </tr>
 
       <tr>
         <td style="background:#FBFDF7;padding:0 48px;">
-          <div style="background:white;border-radius:12px;padding:36px;border:1px solid #DDE8DA;border-left:4px solid ${isMenu ? '#EC6592' : '#2FA35E'};font-size:14px;line-height:1.85;color:#2B3A2E;">
+          <div style="background:white;border-radius:12px;padding:36px;border:1px solid #DDE8DA;border-left:4px solid #2FA35E;font-size:14px;line-height:1.85;color:#2B3A2E;">
             ${htmlContent}
           </div>
         </td>
       </tr>
 
+      <!-- CTA PRINCIPAL : accéder à l'espace + menu -->
       <tr>
         <td style="background:#FBFDF7;padding:32px 48px;">
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td width="33%" style="padding:0 6px 0 0;text-align:center;">
-                <div style="background:#E4F4E8;border-radius:10px;padding:16px 12px;">
-                  <p style="margin:0;font-size:20px;font-weight:700;color:#2FA35E;">NRC</p>
-                  <p style="margin:4px 0 0;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7E8C80;">Références</p>
-                </div>
-              </td>
-              <td width="33%" style="padding:0 3px;text-align:center;">
-                <div style="background:#FBE2EB;border-radius:10px;padding:16px 12px;">
-                  <p style="margin:0;font-size:20px;font-weight:700;color:#EC6592;">100%</p>
-                  <p style="margin:4px 0 0;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7E8C80;">Personnalisé</p>
-                </div>
-              </td>
-              <td width="33%" style="padding:0 0 0 6px;text-align:center;">
-                <div style="background:#FFF1BF;border-radius:10px;padding:16px 12px;">
-                  <p style="margin:0;font-size:20px;font-weight:700;color:#2B3A2E;">4×</p>
-                  <p style="margin:4px 0 0;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7E8C80;">Menus / mois</p>
-                </div>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      <tr>
-        <td style="background:#FBFDF7;padding:0 48px 40px;">
           <div style="background:#2B3A2E;border-radius:14px;padding:36px;text-align:center;border:3px solid #F2843C;">
-            <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.4);">Chaque mois</p>
-            <p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#FBFDF7;line-height:1.3;">Un nouveau menu pour <span style="color:#2FA35E;">${prenom}</span><br><span style="font-size:14px;font-weight:400;color:rgba(245,240,232,0.5);">adapté à la saison et à son évolution</span></p>
-            <a href="https://project-jlc6z.vercel.app" style="display:inline-block;background:#2FA35E;color:white;padding:16px 32px;border-radius:4px;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.04em;border:2px solid #F2843C;">${ctaText}</a>
+            <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.4);">Prochaine étape</p>
+            <p style="margin:0 0 8px;font-size:22px;font-weight:700;color:#FBFDF7;line-height:1.3;">Accède à ton espace<br>et découvre le menu de <span style="color:#2FA35E;">${prenom}</span></p>
+            <p style="margin:0 0 20px;font-size:13px;color:rgba(245,240,232,0.5);">Ton menu de la semaine t'attend — recettes, quantités et liste de courses.</p>
+            <a href="${accessUrl}" style="display:inline-block;background:#2FA35E;color:white;padding:18px 36px;border-radius:4px;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.04em;border:2px solid #F2843C;">
+              Accéder à mon espace et mon menu →
+            </a>
+            <p style="margin:14px 0 0;font-size:11px;color:rgba(245,240,232,0.3);">Un lien de connexion sécurisé te sera envoyé automatiquement.</p>
           </div>
         </td>
       </tr>
@@ -450,7 +283,7 @@ function buildEmailHtml(prenom, htmlContent, type) {
       <tr>
         <td style="background:#FBFDF7;padding:0 48px 32px;">
           <div style="border-top:1px solid #DDE8DA;padding-top:24px;">
-            <p style="margin:0;font-size:11px;color:#7E8C80;line-height:1.7;">⚠ Ce rapport est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consultez votre vétérinaire avant tout changement alimentaire.</p>
+            <p style="margin:0;font-size:11px;color:#7E8C80;line-height:1.7;">⚠ Ce rapport est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consulte ton vétérinaire avant tout changement alimentaire.</p>
           </div>
         </td>
       </tr>
