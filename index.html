@@ -92,7 +92,7 @@ h1 em{font-style:normal;color:var(--sage);}
 .btn-main:hover{background:var(--sage-l);transform:translateY(-1px);}
 .btn-price-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:1px;}
 .btn-price-main{font-size:15px;font-weight:600;}
-.btn-price-sub{font-size:10px;opacity:0.7;font-weight:400;letter-spacing:0.02em;}
+.btn-price-sub{font-size:12px;opacity:0.7;font-weight:400;letter-spacing:0.02em;}
 
 .hero-proof{display:flex;gap:36px;padding-top:20px;border-top:1px solid var(--sand);}
 .proof-num{font-family:var(--display);font-size:30px;font-weight:600;color:var(--tabac);line-height:1;}
@@ -137,6 +137,17 @@ h1 em{font-style:normal;color:var(--sage);}
 h2{font-family:var(--display);font-size:52px;line-height:1.08;font-weight:600;color:var(--tabac);letter-spacing:-0.02em;}
 h2 em{font-style:normal;color:var(--sage);}
 
+/* PREUVE SOCIALE */
+.s-proof2{padding:90px 64px;background:var(--warm);}
+.proof2-wrap{max-width:920px;margin:0 auto;}
+.proof2-wrap .s-label{justify-content:center;color:var(--sage);}
+.proof2-wrap .s-label::before{background:var(--sage);}
+.proof2-cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:30px;}
+.proof2-card{background:#fff;border:1px solid var(--sand);border-radius:18px;padding:34px 32px;box-shadow:0 10px 28px -14px rgba(43,58,46,0.16);display:flex;flex-direction:column;gap:20px;}
+.proof2-quote{font-size:16px;line-height:1.72;color:var(--tabac);font-weight:300;}
+.proof2-author{font-size:13px;color:var(--honey);font-weight:500;display:flex;align-items:center;gap:9px;}
+.proof2-author::before{content:'';width:18px;height:1px;background:var(--sand);}
+
 /* DIFF */
 .s-diff{padding:120px 64px;background:var(--sage-mist);border-top:3px solid var(--pink);}
 .diff-intro{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:end;margin-bottom:80px;}
@@ -159,6 +170,18 @@ h2 em{font-style:normal;color:var(--sage);}
 .td-check{color:var(--sage);font-size:16px;}
 .td-cross{color:var(--sand);font-size:16px;}
 .compare-table tr:hover td{background:var(--ecru);}
+
+/* COMPARAISON — version mobile (cards empilées) */
+.compare-mobile{display:none;}
+.cm-card{background:#fff;border:1px solid var(--sand);border-radius:14px;padding:20px 22px;box-shadow:0 6px 18px -10px rgba(43,58,46,0.16);}
+.cm-row-title{font-family:var(--display);font-size:15px;font-weight:600;color:var(--tabac);margin-bottom:14px;line-height:1.3;}
+.cm-line{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.5;padding:6px 0;}
+.cm-line + .cm-line{border-top:1px solid var(--sand);}
+.cm-line.kyno{color:var(--tabac);font-weight:500;}
+.cm-line.others{color:var(--honey);font-weight:400;}
+.cm-mark{flex-shrink:0;font-size:15px;line-height:1.45;font-weight:600;}
+.cm-mark.ok{color:var(--sage);}
+.cm-mark.no{color:var(--honey);opacity:0.5;}
 
 /* COMMENT */
 .s-how{padding:120px 64px;background:var(--blue-soft);border-top:3px solid var(--orange);border-bottom:3px solid var(--pink);}
@@ -224,6 +247,21 @@ h2 em{font-style:normal;color:var(--sage);}
 /* CARTE STANDARD */
 .offer-standard{background:var(--ecru);border:1px solid var(--sand);border-radius:20px;padding:48px 40px;display:flex;flex-direction:column;gap:20px;}
 .offer-badge-standard{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;padding:5px 12px;border-radius:3px;width:fit-content;background:var(--sage-mist);color:var(--sage);font-weight:600;}
+
+/* FAQ */
+.s-faq{padding:120px 64px;background:var(--sage-mist);border-top:3px solid var(--orange);border-bottom:3px solid var(--pink);}
+.faq-head{text-align:center;margin-bottom:56px;}
+.faq-head .s-label{justify-content:center;}
+.faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}
+.faq-item{background:#fff;border:1px solid var(--sand);border-radius:14px;overflow:hidden;transition:box-shadow 0.25s,border-color 0.25s;}
+.faq-item.open{box-shadow:0 12px 30px -14px rgba(43,58,46,0.22);border-color:var(--sage-l);}
+.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 26px;background:none;border:none;cursor:pointer;font-family:var(--display);font-size:17px;font-weight:600;color:var(--tabac);text-align:left;line-height:1.35;}
+.faq-icon{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--sage);display:flex;align-items:center;justify-content:center;transition:transform 0.3s cubic-bezier(.22,.61,.36,1),background 0.25s;}
+.faq-icon svg{width:13px;height:13px;color:var(--sage);transition:color 0.25s;}
+.faq-item.open .faq-icon{transform:rotate(180deg);background:var(--sage);}
+.faq-item.open .faq-icon svg{color:#fff;}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.38s cubic-bezier(.22,.61,.36,1);}
+.faq-a-inner{padding:0 26px 24px;font-size:14px;line-height:1.8;color:var(--honey);font-weight:300;}
 
 /* WAITLIST / CTA */
 .s-waitlist{padding:120px 64px;background:var(--tabac);text-align:center;display:flex;flex-direction:column;align-items:center;gap:32px;border-top:3px solid var(--pink);}
@@ -339,46 +377,76 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   .hero-card-stack{margin-left:0;width:100%;max-width:360px;align-items:stretch;}
   .hero-carousel{justify-content:center;flex-wrap:wrap;}
   .hero-viva{left:6px;width:150px;opacity:0.92;}
-  .s-diff,.s-compare,.s-how,.s-offers,.s-waitlist,.s-waitlist-full{padding:80px 24px;}
+  .s-diff,.s-compare,.s-how,.s-offers,.s-waitlist,.s-waitlist-full,.s-faq,.s-proof2{padding:80px 24px;}
   .diff-intro{grid-template-columns:1fr;gap:24px;}
   h2{font-size:38px;}
   .diff-grid,.how-steps{grid-template-columns:1fr;}
   .how-steps::before{display:none;}
   .offers-grid{grid-template-columns:1fr;}
+  .proof2-cards{grid-template-columns:1fr;}
   .wl-title,.wl-full-title{font-size:40px;}
   .wl-form{flex-direction:column;border-radius:4px;}
   .wl-btn{border-radius:0 0 4px 4px;}
   footer{grid-template-columns:1fr 1fr;gap:32px;padding:48px 24px;}
   .compare-table{display:none;}
+  .compare-mobile{display:flex;flex-direction:column;gap:14px;margin-top:40px;}
+  .faq-q{font-size:16px;padding:20px 22px;}
 }
 @media(max-width:560px){
   h1{font-size:42px;}
   .fiche-panel{padding:22px;}
 }
+
+/* HAMBURGER MOBILE */
+.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;z-index:201;}
+.nav-burger span{display:block;width:22px;height:2px;background:var(--tabac);border-radius:2px;transition:all 0.3s;}
+.nav-burger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+.nav-burger.open span:nth-child(2){opacity:0;}
+.nav-burger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+@media(max-width:900px){
+  .nav-burger{display:flex;}
+  .nav-links{
+    display:none;flex-direction:column;position:fixed;
+    top:56px;left:0;right:0;z-index:199;
+    background:rgba(252,253,248,0.98);backdrop-filter:blur(12px);
+    border-bottom:2px solid var(--orange);
+    padding:20px 28px 24px;gap:16px;
+  }
+  .nav-links.open{display:flex;}
+  .nav-links a{font-size:14px;opacity:1;padding:8px 0;border-bottom:1px solid var(--sand);}
+  .nav-links a:last-child{border-bottom:none;}
+  .nav-cta{text-align:center;padding:12px 24px!important;border-radius:4px;}
+  .nav-espace{text-align:center;padding:8px 0!important;border:none!important;}
+}
 </style>
 </head>
 <body>
 
+
+
 <nav>
-  <a href="#" class="nav-logo">
+  <a href="index.html" class="nav-logo">
     <span class="logo-mark"><span>K</span></span>
     <span class="logo-word">kyno</span>
   </a>
-  <div class="nav-links">
+  <div class="nav-links" id="navLinks">
     <a href="#difference">Le concept</a>
     <a href="#comment">Comment ça marche</a>
     <a href="#offres">Tarifs</a>
     <a href="login.html" class="nav-espace">Mon espace</a>
     <a href="quiz.html" class="nav-cta">Commencer →</a>
   </div>
+  <button class="nav-burger" id="navBurger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-left">
     <div class="eyebrow">Nutrition canine individualisée</div>
-    <h1>Nourris ton chien<br><em>vraiment.</em></h1>
-    <p class="hero-desc">Ton chien est unique — ses besoins aussi. Kyno calcule sa ration <span class="mark">au gramme près</span>, d'après des <span class="mark mark-blue">recherches scientifiques approfondies</span> (les normes NRC et FEDIAF, références de la nutrition animale). Tu reçois des menus <span class="mark mark-pink">à cuisiner toi-même</span> — recettes et dosages compris. Résultat&nbsp;: plus d'énergie pour courir, un poil qui brille, et <span class="mark mark-sage">moins de frais vétérinaires</span>.</p>
+    <h1>Son nutritionniste personnel,<br><em>à 12 € / mois.</em></h1>
+    <p class="hero-desc">Kyno transforme les <span class="mark mark-blue">données scientifiques</span> de ton chien en menus concrets à cuisiner toi-même. Pas de livraison, pas de boîte noire — juste des <span class="mark mark-pink">recettes précises</span>, adaptées à sa race, son âge et sa santé. Basé sur les mêmes références que les nutritionnistes vétérinaires (<span class="mark">NRC et FEDIAF</span>).</p>
 
     <div class="early-bird-wrap">
       <div class="early-bird-badge">
@@ -475,11 +543,41 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   </g>
 </svg>
     <div class="hero-card-stack">
-      <div class="breed-carousel hero-carousel" id="heroCarousel"></div>
       <div class="hero-card" id="heroCard"></div>
     </div>
   </div>
   
+</section>
+
+<!-- PREUVE SOCIALE -->
+<section class="s-proof2">
+  <div class="proof2-wrap">
+    <div class="s-label">Ce que disent les premiers membres Kyno</div>
+    <div class="proof2-cards">
+      <div class="proof2-card">
+        <p class="proof2-quote">« J'avais essayé de cuisiner pour Pixel tout seul mais je ne savais jamais si je faisais juste. Avec Kyno j'ai enfin l'impression de comprendre ce que je lui donne. »</p>
+        <p class="proof2-author">Thomas, propriétaire d'un Husky de 3 ans</p>
+      </div>
+      <div class="proof2-card">
+        <p class="proof2-quote">« En 3 semaines son pelage a vraiment changé. Et le fait de savoir exactement ce qu'il mange, c'est rassurant. »</p>
+        <p class="proof2-author">Léa, propriétaire d'un Labrador de 5 ans</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FICHE SANTÉ DÉTAILLÉE -->
+<section class="s-fiche" id="fiche">
+  <div class="fiche-head">
+    <div class="s-label" style="justify-content:center;">Ce que tu reçois</div>
+    <h2>La fiche santé<br><em>de ton chien.</em></h2>
+    <p>Chaque semaine, tu reçois le profil complet de ton chien — score santé, répartition nutritionnelle, menus à cuisiner, alertes liées à sa race et compléments ciblés. Choisis une race pour voir un exemple.</p>
+  </div>
+  <div class="fiche-stage">
+    <div class="breed-carousel" id="breedChips"></div>
+    <div class="fiche-panel" id="fichePanel"></div>
+  </div>
+  <p class="fiche-note">Exemple illustratif — ta vraie fiche Kyno est encore plus détaillée. Sans engagement, résiliable à tout moment.</p>
 </section>
 
 <!-- LA DIFFÉRENCE -->
@@ -519,6 +617,40 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
       <tr><td>Suivi santé proactif chaque mois</td><td class="td-check">✓ Suivi mensuel adaptatif</td><td class="td-cross">✗ Uniquement en consultation</td></tr>
     </tbody>
   </table>
+
+  <!-- Version mobile : 6 cards empilées (visible sur tous les écrans <= 900px) -->
+  <div class="compare-mobile">
+    <div class="cm-card">
+      <div class="cm-row-title">Besoins nutritionnels couverts avec précision</div>
+      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> — Calcul NRC / FEDIAF</span></div>
+      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres — Estimation approximative</span></div>
+    </div>
+    <div class="cm-card">
+      <div class="cm-row-title">Carences et excès détectés en amont</div>
+      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> — Alertes intégrées au profil</span></div>
+      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres — Découverts trop tard</span></div>
+    </div>
+    <div class="cm-card">
+      <div class="cm-row-title">Adaptation aux intolérances &amp; pathologies</div>
+      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> — Intégrée dès le profil</span></div>
+      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres — Partiel ou absent</span></div>
+    </div>
+    <div class="cm-card">
+      <div class="cm-row-title">Ajustement selon la saison et l'âge</div>
+      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> — Mensuel et automatique</span></div>
+      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres — Statique</span></div>
+    </div>
+    <div class="cm-card">
+      <div class="cm-row-title">Prévention des troubles digestifs, cutanés, articulaires</div>
+      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> — Anticipé dans le plan</span></div>
+      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres — Traité en curatif</span></div>
+    </div>
+    <div class="cm-card">
+      <div class="cm-row-title">Suivi santé proactif chaque mois</div>
+      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> — Suivi mensuel adaptatif</span></div>
+      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres — Uniquement en consultation</span></div>
+    </div>
+  </div>
 </section>
 
 <!-- COMMENT ÇA MARCHE -->
@@ -532,20 +664,6 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
     <div class="how-step"><div class="step-ring">2</div><div class="step-title">Son plan nutritionnel</div><p class="step-desc">Kyno analyse le profil et génère un rapport sur mesure : besoins, menus de la semaine, compléments ciblés. Tout arrive par email.</p></div>
     <div class="how-step"><div class="step-ring">3</div><div class="step-title">Tu cuisines</div><p class="step-desc">Tu achètes les ingrédients où tu veux et tu cuisines — recettes et dosages fournis. Chaque semaine, un nouveau menu suit la saison et l'évolution de ton chien.</p></div>
   </div>
-</section>
-
-<!-- FICHE SANTÉ DÉTAILLÉE -->
-<section class="s-fiche" id="fiche">
-  <div class="fiche-head">
-    <div class="s-label" style="justify-content:center;">Ce que tu reçois</div>
-    <h2>La fiche santé<br><em>de ton chien.</em></h2>
-    <p>Chaque semaine, tu reçois le profil complet de ton chien — score santé, répartition nutritionnelle, menus à cuisiner, alertes liées à sa race et compléments ciblés. Choisis une race pour voir un exemple.</p>
-  </div>
-  <div class="fiche-stage">
-    <div class="breed-carousel" id="breedChips"></div>
-    <div class="fiche-panel" id="fichePanel"></div>
-  </div>
-  <p class="fiche-note">Exemple illustratif — ta vraie fiche Kyno est encore plus détaillée. Sans engagement, résiliable à tout moment.</p>
 </section>
 
 <!-- OFFRES -->
@@ -609,6 +727,48 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
       <p class="offer-fine">Sans engagement · résiliable à tout moment</p>
     </div>
 
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="s-faq" id="faq">
+  <div class="faq-head">
+    <div class="s-label" style="justify-content:center;">On répond</div>
+    <h2>Questions fréquentes.</h2>
+  </div>
+  <div class="faq-list" id="faqList">
+    <div class="faq-item">
+      <button class="faq-q" type="button">Combien de temps faut-il pour cuisiner ?<span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
+      <div class="faq-a"><div class="faq-a-inner">Une session de batch cooking d'environ 1h par semaine. Tu cuisines une grande quantité en une fois, tu conserves au frigo pour les 3 premiers jours et au congélateur pour le reste. Pas de cuisine quotidienne.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">Dois-je arrêter les croquettes ?<span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
+      <div class="faq-a"><div class="faq-a-inner">Non, pas forcément. Kyno s'adapte à ton rythme — tu peux commencer en mixte (une partie de ration ménagère, une partie de croquettes) et évoluer à ton rythme. Le plan indique toujours les quantités adaptées à chaque mode.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">Et si mon chien n'aime pas les recettes ?<span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
+      <div class="faq-a"><div class="faq-a-inner">Chaque menu est conçu à partir de tes réponses au quiz — ingrédients que ton chien aime, ce qu'il a déjà mangé, ses intolérances. Et si une recette ne passe pas, tu nous le signales dans ton espace client et on adapte le menu suivant.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">Est-ce validé par des vétérinaires ?<span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
+      <div class="faq-a"><div class="faq-a-inner">Les plans Kyno sont basés sur les références NRC 2006 et FEDIAF 2023 — les mêmes standards utilisés par les nutritionnistes vétérinaires professionnels. Kyno est un outil éducatif et ne remplace pas un suivi vétérinaire, mais les calculs nutritionnels sont rigoureux et sourcés.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">Faut-il acheter des compléments spéciaux ?<span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
+      <div class="faq-a"><div class="faq-a-inner">Oui, un complément minéral et vitaminé (CMV) est indispensable en ration ménagère — c'est environ 2-3€/mois. Il est disponible en magasin bio ou sur internet. Kyno indique exactement lequel utiliser et en quelle quantité selon le poids de ton chien.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">Quelle différence avec une calculatrice nutritionnelle gratuite en ligne ?<span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
+      <div class="faq-a"><div class="faq-a-inner">Les calculatrices gratuites donnent des apports caloriques génériques. Kyno intègre la race, les prédispositions génétiques, la saison, les troubles de santé, les intolérances, le comportement alimentaire et l'environnement de vie — et génère des recettes concrètes avec des quantités précises, pas juste des chiffres.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">Pourquoi un abonnement mensuel ?<span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
+      <div class="faq-a"><div class="faq-a-inner">Parce que les besoins de ton chien évoluent — avec l'âge, la saison, son poids, son activité. Un menu de janvier n'est pas adapté à juillet. L'abonnement inclut 4 nouveaux menus par mois, mis à jour selon l'évolution de ton chien via le chat de l'espace client.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" type="button">Puis-je résilier à tout moment ?<span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
+      <div class="faq-a"><div class="faq-a-inner">Oui, sans condition et sans frais. Tu résilies depuis ton espace client en un clic, quand tu veux.</div></div>
+    </div>
   </div>
 </section>
 
@@ -715,6 +875,22 @@ document.getElementById('wl-email-full')?.addEventListener('keydown', function(e
   if (e.key === 'Enter') submitWaitlistFull();
 });
 
+// ── FAQ ACCORDÉON ─────────────────────────────────────────
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.faq-item');
+    const ans = item.querySelector('.faq-a');
+    const isOpen = item.classList.contains('open');
+    if (isOpen) {
+      item.classList.remove('open');
+      ans.style.maxHeight = null;
+    } else {
+      item.classList.add('open');
+      ans.style.maxHeight = ans.scrollHeight + 'px';
+    }
+  });
+});
+
 // ── SCROLL REVEAL ─────────────────────────────────────────
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => {
@@ -725,7 +901,7 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.1 });
 
-document.querySelectorAll('.diff-card, .how-step, .offer-early, .offer-standard').forEach(el => {
+document.querySelectorAll('.diff-card, .how-step, .offer-early, .offer-standard, .proof2-card').forEach(el => {
   el.style.opacity = '0';
   el.style.transform = 'translateY(16px)';
   el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
@@ -882,10 +1058,25 @@ function selectBreed(key){
   renderFiche(key);
   document.querySelectorAll('.breed-ava').forEach(el=>el.classList.toggle('active', el.dataset.breed===key));
 }
-buildCarousel('heroCarousel');
 buildCarousel('breedChips');
 selectBreed('epagneul');
 </script>
 
 
+
+<script>
+function toggleMenu(){
+  var links = document.getElementById('navLinks');
+  var burger = document.getElementById('navBurger');
+  links.classList.toggle('open');
+  burger.classList.toggle('open');
+}
+// Fermer le menu au clic sur un lien
+document.querySelectorAll('#navLinks a').forEach(function(a){
+  a.addEventListener('click', function(){
+    document.getElementById('navLinks').classList.remove('open');
+    document.getElementById('navBurger').classList.remove('open');
+  });
+});
+</script>
 </body></html>
