@@ -107,7 +107,7 @@ h1 em{font-style:normal;color:var(--sage);}
 .hero-card-stack{position:relative;z-index:2;margin-left:90px;display:flex;flex-direction:column;gap:14px;}
 .hero-carousel{justify-content:flex-start;gap:8px;padding-left:2px;}
 .hero-carousel .breed-ava .ph{width:46px;height:46px;border-width:2px;}
-.hero-carousel .breed-ava .nm{font-size:10px;}
+.hero-carousel .breed-ava .nm{display:none;}
 .hero-carousel .breed-ava.active .ph{box-shadow:0 0 0 3px var(--banana-soft);}
 .card-head{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
 .card-av{width:46px;height:46px;border-radius:50%;background:var(--sage-mist);border:2px solid var(--tabac);overflow:hidden;flex-shrink:0;}
@@ -543,6 +543,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   </g>
 </svg>
     <div class="hero-card-stack">
+      <div class="breed-carousel hero-carousel" id="heroCarousel"></div>
       <div class="hero-card" id="heroCard"></div>
     </div>
   </div>
@@ -1058,6 +1059,7 @@ function selectBreed(key){
   renderFiche(key);
   document.querySelectorAll('.breed-ava').forEach(el=>el.classList.toggle('active', el.dataset.breed===key));
 }
+buildCarousel('heroCarousel');
 buildCarousel('breedChips');
 selectBreed('epagneul');
 </script>
