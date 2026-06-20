@@ -80,7 +80,11 @@ async function generateMenuInBackground(email) {
   const saison = getSaison();
   const pm = profile.poids ? Math.pow(profile.poids, 0.75).toFixed(2) : 'à calculer';
 
-  // 2. Générer le menu via Claude (prompt riche : batch cooking, courses, coût)
+  // 2. Générer le menu via Claude — UNE SEULE RÉPONSE EN JSON STRUCTURÉ
+  // Le JSON contient à la fois le texte lisible pour l'email ET les données
+  // structurées pour l'espace client (recettes, courses, batch cooking, coût).
+  // Avantage : un seul appel, jamais de désynchronisation entre les deux formats,
+  // pas de parsing fragile de texte libre.
   const menuResponse = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -90,9 +94,9 @@ async function generateMenuInBackground(email) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
-      max_tokens: 4000,
+      max_tokens: 4500,
       system: buildMenuPrompt(profile, saison, pm),
-      messages: [{ role: 'user', content: 'Génère le menu de la semaine.' }]
+      messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
     })
   });
 
@@ -103,9 +107,20 @@ async function generateMenuInBackground(email) {
   }
 
   const menuResult = await menuResponse.json();
-  const menu = menuResult.content[0].text;
+  let rawText = menuResult.content[0].text.trim();
 
-  // 3. Sauvegarder le menu dans Supabase (pour l'espace client)
+  // Sécurité : enlever d'éventuelles balises ```json si le modèle les ajoute
+  rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
+
+  let menuData;
+  try {
+    menuData = JSON.parse(rawText);
+  } catch (parseErr) {
+    console.error('Erreur de parsing JSON du menu:', parseErr, rawText);
+    return;
+  }
+
+  // 3. Sauvegarder les données structurées dans Supabase (pour l'espace client)
   await fetch(`${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`, {
     method: 'PATCH',
     headers: {
@@ -115,13 +130,20 @@ async function generateMenuInBackground(email) {
       'Prefer': 'return=minimal'
     },
     body: JSON.stringify({
-      menu_texte: menu,
+      menu_texte: menuData.email_html || '',
+      recettes: [menuData.recette_matin, menuData.recette_soir].filter(Boolean),
+      batch_steps: menuData.batch_steps || [],
+      courses: menuData.courses || [],
+      cout_semaine: menuData.cout_semaine || null,
+      cout_indus: menuData.cout_indus || null,
+      economie: menuData.economie || null,
+      batch_time: menuData.batch_time || null,
       menu_envoye: true
     })
   });
 
-  // 4. Envoyer le menu par email (même niveau de détail qu'avant la refonte)
-  await sendEmailMenu(email, prenomChien, menu);
+  // 4. Envoyer le menu par email (texte lisible, même niveau de détail qu'avant)
+  await sendEmailMenu(email, prenomChien, menuData.email_html || '');
 
   console.log(`Menu généré et envoyé avec succès pour ${prenomChien} (${email})`);
 }
@@ -138,7 +160,7 @@ function buildMenuPrompt(profile, saison, pm) {
   const intolerances = mergeAutre(profile.intolerances, profile.intolerancesAutre, ['aucune']);
   const equipement = Array.isArray(profile.equipement) ? profile.equipement : [];
 
-  return `Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire.
+  return `Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown \`\`\`.
 
 ## PROFIL
 - Prénom : ${nom}
@@ -155,60 +177,61 @@ function buildMenuPrompt(profile, saison, pm) {
 ## CONCEPT DU MENU
 Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
 - 2 recettes uniquement : une pour le repas du MATIN, une pour le repas du SOIR
-- Les recettes sont cuisinées en grande quantité pour toute la semaine
+- Les recettes sont cuisinées en grande quantité pour toute la semaine (×7 jours)
 - Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur en portions
 - Les portions sont décongelées la veille au frigo
+- Adapte les légumes et protéines à la saison : ${saison}
 
-## FORMAT REQUIS
+## STRUCTURE JSON EXACTE À RESPECTER
 
-### 1. QUANTITÉ JOURNALIÈRE
-- Total en grammes par jour pour ${nom}
-- Répartition : matin (40%) / soir (60%)
+{
+  "recette_matin": {
+    "moment": "Le matin",
+    "color": "#FFCE2E",
+    "titre": "nom de la recette, court et appétissant",
+    "ration": nombre en grammes (ration par repas, pas le total semaine),
+    "ingredients": [
+      { "name": "nom de l'ingrédient", "qty": "quantité par repas, ex: 80 g" }
+    ],
+    "note": "note nutritionnelle courte, 1 phrase, pourquoi cette recette est bonne pour ${nom}"
+  },
+  "recette_soir": {
+    "moment": "Le soir",
+    "color": "#2FA35E",
+    "titre": "nom de la recette, court et appétissant",
+    "ration": nombre en grammes (ration par repas, pas le total semaine),
+    "ingredients": [
+      { "name": "nom de l'ingrédient", "qty": "quantité par repas, ex: 105 g" }
+    ],
+    "note": "note nutritionnelle courte, 1 phrase"
+  },
+  "batch_time": "≈ XX min de prépa",
+  "batch_steps": [
+    { "n": 1, "text": "étape détaillée et concrète, avec temps de cuisson si pertinent" },
+    { "n": 2, "text": "..." },
+    { "n": 3, "text": "..." },
+    { "n": 4, "text": "..." }
+  ],
+  "courses": [
+    { "name": "ingrédient", "qty": "quantité totale pour 7 jours, ex: 560 g" }
+  ],
+  "cout_semaine": "XX,XX €",
+  "cout_indus": "XX €",
+  "economie": "XX,XX €",
+  "email_html": "Texte complet du menu en Markdown, formaté EXACTEMENT comme l'exemple ci-dessous, avec quantités pour 7 jours dans les recettes, préparation, batch cooking, conditionnement, liste de courses, coût. Utilise \\n pour les retours à la ligne et ** pour le gras. Commence par 'Voici le menu de la semaine de ${nom} !'"
+}
 
-### 2. RECETTE MATIN — [nom de la recette]
-Ingrédients pour 7 jours au total (en grammes) :
-- Protéine principale : X g
-- Légume 1 : X g
-- Légume 2 : X g
-- Complément : X g
-- Huile oméga-3 : X ml (à ajouter FROIDE dans la gamelle, jamais chauffée)
+## EXEMPLE DE STRUCTURE POUR email_html (respecte ce niveau de détail)
+"# Voici le menu de la semaine de ${nom} !\\n\\n## 1. QUANTITÉ JOURNALIÈRE\\nTotal journalier : Xg par jour - Repas du matin (40%) : Xg - Repas du soir (60%) : Xg\\n\\n## 2. RECETTE MATIN — [titre]\\n### Ingrédients pour 7 jours (X total) :\\n- ...\\n### Préparation :\\n1. ...\\n\\n## 3. RECETTE SOIR — [titre]\\n[même format]\\n\\n## 4. SESSION BATCH COOKING\\nJour recommandé : ... Durée totale : ...\\n### Déroulé optimisé :\\n...\\n\\n## 5. CONDITIONNEMENT\\n### Stockage :\\n...\\n### Conseils :\\n...\\n\\n## 6. LISTE DE COURSES\\n### 🥩 Viandes & Poissons\\n...\\n### 🥕 Légumes & Féculents\\n...\\n### 🧴 Compléments & Huiles\\n...\\n\\n## 7. COÛT ESTIMÉ\\n...\\n💰 Total semaine : environ X€\\n\\n## 🎯 POINTS CLÉS POUR ${nom}\\n✅ ...\\n\\nBon appétit à ${nom} ! 🐾"
 
-Préparation (étapes simples) :
-1. ...
-2. ...
-3. ...
-
-### 3. RECETTE SOIR — [nom de la recette]
-Même format que la recette matin.
-
-### 4. SESSION BATCH COOKING
-Jour recommandé : dimanche (ou autre)
-Durée estimée : X minutes
-Étapes dans l'ordre :
-1. ...
-2. ...
-
-### 5. CONDITIONNEMENT
-- Portions jours 1-2-3 → réfrigérateur (boîtes hermétiques)
-- Portions jours 4-5-6-7 → congélateur (sachets ou boîtes)
-- Décongélation : la veille au soir au réfrigérateur
-- Ne jamais réchauffer au micro-ondes — tiède à l'eau chaude
-
-### 6. LISTE DE COURSES
-Viandes & poissons :
-- ...
-Légumes :
-- ...
-Compléments & huiles :
-- ...
-CMV : Vit'i5 ou équivalent — dosage selon le poids de ${nom}
-
-### 7. COÛT ESTIMÉ
-Total semaine : environ X€ (adapté au budget ${profile.budget || 'moyen'})
-
-Commence par : "Voici le menu de la semaine de ${nom} !"
-Intolérances à exclure : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
-Adapte les légumes et protéines à la saison : ${saison}`;
+Règles importantes :
+- Les valeurs "ration" et "qty" dans recette_matin/recette_soir sont les quantités PAR REPAS (pas le total semaine)
+- Les valeurs "qty" dans "courses" sont les quantités TOTALES pour 7 jours
+- "color" reste fixe : "#FFCE2E" pour le matin, "#2FA35E" pour le soir
+- "cout_indus" est une estimation du prix d'un service de livraison industrielle équivalent (Butternut Box, Pet's Deli) pour comparaison
+- "economie" = cout_indus - cout_semaine
+- Respecte les intolérances : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
+- Le JSON doit être strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles`;
 }
 
 // ── SAISON ────────────────────────────────────────────────
