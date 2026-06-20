@@ -16,11 +16,15 @@ module.exports = async function handler(req, res) {
     if (!email) return res.status(400).json({ error: 'Email manquant' });
 
     // ── 1. Envoyer le lien magique via Supabase Auth ──────
+    // On utilise la SERVICE_KEY (clé secrète serveur) plutôt que l'ANON_KEY :
+    // c'est un appel serveur-à-serveur avec create_user:true, qui nécessite
+    // des privilèges admin avec le nouveau système de clés Supabase (sb_secret_...).
     const magicLinkResponse = await fetch(`${process.env.SUPABASE_URL}/auth/v1/otp`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': process.env.SUPABASE_ANON_KEY
+        'apikey': process.env.SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`
       },
       body: JSON.stringify({
         email: email,
@@ -34,7 +38,7 @@ module.exports = async function handler(req, res) {
     if (!magicLinkResponse.ok) {
       const err = await magicLinkResponse.json().catch(() => ({}));
       console.error('Erreur envoi magic link:', err);
-      return res.status(500).json({ error: 'Impossible d\'envoyer le lien de connexion' });
+      return res.status(500).json({ error: 'Impossible d\'envoyer le lien de connexion', detail: err });
     }
 
     // ── 2. Répondre immédiatement au client ────────────────
