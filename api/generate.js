@@ -4,6 +4,21 @@
 // ── SUPABASE ──────────────────────────────────────────────
 async function saveToSupabase(data, statut) {
   const url = `${process.env.SUPABASE_URL}/rest/v1/user`;
+
+  // Fusion des champs "autre" avec leur liste correspondante
+  const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
+  const sensibilites = mergeAutre(data.problemesOreilles, data.problemesOreillesAutre, ['non']);
+  const comportementParts = [
+    ...(Array.isArray(data.comportementAlimentaire) ? data.comportementAlimentaire : []),
+    ...mergeAutre(data.troublesComportement, data.troublesComportementAutre, ['aucun'])
+  ];
+  const environnement = data.environnement === 'autre' && data.environnementAutre
+    ? data.environnementAutre
+    : data.environnement;
+  const antecedentsTexte = data.antecedents && data.antecedents.trim()
+    ? data.antecedents.trim()
+    : 'Aucun antécédent particulier signalé';
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -18,10 +33,22 @@ async function saveToSupabase(data, statut) {
       prenom_chien: data.prenom,
       race: data.race,
       poids: data.poids,
+      age: data.age,
+      sexe: data.sexe,
       plan: data.plan || 'beta',
       statut: statut,
       rapport_envoye: true,
-      menu_envoye: false // le menu sera envoyé après connexion
+      menu_envoye: false, // le menu sera envoyé après connexion
+
+      // ── Données enrichies du quiz, utilisées par l'espace client ──
+      antecedents: antecedentsTexte,
+      allergies: intolerances,
+      sensibilites: sensibilites,
+      activite: data.activite || null,
+      environnement: environnement || null,
+      comportement: comportementParts.length > 0 ? comportementParts.join(', ') : 'Mange normalement',
+      frequence_repas: data.frequenceMenus || null,
+      objectifs: mergeAutre(data.objectif, data.objectifAutre)
     })
   });
   return response;
