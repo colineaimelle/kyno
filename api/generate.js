@@ -25,7 +25,7 @@ async function saveToSupabase(data, statut) {
       'Content-Type': 'application/json',
       'apikey': process.env.SUPABASE_SERVICE_KEY,
       'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-      'Prefer': 'return=minimal'
+      'Prefer': 'return=minimal,resolution=merge-duplicates'
     },
     body: JSON.stringify({
       email: data.email,
