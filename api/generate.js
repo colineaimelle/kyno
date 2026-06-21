@@ -3,7 +3,7 @@
 
 // ── SUPABASE ──────────────────────────────────────────────
 async function saveToSupabase(data, statut) {
-  const url = `${process.env.SUPABASE_URL}/rest/v1/user`;
+  const url = `${process.env.SUPABASE_URL}/rest/v1/user?on_conflict=email`;
 
   // Fusion des champs "autre" avec leur liste correspondante
   const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
