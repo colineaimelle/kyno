@@ -51,6 +51,14 @@ async function saveToSupabase(data, statut) {
       objectifs: mergeAutre(data.objectif, data.objectifAutre)
     })
   });
+
+  // Vérification explicite : sans ça, une erreur Supabase (mauvais type de
+  // colonne, contrainte violée, etc.) passe complètement inaperçue.
+  if (!response.ok) {
+    const errBody = await response.text().catch(() => '');
+    console.error('Erreur saveToSupabase:', response.status, errBody);
+  }
+
   return response;
 }
 
