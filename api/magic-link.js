@@ -1,6 +1,7 @@
 // api/magic-link.js
 // Reçoit l'email depuis acces.html, envoie le lien magique Supabase
-// et déclenche la génération du menu en arrière-plan (fire-and-forget).
+// et génère le menu (synchrone — Vercel peut tuer le process avant la fin
+// d'un traitement fire-and-forget lancé après la réponse HTTP, donc on attend).
 
 module.exports = async function handler(req, res) {
 
@@ -41,14 +42,20 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Impossible d\'envoyer le lien de connexion', detail: err });
     }
 
-    // ── 2. Répondre immédiatement au client ────────────────
-    res.status(200).json({ success: true });
+    // ── 2. Générer le menu — ON ATTEND LA FIN avant de répondre ──
+    // Vercel peut interrompre l'exécution juste après res.json() ; un
+    // fire-and-forget lancé après la réponse n'est donc pas fiable à 100%.
+    // On accepte un temps de réponse plus long (10-20s) côté front pour
+    // garantir que le menu est bien généré et envoyé.
+    try {
+      await generateMenuInBackground(email);
+    } catch (menuErr) {
+      console.error('Erreur génération menu:', menuErr);
+      // On ne fait pas échouer la requête pour autant : le magic link est
+      // déjà parti, l'utilisatrice peut se connecter même sans menu.
+    }
 
-    // ── 3. Lancer la génération du menu en arrière-plan ────
-    // (fire-and-forget — ne bloque pas la réponse HTTP ci-dessus)
-    generateMenuInBackground(email).catch(err => {
-      console.error('Erreur génération menu en arrière-plan:', err);
-    });
+    return res.status(200).json({ success: true });
 
   } catch (error) {
     console.error('Erreur magic-link.js:', error);
@@ -57,6 +64,7 @@ module.exports = async function handler(req, res) {
     }
   }
 };
+
 
 // ── GÉNÉRATION DU MENU EN ARRIÈRE-PLAN ─────────────────────
 async function generateMenuInBackground(email) {
