@@ -102,7 +102,7 @@ async function generateMenuInBackground(email) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
-      max_tokens: 4500,
+      max_tokens: 8000,
       system: buildMenuPrompt(profile, saison, pm),
       messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
     })
@@ -120,11 +120,19 @@ async function generateMenuInBackground(email) {
   // Sécurité : enlever d'éventuelles balises ```json si le modèle les ajoute
   rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
 
+  // Sécurité supplémentaire : si du texte traîne avant/après malgré la consigne,
+  // on isole le bloc JSON entre la première { et la dernière }.
+  const firstBrace = rawText.indexOf('{');
+  const lastBrace = rawText.lastIndexOf('}');
+  if (firstBrace > 0 || lastBrace < rawText.length - 1) {
+    rawText = rawText.slice(firstBrace, lastBrace + 1);
+  }
+
   let menuData;
   try {
     menuData = JSON.parse(rawText);
   } catch (parseErr) {
-    console.error('Erreur de parsing JSON du menu:', parseErr, rawText);
+    console.error('Erreur de parsing JSON du menu:', parseErr.message, '| stop_reason:', menuResult.stop_reason, '| longueur:', rawText.length, '| fin du texte:', rawText.slice(-200));
     return;
   }
 
