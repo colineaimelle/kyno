@@ -96,10 +96,8 @@ h3{font-family:'Syne';font-weight:700;font-size:19px;margin:0;}
 .bar-target{position:absolute;left:80%;top:-4px;bottom:-4px;width:2px;background:#2B3A2E;opacity:.5;border-radius:2px;}
 .obj-block{display:flex;flex-direction:column;gap:10px;border-top:1.5px solid #EDF2E8;padding-top:18px;margin-top:4px;}
 .obj-label{font-family:'Manrope';font-weight:700;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#7E8C80;}
-.obj-btns{display:flex;gap:7px;}
-.obj-btn{flex:1;padding:11px 6px;border-radius:4px;font-family:'Syne';font-weight:600;font-size:13px;cursor:pointer;text-align:center;transition:all .15s;}
-.obj-btn.active{background:#2FA35E;color:#fff;border:2px solid #F2843C;}
-.obj-btn:not(.active){background:#FBFDF7;color:#5d6b60;border:2px solid #E4ECDF;}
+.obj-badges{display:flex;flex-wrap:wrap;gap:7px;}
+.obj-badge{display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;font-family:'Syne';font-weight:600;font-size:12.5px;background:#E4F4E8;border:1.5px solid #2FA35E;color:#1d7a45;}
 .obj-help{font-family:'Manrope';font-size:12px;line-height:1.45;color:#5d6b60;margin:2px 0 0;}
 .alertes-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
 .alerte-warn{display:flex;align-items:center;gap:9px;background:#FFF1BF;border:1.5px solid #F2843C;border-radius:11px;padding:9px 14px;}
@@ -413,12 +411,8 @@ h3{font-family:'Syne';font-weight:700;font-size:19px;margin:0;}
             </div>
             <div id="macrosContainer"></div>
             <div class="obj-block">
-              <span class="obj-label">Son objectif</span>
-              <div class="obj-btns">
-                <button class="obj-btn" id="objM" onclick="setObjectif('maintien')">Maintien</button>
-                <button class="obj-btn" id="objP" onclick="setObjectif('perte')">Perte</button>
-                <button class="obj-btn" id="objPr" onclick="setObjectif('prise')">Prise</button>
-              </div>
+              <span class="obj-label">Ses objectifs</span>
+              <div class="obj-badges" id="objBadges"></div>
               <p class="obj-help" id="objHelp">—</p>
             </div>
             <div class="alertes-row" id="alertesContainer"></div>
@@ -601,7 +595,6 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 let userProfile = null;
 let chatHistory = [];
-let currentObjectif = 'maintien';
 let currentSlide = 0;
 const SLIDE_LABELS = ['Portrait', 'Profil', 'Bilan', 'Évolution'];
 const BIG_DASH_SMALL = 2 * Math.PI * 49;
@@ -664,8 +657,7 @@ function renderAll(p) {
   renderProfilRows(p);
 
   renderMacros(p);
-  currentObjectif = p.objectif || 'maintien';
-  setObjectif(currentObjectif, false);
+  renderObjectifs(p);
   renderAlertes(p);
 
   renderEvolution(p);
@@ -784,20 +776,36 @@ function renderMacros(p) {
   }, 100);
 }
 
-function setObjectif(obj, save = true) {
-  currentObjectif = obj;
-  ['M','P','Pr'].forEach(k => document.getElementById('obj'+k).classList.remove('active'));
-  const map = { maintien:'M', perte:'P', prise:'Pr' };
-  document.getElementById('obj' + (map[obj] || 'M')).classList.add('active');
-  const helps = {
-    maintien: 'On stabilise son poids de forme, ration équilibrée.',
-    perte: 'Objectif −0,8 kg sur 8 semaines, tout en douceur.',
-    prise: 'On vise +0,6 kg de masse, ration enrichie en protéines.'
+function renderObjectifs(p) {
+  const objectifs = Array.isArray(p.objectifs) && p.objectifs.length > 0
+    ? p.objectifs
+    : ['santé générale'];
+
+  const ICONES = {
+    'santé générale': '✓',
+    'perte de poids': '↓',
+    'pelage et peau': '✦',
+    'digestion': '◐',
+    'sport et performance': '⚡',
+    'senior et longévité': '♥',
+    'problème spécifique': '!'
   };
-  document.getElementById('objHelp').textContent = helps[obj] || '';
-  if (save && userProfile) {
-    sb.from('user').update({ objectif: obj }).eq('email', currentUser.email).then(() => {});
-  }
+  const HELPS = {
+    'santé générale': 'On vise un équilibre nutritionnel global, sans déséquilibre particulier à corriger.',
+    'perte de poids': 'Ration calibrée pour une perte douce et progressive, sans carence.',
+    'pelage et peau': 'Apports renforcés en oméga-3 et zinc pour densifier le poil et apaiser la peau.',
+    'digestion': 'Fibres et protéines choisies pour stabiliser le transit et limiter les irritations.',
+    'sport et performance': 'Ration enrichie en protéines et énergie pour soutenir l\'effort et la récupération.',
+    'senior et longévité': 'Accent sur les articulations, la digestibilité et le maintien de la masse musculaire.',
+    'problème spécifique': 'Suivi rapproché — précise les évolutions dans le chat pour affiner le plan.'
+  };
+
+  document.getElementById('objBadges').innerHTML = objectifs.map(o => `
+    <span class="obj-badge">${ICONES[o] || '•'} ${o.charAt(0).toUpperCase() + o.slice(1)}</span>
+  `).join('');
+
+  const helpTexts = objectifs.map(o => HELPS[o]).filter(Boolean);
+  document.getElementById('objHelp').textContent = helpTexts[0] || '';
 }
 
 function renderAlertes(p) {
