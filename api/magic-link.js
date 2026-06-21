@@ -165,7 +165,8 @@ function mergeAutre(arr, autre, excludeVals = []) {
 
 function buildMenuPrompt(profile, saison, pm) {
   const nom = profile.prenom_chien || profile.prenom || 'ton chien';
-  const intolerances = mergeAutre(profile.intolerances, profile.intolerancesAutre, ['aucune']);
+  // "allergies" est le nom de colonne réellement sauvegardé en base (ex-intolerances du quiz)
+  const intolerances = Array.isArray(profile.allergies) ? profile.allergies : [];
   const equipement = Array.isArray(profile.equipement) ? profile.equipement : [];
 
   return `Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown \`\`\`.
