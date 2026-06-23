@@ -17,9 +17,6 @@ module.exports = async function handler(req, res) {
     if (!email) return res.status(400).json({ error: 'Email manquant' });
 
     // ── 1. Envoyer le lien magique via Supabase Auth ──────
-    // On utilise la SERVICE_KEY (clé secrète serveur) plutôt que l'ANON_KEY :
-    // c'est un appel serveur-à-serveur avec create_user:true, qui nécessite
-    // des privilèges admin avec le nouveau système de clés Supabase (sb_secret_...).
     const magicLinkResponse = await fetch(`${process.env.SUPABASE_URL}/auth/v1/otp`, {
       method: 'POST',
       headers: {
@@ -43,16 +40,10 @@ module.exports = async function handler(req, res) {
     }
 
     // ── 2. Générer le menu — ON ATTEND LA FIN avant de répondre ──
-    // Vercel peut interrompre l'exécution juste après res.json() ; un
-    // fire-and-forget lancé après la réponse n'est donc pas fiable à 100%.
-    // On accepte un temps de réponse plus long (10-20s) côté front pour
-    // garantir que le menu est bien généré et envoyé.
     try {
       await generateMenuInBackground(email);
     } catch (menuErr) {
       console.error('Erreur génération menu:', menuErr);
-      // On ne fait pas échouer la requête pour autant : le magic link est
-      // déjà parti, l'utilisatrice peut se connecter même sans menu.
     }
 
     return res.status(200).json({ success: true });
@@ -66,9 +57,8 @@ module.exports = async function handler(req, res) {
 };
 
 
-// ── GÉNÉRATION DU MENU EN ARRIÈRE-PLAN ─────────────────────
+// ── GÉNÉRATION DU MENU ─────────────────────────────────────
 async function generateMenuInBackground(email) {
-  // 1. Récupérer le profil complet du chien depuis Supabase
   const userResponse = await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}&select=*`,
     {
@@ -88,11 +78,6 @@ async function generateMenuInBackground(email) {
   const saison = getSaison();
   const pm = profile.poids ? Math.pow(profile.poids, 0.75).toFixed(2) : 'à calculer';
 
-  // 2. Générer le menu via Claude — UNE SEULE RÉPONSE EN JSON STRUCTURÉ
-  // Le JSON contient à la fois le texte lisible pour l'email ET les données
-  // structurées pour l'espace client (recettes, courses, batch cooking, coût).
-  // Avantage : un seul appel, jamais de désynchronisation entre les deux formats,
-  // pas de parsing fragile de texte libre.
   const menuResponse = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -117,11 +102,8 @@ async function generateMenuInBackground(email) {
   const menuResult = await menuResponse.json();
   let rawText = menuResult.content[0].text.trim();
 
-  // Sécurité : enlever d'éventuelles balises ```json si le modèle les ajoute
   rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
 
-  // Sécurité supplémentaire : si du texte traîne avant/après malgré la consigne,
-  // on isole le bloc JSON entre la première { et la dernière }.
   const firstBrace = rawText.indexOf('{');
   const lastBrace = rawText.lastIndexOf('}');
   if (firstBrace > 0 || lastBrace < rawText.length - 1) {
@@ -136,7 +118,6 @@ async function generateMenuInBackground(email) {
     return;
   }
 
-  // 3. Sauvegarder les données structurées dans Supabase (pour l'espace client)
   await fetch(`${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`, {
     method: 'PATCH',
     headers: {
@@ -158,26 +139,32 @@ async function generateMenuInBackground(email) {
     })
   });
 
-  // 4. Envoyer le menu par email (texte lisible, même niveau de détail qu'avant)
   await sendEmailMenu(email, prenomChien, menuData.email_html || '');
 
   console.log(`Menu généré et envoyé avec succès pour ${prenomChien} (${email})`);
 }
 
-// ── PROMPT MENU (riche : quantités, batch cooking, courses, coût) ──
-function mergeAutre(arr, autre, excludeVals = []) {
-  const base = Array.isArray(arr) ? arr.filter(v => !excludeVals.includes(v) && v !== 'autre' && v !== 'autres') : [];
-  if (autre && autre.trim()) base.push(autre.trim());
-  return base;
-}
-
+// ── PROMPT MENU ────────────────────────────────────────────
 function buildMenuPrompt(profile, saison, pm) {
   const nom = profile.prenom_chien || profile.prenom || 'ton chien';
-  // "allergies" est le nom de colonne réellement sauvegardé en base (ex-intolerances du quiz)
   const intolerances = Array.isArray(profile.allergies) ? profile.allergies : [];
   const equipement = Array.isArray(profile.equipement) ? profile.equipement : [];
 
-  return `Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown \`\`\`.
+  // FIX : interdiction formulée en premier, en majuscules, avant tout le reste du prompt.
+  // Claude peut ignorer une contrainte douce enfouie dans le corps du prompt quand
+  // elle entre en conflit avec ses priors nutritionnels (ex: saumon = bon pour les chiens).
+  // La placer en ouverture avec un langage catégorique empêche ce comportement.
+  const interdictionBlock = intolerances.length > 0
+    ? `⚠️ INTERDICTION ABSOLUE — LIS CECI EN PREMIER :
+Les ingrédients suivants sont STRICTEMENT INTERDITS dans ce menu : ${intolerances.join(', ')}.
+NE LES UTILISE JAMAIS, ni dans les recettes, ni dans la liste de courses, ni dans le email_html.
+Peu importe leur valeur nutritionnelle. Une violation de cette règle met la vie du chien en danger.
+Si tu n'as aucun autre choix pour une catégorie d'ingrédient, choisis une alternative totalement différente.
+
+`
+    : '';
+
+  return `${interdictionBlock}Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown \`\`\`.
 
 ## PROFIL
 - Prénom : ${nom}
@@ -189,7 +176,7 @@ function buildMenuPrompt(profile, saison, pm) {
 - Budget : ${profile.budget || 'moyen'}
 - Équipement : ${equipement.join(', ') || 'standard'}
 - Temps préparation : ${profile.tempsPrep || 'non renseigné'}
-- Intolérances à exclure absolument : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
+- Intolérances INTERDITES (aucune exception) : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
 
 ## CONCEPT DU MENU
 Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
@@ -241,13 +228,13 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
 ## EXEMPLE DE STRUCTURE POUR email_html (respecte ce niveau de détail)
 "# Voici le menu de la semaine de ${nom} !\\n\\n## 1. QUANTITÉ JOURNALIÈRE\\nTotal journalier : Xg par jour - Repas du matin (40%) : Xg - Repas du soir (60%) : Xg\\n\\n## 2. RECETTE MATIN — [titre]\\n### Ingrédients pour 7 jours (X total) :\\n- ...\\n### Préparation :\\n1. ...\\n\\n## 3. RECETTE SOIR — [titre]\\n[même format]\\n\\n## 4. SESSION BATCH COOKING\\nJour recommandé : ... Durée totale : ...\\n### Déroulé optimisé :\\n...\\n\\n## 5. CONDITIONNEMENT\\n### Stockage :\\n...\\n### Conseils :\\n...\\n\\n## 6. LISTE DE COURSES\\n### 🥩 Viandes & Poissons\\n...\\n### 🥕 Légumes & Féculents\\n...\\n### 🧴 Compléments & Huiles\\n...\\n\\n## 7. COÛT ESTIMÉ\\n...\\n💰 Total semaine : environ X€\\n\\n## 🎯 POINTS CLÉS POUR ${nom}\\n✅ ...\\n\\nBon appétit à ${nom} ! 🐾"
 
-Règles importantes :
+## RÈGLES IMPORTANTES
 - Les valeurs "ration" et "qty" dans recette_matin/recette_soir sont les quantités PAR REPAS (pas le total semaine)
 - Les valeurs "qty" dans "courses" sont les quantités TOTALES pour 7 jours
 - "color" reste fixe : "#FFCE2E" pour le matin, "#2FA35E" pour le soir
 - "cout_indus" est une estimation du prix d'un service de livraison industrielle équivalent (Butternut Box, Pet's Deli) pour comparaison
 - "economie" = cout_indus - cout_semaine
-- Respecte les intolérances : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
+- INTERDICTION ABSOLUE (rappel final) : ${intolerances.length > 0 ? `les ingrédients suivants ne doivent apparaître nulle part dans ta réponse : ${intolerances.join(', ')}` : 'aucune intolérance déclarée'}
 - Le JSON doit être strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles`;
 }
 
