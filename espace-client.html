@@ -1131,7 +1131,7 @@ function addMessage(type, text) {
   div.className = type === 'ia' ? 'msg-ia' : 'msg-user';
   div.innerHTML = `
     <span class="msg-sender ${type === 'ia' ? 'ia' : 'user'}">${type === 'ia' ? 'Kyno' : 'Toi'}</span>
-    <div class="${type === 'ia' ? 'bubble-ia' : 'bubble-user'}">${escHtml(text)}</div>
+    <div class="${type === 'ia' ? 'bubble-ia' : 'bubble-user'}">${type === 'ia' ? renderIaText(text) : escHtml(text)}</div>
   `;
   zone.appendChild(div);
   zone.scrollTop = zone.scrollHeight;
@@ -1184,6 +1184,13 @@ function fr(n) { return String(n).replace('.', ','); }
 function escHtml(t) {
   if (typeof t !== 'string') return '';
   return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+function renderIaText(t) {
+  if (typeof t !== 'string') return '';
+  return t
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
 }
 function formatDate(iso) {
   if (!iso) return 'récemment';
