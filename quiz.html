@@ -1,383 +1,30 @@
 <!DOCTYPE html>
-<html lang="fr"><head>
+<html lang="fr">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kyno — Créer le profil de mon chien</title>
-<meta name="description" content="Réponds à quelques questions sur ton chien et reçois son plan nutritionnel personnalisé gratuitement.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<style>/* cyrillic-ext */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url("98fd9529-d6bf-4e49-a32c-b6281fcf9992") format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url("ea00ec34-149b-4cf3-902f-503fe84730f5") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url("25bc242f-cae4-410c-b056-4f0a2dfb4bd0") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url("ce9912a8-883f-4aef-aa61-9a31e29bffaf") format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url("be8c920b-406a-4703-91ee-7e76fc67b5d6") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url("2ad97c87-c9d1-4612-b4af-70fbce5e5cf8") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* cyrillic-ext */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("98fd9529-d6bf-4e49-a32c-b6281fcf9992") format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("ea00ec34-149b-4cf3-902f-503fe84730f5") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("25bc242f-cae4-410c-b056-4f0a2dfb4bd0") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("ce9912a8-883f-4aef-aa61-9a31e29bffaf") format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("be8c920b-406a-4703-91ee-7e76fc67b5d6") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("2ad97c87-c9d1-4612-b4af-70fbce5e5cf8") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* cyrillic-ext */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("98fd9529-d6bf-4e49-a32c-b6281fcf9992") format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("ea00ec34-149b-4cf3-902f-503fe84730f5") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("25bc242f-cae4-410c-b056-4f0a2dfb4bd0") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("ce9912a8-883f-4aef-aa61-9a31e29bffaf") format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("be8c920b-406a-4703-91ee-7e76fc67b5d6") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("2ad97c87-c9d1-4612-b4af-70fbce5e5cf8") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* cyrillic-ext */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("98fd9529-d6bf-4e49-a32c-b6281fcf9992") format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-}
-/* cyrillic */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("ea00ec34-149b-4cf3-902f-503fe84730f5") format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-/* greek */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("25bc242f-cae4-410c-b056-4f0a2dfb4bd0") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* vietnamese */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("ce9912a8-883f-4aef-aa61-9a31e29bffaf") format('woff2');
-  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("be8c920b-406a-4703-91ee-7e76fc67b5d6") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("2ad97c87-c9d1-4612-b4af-70fbce5e5cf8") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* greek */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("5fd80c4a-6008-408e-9069-14a6bc8983a4") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("6191e357-653d-4d25-b283-0711deb9fca0") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("17183762-b561-4a52-8f84-31ae8b4243bb") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* greek */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("5fd80c4a-6008-408e-9069-14a6bc8983a4") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("6191e357-653d-4d25-b283-0711deb9fca0") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url("17183762-b561-4a52-8f84-31ae8b4243bb") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* greek */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("5fd80c4a-6008-408e-9069-14a6bc8983a4") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("6191e357-653d-4d25-b283-0711deb9fca0") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url("17183762-b561-4a52-8f84-31ae8b4243bb") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-/* greek */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("5fd80c4a-6008-408e-9069-14a6bc8983a4") format('woff2');
-  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("6191e357-653d-4d25-b283-0711deb9fca0") format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Syne';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("17183762-b561-4a52-8f84-31ae8b4243bb") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-</style>
-
-
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --sage:#2FA35E;
-  --sage-l:#7CCB95;
-  --sage-mist:#E4F4E8;
-  --ecru:#FBFDF7;
-  --sand:#DDE8DA;
-  --honey:#7E8C80;
-  --tabac:#2B3A2E;
-  --warm:#FCFDF8;
-  --dark:#233028;
-  --peach:#EC6592;
-  --banana:#FFCE2E;
-  --banana-soft:#FFF1BF;
-  --blue:#3E8FC4;
-  --blue-soft:#DEEBF7;
-  --pink:#EC6592;
-  --pink-soft:#FBE2EB;
-  --orange:#F2843C;
+  --sage:#2FA35E;--sage-l:#7CCB95;--sage-mist:#E4F4E8;
+  --ecru:#FBFDF7;--sand:#DDE8DA;--honey:#7E8C80;
+  --tabac:#2B3A2E;--warm:#FCFDF8;
+  --peach:#EC6592;--banana:#FFCE2E;--banana-soft:#FFF1BF;
+  --blue:#3E8FC4;--blue-soft:#DEEBF7;
+  --pink:#EC6592;--pink-soft:#FBE2EB;--orange:#F2843C;
   --display:"Syne",system-ui,sans-serif;
   --body:"Manrope",system-ui,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{font-family:var(--body);background:var(--warm);color:var(--tabac);font-weight:400;min-height:100vh;-webkit-font-smoothing:antialiased;}
-
-/* soft pop background */
-body::before{
-  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:
-    radial-gradient(60% 50% at 100% 0%, var(--blue-soft) 0%, transparent 55%),
-    radial-gradient(50% 45% at 0% 100%, var(--banana-soft) 0%, transparent 55%),
-    radial-gradient(55% 40% at 0% 0%, var(--sage-mist) 0%, transparent 50%);
-  opacity:0.7;
-}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(60% 50% at 100% 0%,var(--blue-soft) 0%,transparent 55%),radial-gradient(50% 45% at 0% 100%,var(--banana-soft) 0%,transparent 55%),radial-gradient(55% 40% at 0% 0%,var(--sage-mist) 0%,transparent 50%);opacity:0.7;}
 
 /* NAV */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  height:58px;background:rgba(252,253,248,0.9);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border-bottom:2px solid var(--tabac);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 28px;
-}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:58px;background:rgba(252,253,248,0.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:2px solid var(--tabac);display:flex;align-items:center;justify-content:space-between;padding:0 28px;}
 .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
 .logo-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--sage);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--sage-mist);}
 .logo-mark span{font-family:var(--display);font-weight:600;font-size:16px;color:var(--sage);line-height:1;margin-top:-1px;}
@@ -385,99 +32,108 @@ nav{
 .nav-step{font-family:var(--display);font-size:12px;color:var(--sage);font-weight:600;letter-spacing:0.04em;background:var(--sage-mist);padding:5px 12px;border-radius:999px;border:1.5px solid var(--sage-l);}
 
 /* PROGRESS */
-.progress-bar{position:fixed;top:58px;left:0;right:0;z-index:99;height:6px;background:var(--sand);}
-.progress-fill{height:100%;background:var(--sage);transition:width 0.45s cubic-bezier(.22,.61,.36,1);width:3%;border-right:2px solid var(--tabac);}
+.progress-bar{position:fixed;top:58px;left:0;right:0;z-index:99;height:5px;background:var(--sand);}
+.progress-fill{height:100%;background:var(--sage);transition:width 0.45s cubic-bezier(.22,.61,.36,1);width:5%;border-right:2px solid var(--tabac);}
 
 .wrap{max-width:620px;margin:0 auto;padding:120px 24px 90px;}
-
 .step{display:none;}
-.step.active{display:block;}
+.step.active{display:block;animation:fadeUp 0.4s cubic-bezier(.22,.61,.36,1) both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
 
 .step-num{font-family:var(--display);font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--peach);font-weight:600;margin-bottom:14px;display:inline-flex;align-items:center;gap:9px;}
 .step-num::before{content:"";width:18px;height:2px;background:var(--peach);border-radius:2px;}
-.step-question{font-family:var(--display);font-size:38px;font-weight:600;color:var(--tabac);line-height:1.08;letter-spacing:-0.02em;margin-bottom:10px;}
+.step-question{font-family:var(--display);font-size:clamp(28px,5vw,38px);font-weight:600;color:var(--tabac);line-height:1.08;letter-spacing:-0.02em;margin-bottom:10px;}
 .step-question em{font-style:normal;color:var(--sage);}
-.step-hint{font-size:14px;color:var(--honey);margin-bottom:30px;line-height:1.65;font-weight:400;max-width:520px;}
+.step-hint{font-size:14px;color:var(--honey);margin-bottom:28px;line-height:1.65;font-weight:400;max-width:520px;}
 
-/* card around inputs */
-.field-card{
-  background:#fff;border:2.5px solid var(--pink);border-radius:18px;
-  padding:24px;box-shadow:6px 6px 0 var(--pink-soft);
-}
+/* FIELD CARD */
+.field-card{background:#fff;border:2.5px solid var(--pink);border-radius:18px;padding:24px;box-shadow:6px 6px 0 var(--pink-soft);}
 
-input[type=text],input[type=number],input[type=email],textarea{
-  width:100%;padding:15px 18px;
-  border:2px solid var(--sand);border-radius:11px;
-  background:var(--warm);color:var(--tabac);
-  font-family:var(--body);font-size:16px;font-weight:400;
-  outline:none;transition:border-color 0.18s,box-shadow 0.18s;-webkit-appearance:none;
-}
+/* INPUTS */
+input[type=text],input[type=number],input[type=email],textarea{width:100%;padding:15px 18px;border:2px solid var(--sand);border-radius:11px;background:var(--warm);color:var(--tabac);font-family:var(--body);font-size:16px;font-weight:400;outline:none;transition:border-color 0.18s,box-shadow 0.18s;-webkit-appearance:none;}
 input::placeholder,textarea::placeholder{color:#A8B2A6;}
 input:focus,textarea:focus{border-color:var(--sage);box-shadow:3px 3px 0 var(--sage-mist);}
-textarea{resize:vertical;min-height:110px;}
+textarea{resize:vertical;min-height:100px;}
 
-.options{display:flex;flex-wrap:wrap;gap:11px;}
-.opt{
-  padding:13px 19px;border-radius:12px;
-  border:2px solid var(--sand);background:#fff;
-  cursor:pointer;color:var(--tabac);
-  font-family:var(--body);font-size:14.5px;font-weight:500;
-  transition:all 0.15s cubic-bezier(.22,.61,.36,1);user-select:none;line-height:1.35;
-}
+/* OPTIONS */
+.options{display:flex;flex-wrap:wrap;gap:10px;}
+.opt{padding:12px 18px;border-radius:12px;border:2px solid var(--sand);background:#fff;cursor:pointer;color:var(--tabac);font-family:var(--body);font-size:14px;font-weight:500;transition:all 0.15s cubic-bezier(.22,.61,.36,1);user-select:none;line-height:1.35;}
 .opt:hover{border-color:var(--sage-l);transform:translateY(-2px);box-shadow:3px 3px 0 var(--sage-mist);}
-.opt small{display:block;font-weight:400;color:var(--honey);margin-top:2px;}
+.opt small{display:block;font-weight:400;color:var(--honey);margin-top:2px;font-size:12px;}
 .opt.selected{background:var(--sage-mist);border-color:var(--sage);color:var(--sage);font-weight:600;box-shadow:3px 3px 0 var(--sage);transform:translateY(-2px);}
 .opt.selected small{color:var(--sage);}
 
-.step-nav{display:flex;gap:12px;margin-top:30px;align-items:center;}
-.btn-next{
-  flex:1;padding:16px;background:var(--sage);color:#fff;
-  border:2px solid var(--orange);border-radius:12px;
-  font-family:var(--display);font-size:15px;font-weight:600;
-  letter-spacing:0.02em;cursor:pointer;
-  box-shadow:4px 4px 0 var(--orange);
-  transition:transform 0.16s cubic-bezier(.22,.61,.36,1),box-shadow 0.16s,background 0.2s;
-}
+/* OPTIONS LARGE (2 colonnes) */
+.options-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.options-2 .opt{text-align:center;padding:16px 12px;}
+
+/* POIDS INTERACTIF */
+.poids-wrap{display:flex;flex-direction:column;gap:18px;}
+.poids-input-row{display:flex;align-items:center;gap:12px;}
+.poids-input-row input{flex:1;font-family:var(--display);font-size:28px;font-weight:600;text-align:center;padding:14px;border-radius:12px;}
+.poids-unit{font-family:var(--display);font-weight:600;font-size:20px;color:var(--honey);}
+.poids-visual{background:#fff;border:2px solid var(--sand);border-radius:16px;padding:20px;text-align:center;}
+.poids-silhouette{display:flex;justify-content:center;align-items:flex-end;gap:6px;margin-bottom:12px;height:80px;}
+.poids-dog{transition:all 0.3s cubic-bezier(.22,.61,.36,1);}
+.poids-label{font-family:var(--display);font-weight:700;font-size:15px;margin-bottom:4px;}
+.poids-sublabel{font-family:var(--body);font-size:12px;color:var(--honey);}
+.poids-bar{width:100%;height:8px;border-radius:999px;background:var(--sand);margin-top:14px;overflow:hidden;}
+.poids-bar-fill{height:100%;border-radius:999px;transition:all 0.3s cubic-bezier(.22,.61,.36,1);}
+
+/* SOUS-QUESTION */
+.sub-question{margin-top:18px;padding:18px;background:var(--sage-mist);border:1.5px solid var(--sage-l);border-radius:14px;display:none;}
+.sub-question.visible{display:block;animation:fadeUp 0.3s both;}
+.sub-label{font-family:var(--display);font-weight:600;font-size:14px;color:var(--tabac);margin-bottom:12px;}
+
+/* ASTUCE CONTEXTUELLE */
+.tip-box{display:none;margin-top:14px;padding:13px 16px;background:var(--banana-soft);border:1.5px solid var(--banana);border-radius:12px;font-size:13px;color:var(--tabac);line-height:1.6;}
+.tip-box.visible{display:block;animation:fadeUp 0.3s both;}
+
+/* NAV BOUTONS */
+.step-nav{display:flex;gap:12px;margin-top:28px;align-items:center;}
+.btn-next{flex:1;padding:16px;background:var(--sage);color:#fff;border:2px solid var(--orange);border-radius:12px;font-family:var(--display);font-size:15px;font-weight:600;letter-spacing:0.02em;cursor:pointer;box-shadow:4px 4px 0 var(--orange);transition:transform 0.16s cubic-bezier(.22,.61,.36,1),box-shadow 0.16s,background 0.2s;}
 .btn-next:hover{background:var(--sage-l);color:var(--tabac);transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--orange);}
 .btn-next:active{transform:translate(0,0);box-shadow:4px 4px 0 var(--orange);}
 .btn-next:disabled{background:var(--sand);border-color:var(--sand);box-shadow:4px 4px 0 var(--sand);cursor:not-allowed;color:var(--honey);}
-.btn-back{
-  padding:16px 20px;background:#fff;color:var(--tabac);
-  border:2px solid var(--tabac);border-radius:12px;
-  font-family:var(--display);font-size:15px;font-weight:600;
-  cursor:pointer;box-shadow:3px 3px 0 var(--tabac);
-  transition:transform 0.16s,box-shadow 0.16s;
-}
+.btn-back{padding:16px 20px;background:#fff;color:var(--tabac);border:2px solid var(--tabac);border-radius:12px;font-family:var(--display);font-size:15px;font-weight:600;cursor:pointer;box-shadow:3px 3px 0 var(--tabac);transition:transform 0.16s,box-shadow 0.16s;}
 .btn-back:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--tabac);}
-.btn-back:active{transform:translate(0,0);box-shadow:3px 3px 0 var(--tabac);}
 
-.step-error{color:#D6452F;font-size:13.5px;font-weight:500;margin-top:14px;display:flex;align-items:center;gap:7px;}
+/* ERREUR */
+.step-error{color:#D6452F;font-size:13.5px;font-weight:500;margin-top:12px;display:flex;align-items:center;gap:7px;}
 .step-error::before{content:"!";display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#D6452F;color:#fff;font-family:var(--display);font-size:12px;font-weight:700;flex-shrink:0;}
+.error-msg{display:none;background:var(--pink-soft);border:2px solid var(--pink);border-radius:11px;padding:13px 16px;font-size:13.5px;color:#B23A60;font-weight:500;margin-top:14px;}
 
-.beta-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  background:var(--banana-soft);color:var(--tabac);
-  font-family:var(--display);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;
-  padding:7px 14px;border-radius:999px;margin-bottom:22px;border:2px solid var(--banana);
-}
+/* BADGE BETA */
+.beta-badge{display:inline-flex;align-items:center;gap:8px;background:var(--banana-soft);color:var(--tabac);font-family:var(--display);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding:7px 14px;border-radius:999px;margin-bottom:22px;border:2px solid var(--banana);}
 .beta-dot{width:7px;height:7px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
 
-.error-msg{
-  display:none;background:var(--pink-soft);border:2px solid var(--pink);
-  border-radius:11px;padding:13px 16px;
-  font-size:13.5px;color:#B23A60;font-weight:500;margin-top:14px;
-}
+/* ACTIVITÉ - ICÔNES */
+.activite-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.activite-opt{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;border-radius:14px;border:2px solid var(--sand);background:#fff;cursor:pointer;transition:all 0.15s cubic-bezier(.22,.61,.36,1);}
+.activite-opt:hover{border-color:var(--sage-l);transform:translateY(-2px);}
+.activite-opt.selected{background:var(--sage-mist);border-color:var(--sage);box-shadow:3px 3px 0 var(--sage);}
+.activite-icon{font-size:28px;line-height:1;}
+.activite-label{font-family:var(--display);font-weight:600;font-size:12px;color:var(--tabac);text-align:center;line-height:1.2;}
+.activite-opt.selected .activite-label{color:var(--sage);}
+
+/* BUDGET */
+.budget-grid{display:flex;flex-direction:column;gap:10px;}
+.budget-opt{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-radius:14px;border:2px solid var(--sand);background:#fff;cursor:pointer;transition:all 0.15s cubic-bezier(.22,.61,.36,1);}
+.budget-opt:hover{border-color:var(--sage-l);transform:translateY(-2px);}
+.budget-opt.selected{background:var(--sage-mist);border-color:var(--sage);box-shadow:3px 3px 0 var(--sage);}
+.budget-opt-left{display:flex;flex-direction:column;gap:3px;}
+.budget-name{font-family:var(--display);font-weight:700;font-size:15px;color:var(--tabac);}
+.budget-desc{font-family:var(--body);font-size:12px;color:var(--honey);}
+.budget-opt.selected .budget-name{color:var(--sage);}
+.budget-badge{font-family:var(--display);font-weight:700;font-size:13px;color:var(--sage);background:var(--sage-mist);padding:4px 10px;border-radius:999px;}
+.budget-opt.selected .budget-badge{background:var(--sage);color:#fff;}
 
 /* LOADING */
 .loading{display:none;text-align:center;padding:90px 24px;}
 .loading-viva{width:150px;height:auto;margin:0 auto 8px;animation:bob 2.4s ease-in-out infinite;}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-1.5deg);}50%{transform:translateY(-10px) rotate(1.5deg);}}
-.loading-ring{
-  width:48px;height:48px;border-radius:50%;
-  border:4px solid var(--sand);border-top-color:var(--sage);
-  animation:spin 0.9s linear infinite;margin:6px auto 24px;
-}
+.loading-ring{width:48px;height:48px;border-radius:50%;border:4px solid var(--sand);border-top-color:var(--sage);animation:spin 0.9s linear infinite;margin:6px auto 24px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading h2{font-family:var(--display);font-size:30px;font-weight:600;color:var(--tabac);margin-bottom:14px;line-height:1.15;letter-spacing:-0.01em;}
 .loading h2 span{color:var(--sage);}
@@ -486,37 +142,30 @@ textarea{resize:vertical;min-height:110px;}
 /* SUCCESS */
 .success{display:none;text-align:center;padding:80px 24px;}
 .success-viva{width:172px;height:auto;margin:0 auto 10px;filter:drop-shadow(0 14px 20px rgba(43,58,46,.14));}
-.success-tag{
-  display:inline-flex;align-items:center;gap:7px;
-  background:var(--sage-mist);color:var(--sage);
-  font-family:var(--display);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;
-  padding:6px 14px;border-radius:999px;margin-bottom:20px;border:2px solid var(--sage-l);
-}
+.success-tag{display:inline-flex;align-items:center;gap:7px;background:var(--sage-mist);color:var(--sage);font-family:var(--display);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;padding:6px 14px;border-radius:999px;margin-bottom:20px;border:2px solid var(--sage-l);}
 .success h2{font-family:var(--display);font-size:40px;font-weight:600;color:var(--tabac);margin-bottom:16px;line-height:1.1;letter-spacing:-0.02em;}
 .success h2 em{font-style:normal;color:var(--sage);}
 .success p{font-size:15px;color:var(--honey);line-height:1.8;max-width:440px;margin:0 auto 26px;font-weight:400;}
-.success-note{
-  background:#fff;border:2.5px solid var(--banana);border-radius:16px;padding:20px 24px;
-  font-size:13.5px;color:var(--tabac);line-height:1.75;font-weight:400;
-  max-width:460px;margin:0 auto;box-shadow:5px 5px 0 var(--banana-soft);text-align:left;
-}
+.success-note{background:#fff;border:2.5px solid var(--banana);border-radius:16px;padding:20px 24px;font-size:13.5px;color:var(--tabac);line-height:1.75;font-weight:400;max-width:460px;margin:0 auto;box-shadow:5px 5px 0 var(--banana-soft);text-align:left;}
 .success-note b{font-weight:600;color:var(--sage);}
 
 @media(max-width:560px){
-  .step-question{font-size:30px;}
+  .step-question{font-size:26px;}
   nav{padding:0 18px;}
   .wrap{padding:110px 18px 70px;}
+  .activite-grid{grid-template-columns:repeat(2,1fr);}
+  .options-2{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="Kyno Landing - Production.html" class="nav-logo">
+  <a href="index.html" class="nav-logo">
     <span class="logo-mark"><span>K</span></span>
     <span class="logo-word">kyno</span>
   </a>
-  <span class="nav-step" id="navStep">Question 1 / 35</span>
+  <span class="nav-step" id="navStep">Question 1 / 21</span>
 </nav>
 
 <div class="progress-bar">
@@ -525,10 +174,10 @@ textarea{resize:vertical;min-height:110px;}
 
 <div class="wrap" id="quizWrap">
 
-  <!-- Q1 -->
+  <!-- Q1 — PRÉNOM -->
   <div class="step active" data-step="1">
     <div class="beta-badge"><div class="beta-dot"></div>Bêta gratuite — 100 places</div>
-    <div class="step-num">Question 1 / 35</div>
+    <div class="step-num">Profil · 1 / 6</div>
     <h2 class="step-question">Comment s'appelle<br><em>ton chien ?</em></h2>
     <p class="step-hint">Son prénom apparaîtra dans tout son rapport nutritionnel personnalisé.</p>
     <div class="field-card">
@@ -539,9 +188,9 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q2 -->
+  <!-- Q2 — RACE -->
   <div class="step" data-step="2">
-    <div class="step-num">Question 2 / 35</div>
+    <div class="step-num">Profil · 2 / 6</div>
     <h2 class="step-question">Quelle est<br><em>sa race ?</em></h2>
     <p class="step-hint">Si croisé, indique le croisement principal. Chaque race a des prédispositions nutritionnelles spécifiques.</p>
     <div class="field-card">
@@ -553,18 +202,18 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q3 -->
+  <!-- Q3 — ÂGE -->
   <div class="step" data-step="3">
-    <div class="step-num">Question 3 / 35</div>
+    <div class="step-num">Profil · 3 / 6</div>
     <h2 class="step-question">Quel âge<br><em>a-t-il ?</em></h2>
     <p class="step-hint">L'âge détermine ses besoins énergétiques et le ratio calcium/phosphore idéal.</p>
     <div class="options" id="q3">
-      <div class="opt" onclick="radio('q3',this,'moins de 6 mois')">Moins de 6 mois</div>
-      <div class="opt" onclick="radio('q3',this,'6 mois à 1 an')">6 mois – 1 an</div>
-      <div class="opt" onclick="radio('q3',this,'1 à 3 ans')">1 – 3 ans</div>
-      <div class="opt" onclick="radio('q3',this,'3 à 7 ans')">3 – 7 ans</div>
-      <div class="opt" onclick="radio('q3',this,'7 à 10 ans')">7 – 10 ans</div>
-      <div class="opt" onclick="radio('q3',this,'plus de 10 ans')">Plus de 10 ans</div>
+      <div class="opt" onclick="radio('q3',this,'moins de 6 mois')">Moins de 6 mois<small>Chiot</small></div>
+      <div class="opt" onclick="radio('q3',this,'6 mois à 1 an')">6 mois – 1 an<small>Chiot en croissance</small></div>
+      <div class="opt" onclick="radio('q3',this,'1 à 3 ans')">1 – 3 ans<small>Jeune adulte</small></div>
+      <div class="opt" onclick="radio('q3',this,'3 à 7 ans')">3 – 7 ans<small>Adulte</small></div>
+      <div class="opt" onclick="radio('q3',this,'7 à 10 ans')">7 – 10 ans<small>Mature</small></div>
+      <div class="opt" onclick="radio('q3',this,'plus de 10 ans')">Plus de 10 ans<small>Senior</small></div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(3)">←</button>
@@ -572,13 +221,31 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q4 -->
+  <!-- Q4 — POIDS -->
   <div class="step" data-step="4">
-    <div class="step-num">Question 4 / 35</div>
-    <h2 class="step-question">Quel est<br><em>son poids ?</em></h2>
-    <p class="step-hint">En kilogrammes. C'est la base du calcul de ses besoins caloriques exacts selon la formule NRC.</p>
+    <div class="step-num">Profil · 4 / 6</div>
+    <h2 class="step-question">Combien pèse-t-il<br><em>en kg ?</em></h2>
+    <p class="step-hint">La base du calcul de ses besoins caloriques selon la formule NRC.</p>
     <div class="field-card">
-      <input type="number" id="q4" placeholder="Ex : 14" min="0.5" max="100" step="0.1">
+      <div class="poids-wrap">
+        <div class="poids-input-row">
+          <input type="number" id="q4" placeholder="Ex: 14" min="0.5" max="100" step="0.1" oninput="updatePoidsVisual()">
+          <span class="poids-unit">kg</span>
+        </div>
+        <div class="poids-visual" id="poidsVisual">
+          <div class="poids-silhouette" id="poidsSilhouette">
+            <svg id="poidsDog" width="80" height="80" viewBox="0 0 100 100" fill="none">
+              <ellipse cx="50" cy="70" rx="28" ry="18" fill="#E4F4E8" stroke="#DDE8DA" stroke-width="2"/>
+              <circle cx="50" cy="48" r="20" fill="#E4F4E8" stroke="#DDE8DA" stroke-width="2"/>
+              <ellipse cx="38" cy="32" rx="7" ry="12" fill="#E4F4E8" stroke="#DDE8DA" stroke-width="2"/>
+              <ellipse cx="62" cy="32" rx="7" ry="12" fill="#E4F4E8" stroke="#DDE8DA" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="poids-label" id="poidsLabel">Saisis son poids</div>
+          <div class="poids-sublabel" id="poidsSublabel">pour voir son profil morphologique</div>
+          <div class="poids-bar"><div class="poids-bar-fill" id="poidsBarFill" style="width:0%;background:var(--sand);"></div></div>
+        </div>
+      </div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(4)">←</button>
@@ -586,18 +253,22 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q5 -->
+  <!-- Q5 — SEXE + CASTRATION -->
   <div class="step" data-step="5">
-    <div class="step-num">Question 5 / 35</div>
-    <h2 class="step-question">Son sexe<br><em>et statut ?</em></h2>
+    <div class="step-num">Profil · 5 / 6</div>
+    <h2 class="step-question" id="q5Title">C'est un garçon<br><em>ou une fille ?</em></h2>
     <p class="step-hint">La stérilisation réduit les besoins énergétiques de 20 à 30 % — un ajustement crucial.</p>
-    <div class="options" id="q5">
-      <div class="opt" onclick="radio('q5',this,'mâle entier')">Mâle entier</div>
-      <div class="opt" onclick="radio('q5',this,'mâle stérilisé')">Mâle stérilisé</div>
-      <div class="opt" onclick="radio('q5',this,'femelle entière')">Femelle entière</div>
-      <div class="opt" onclick="radio('q5',this,'femelle stérilisée')">Femelle stérilisée</div>
-      <div class="opt" onclick="radio('q5',this,'femelle gestante')">Femelle gestante</div>
-      <div class="opt" onclick="radio('q5',this,'femelle allaitante')">Femelle allaitante</div>
+    <div class="options-2" id="q5">
+      <div class="opt" onclick="radio('q5',this,'male'); showSexeSub('male')">🐾 Un garçon</div>
+      <div class="opt" onclick="radio('q5',this,'femelle'); showSexeSub('femelle')">🌸 Une fille</div>
+    </div>
+    <div class="sub-question" id="q5sub">
+      <div class="sub-label" id="q5subLabel">Est-il castré ?</div>
+      <div class="options" id="q5b">
+        <div class="opt" onclick="radio('q5b',this,'oui')">Oui</div>
+        <div class="opt" onclick="radio('q5b',this,'non')">Non</div>
+        <div class="opt" onclick="radio('q5b',this,'je ne sais pas')">Je ne sais pas</div>
+      </div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(5)">←</button>
@@ -605,16 +276,32 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q6 -->
+  <!-- Q6 — ACTIVITÉ -->
   <div class="step" data-step="6">
-    <div class="step-num">Question 6 / 35</div>
-    <h2 class="step-question">Son niveau<br><em>d'activité quotidien ?</em></h2>
+    <div class="step-num">Profil · 6 / 6</div>
+    <h2 class="step-question">Son niveau<br><em>d'activité ?</em></h2>
     <p class="step-hint">Un chien très actif peut avoir des besoins caloriques 2× supérieurs à un chien sédentaire.</p>
-    <div class="options" id="q6">
-      <div class="opt" onclick="radio('q6',this,'très sédentaire')">Très sédentaire<small>Peu de sorties, appartement</small></div>
-      <div class="opt" onclick="radio('q6',this,'modéré')">Modéré<small>1-2 balades / jour</small></div>
-      <div class="opt" onclick="radio('q6',this,'actif')">Actif<small>Sport régulier, jardin</small></div>
-      <div class="opt" onclick="radio('q6',this,'très actif')">Très actif<small>Chasse, agility, trail</small></div>
+    <div class="activite-grid">
+      <div class="activite-opt" onclick="selectActivite(this,'très sédentaire')">
+        <span class="activite-icon">🛋️</span>
+        <span class="activite-label">Très sédentaire</span>
+        <span style="font-size:11px;color:var(--honey);text-align:center;">Peu de sorties</span>
+      </div>
+      <div class="activite-opt" onclick="selectActivite(this,'modéré')">
+        <span class="activite-icon">🚶</span>
+        <span class="activite-label">Modéré</span>
+        <span style="font-size:11px;color:var(--honey);text-align:center;">1-2 balades/jour</span>
+      </div>
+      <div class="activite-opt" onclick="selectActivite(this,'actif')">
+        <span class="activite-icon">🏃</span>
+        <span class="activite-label">Actif</span>
+        <span style="font-size:11px;color:var(--honey);text-align:center;">Sport régulier</span>
+      </div>
+      <div class="activite-opt" onclick="selectActivite(this,'très actif')">
+        <span class="activite-icon">⚡</span>
+        <span class="activite-label">Très actif</span>
+        <span style="font-size:11px;color:var(--honey);text-align:center;">Chasse, agility</span>
+      </div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(6)">←</button>
@@ -622,19 +309,21 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q7 -->
+  <!-- Q7 — ALIMENTATION ACTUELLE -->
   <div class="step" data-step="7">
-    <div class="step-num">Question 7 / 35</div>
-    <h2 class="step-question">Où vit-il<br><em>au quotidien ?</em></h2>
-    <p class="step-hint">L'environnement influence les besoins en hydratation et en énergie thermique.</p>
+    <div class="step-num">Santé · 1 / 7</div>
+    <h2 class="step-question">Comment le<br><em>nourris-tu ?</em></h2>
+    <p class="step-hint">Plusieurs choix possibles. Kyno analysera ce qui manque dans son alimentation actuelle.</p>
     <div class="options" id="q7">
-      <div class="opt" onclick="radio('q7',this,'grande ville appartement')">Grande ville / Appartement</div>
-      <div class="opt" onclick="radio('q7',this,'ville avec jardin')">Ville avec jardin</div>
-      <div class="opt" onclick="radio('q7',this,'campagne')">Campagne</div>
-      <div class="opt" onclick="radio('q7',this,'autre'); toggleAutre('q7')">Autre</div>
+      <div class="opt" onclick="multi('q7',this,'croquettes')">Croquettes</div>
+      <div class="opt" onclick="multi('q7',this,'pâtée industrielle')">Pâtée industrielle</div>
+      <div class="opt" onclick="multi('q7',this,'ration ménagère')">Ration ménagère</div>
+      <div class="opt" onclick="multi('q7',this,'BARF')">BARF (cru)</div>
+      <div class="opt" onclick="multi('q7',this,'mixte')">Mixte</div>
+      <div class="opt" onclick="multi('q7',this,'autre'); toggleAutre('q7')">Autre</div>
     </div>
     <div class="field-card" id="q7-autre-wrap" style="display:none;margin-top:14px;">
-      <input type="text" id="q7-autre" placeholder="Précise son environnement…" autocomplete="off">
+      <input type="text" id="q7-autre" placeholder="Précise…" autocomplete="off">
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(7)">←</button>
@@ -642,20 +331,44 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q8 -->
+  <!-- Q8 — MALADIE DIAGNOSTIQUÉE -->
   <div class="step" data-step="8">
-    <div class="step-num">Question 8 / 35</div>
-    <h2 class="step-question">Comment le<br><em>nourris-tu actuellement ?</em></h2>
-    <p class="step-hint">Plusieurs choix possibles. Kyno analysera ce qui manque dans son alimentation actuelle.</p>
-    <div class="options" id="q8">
-      <div class="opt" onclick="multi('q8',this,'croquettes')">Croquettes</div>
-      <div class="opt" onclick="multi('q8',this,'pâtée industrielle')">Pâtée industrielle</div>
-      <div class="opt" onclick="multi('q8',this,'ration ménagère')">Ration ménagère</div>
-      <div class="opt" onclick="multi('q8',this,'BARF')">BARF (cru)</div>
-      <div class="opt" onclick="multi('q8',this,'autre'); toggleAutre('q8')">Autre</div>
+    <div class="step-num">Santé · 2 / 7</div>
+    <h2 class="step-question">Un vétérinaire a-t-il<br><em>diagnostiqué une maladie ?</em></h2>
+    <p class="step-hint">Ces informations permettent d'adapter le plan nutritionnel en toute sécurité.</p>
+    <div class="options-2" id="q8">
+      <div class="opt" onclick="radio('q8',this,'oui'); showMaladies(true)">Oui</div>
+      <div class="opt" onclick="radio('q8',this,'non'); showMaladies(false)">Non</div>
     </div>
-    <div class="field-card" id="q8-autre-wrap" style="display:none;margin-top:14px;">
-      <input type="text" id="q8-autre" placeholder="Précise son alimentation actuelle…" autocomplete="off">
+    <div class="sub-question" id="maladiesSub">
+      <div class="sub-label">Lesquelles ? (plusieurs choix possibles)</div>
+      <div class="options" id="q8maladies" style="margin-top:8px;">
+        <div class="opt" onclick="multi('q8maladies',this,'hypothyroïdie')">Hypothyroïdie</div>
+        <div class="opt" onclick="multi('q8maladies',this,'hyperthyroïdie')">Hyperthyroïdie</div>
+        <div class="opt" onclick="multi('q8maladies',this,'maladie de Cushing')">Maladie de Cushing</div>
+        <div class="opt" onclick="multi('q8maladies',this,'arthrose')">Arthrose</div>
+        <div class="opt" onclick="multi('q8maladies',this,'dysplasie')">Dysplasie</div>
+        <div class="opt" onclick="multi('q8maladies',this,'cancer')">Cancer / tumeur</div>
+        <div class="opt" onclick="multi('q8maladies',this,'épilepsie')">Épilepsie</div>
+        <div class="opt" onclick="multi('q8maladies',this,'maladie cardiaque')">Maladie cardiaque</div>
+        <div class="opt" onclick="multi('q8maladies',this,'maladie rénale')">Maladie rénale</div>
+        <div class="opt" onclick="multi('q8maladies',this,'calculs urinaires struvite')">Calculs urinaires — struvite</div>
+        <div class="opt" onclick="multi('q8maladies',this,'calculs urinaires oxalate')">Calculs urinaires — oxalate</div>
+        <div class="opt" onclick="multi('q8maladies',this,'diabète')">Diabète</div>
+        <div class="opt" onclick="multi('q8maladies',this,'malabsorption intestinale')">Malabsorption intestinale</div>
+        <div class="opt" onclick="multi('q8maladies',this,'MICI')">MICI (maladie inflammatoire)</div>
+        <div class="opt" onclick="multi('q8maladies',this,'pancréatite')">Pancréatite</div>
+        <div class="opt" onclick="multi('q8maladies',this,'insuffisance hépatique')">Insuffisance hépatique</div>
+        <div class="opt" onclick="multi('q8maladies',this,'leishmaniose')">Leishmaniose</div>
+        <div class="opt" onclick="multi('q8maladies',this,'obésité')">Obésité</div>
+        <div class="opt" onclick="multi('q8maladies',this,'allergies cutanées')">Allergies cutanées diagnostiquées</div>
+        <div class="opt" onclick="multi('q8maladies',this,'problèmes dentaires')">Problèmes dentaires / ne peut plus mâcher</div>
+        <div class="opt" onclick="multi('q8maladies',this,'convalescence')">Convalescence post-opératoire</div>
+        <div class="opt" onclick="multi('q8maladies',this,'autre maladie'); toggleAutre('q8maladies')">Autre</div>
+      </div>
+      <div class="field-card" id="q8maladies-autre-wrap" style="display:none;margin-top:14px;">
+        <input type="text" id="q8maladies-autre" placeholder="Précise la maladie…" autocomplete="off">
+      </div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(8)">←</button>
@@ -663,13 +376,20 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q9 -->
+  <!-- Q9 — TRAITEMENTS -->
   <div class="step" data-step="9">
-    <div class="step-num">Question 9 / 35</div>
-    <h2 class="step-question">Des antécédents<br><em>médicaux ?</em></h2>
-    <p class="step-hint">Maladies diagnostiquées, chirurgies, hospitalisations. Ces infos permettent d'adapter le plan en sécurité.</p>
-    <div class="field-card">
-      <textarea id="q9" placeholder="Ex : dysplasie de la hanche diagnostiquée à 2 ans, aucun antécédent, allergie cutanée…"></textarea>
+    <div class="step-num">Santé · 3 / 7</div>
+    <h2 class="step-question">Est-il sous<br><em>traitement ?</em></h2>
+    <p class="step-hint">Médicaments, antiparasitaires, compléments. Certains interagissent avec l'alimentation.</p>
+    <div class="options-2" id="q9">
+      <div class="opt" onclick="radio('q9',this,'non'); showTraitement(false)">Non</div>
+      <div class="opt" onclick="radio('q9',this,'oui'); showTraitement(true)">Oui</div>
+    </div>
+    <div class="sub-question" id="traitementSub">
+      <div class="sub-label">Lequel / lesquels ?</div>
+      <div class="field-card" style="margin-top:8px;box-shadow:none;border:1.5px solid var(--sand);">
+        <input type="text" id="q9traitement" placeholder="Ex : Metacam, antiparasitaire mensuel, Apoquel…" autocomplete="off">
+      </div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(9)">←</button>
@@ -677,35 +397,52 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q10 -->
+  <!-- Q10 — PETITS TRACAS (regroupé) -->
   <div class="step" data-step="10">
-    <div class="step-num">Question 10 / 35</div>
-    <h2 class="step-question">Des problèmes de santé<br><em>actuels ?</em></h2>
-    <p class="step-hint">Plusieurs choix possibles.</p>
+    <div class="step-num">Santé · 4 / 7</div>
+    <h2 class="step-question">Des petits tracas<br><em>au quotidien ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Ces signaux nous permettent d'adapter les recettes et les compléments.</p>
     <div class="options" id="q10">
-      <div class="opt" onclick="multi('q10',this,'aucun')">Aucun</div>
-      <div class="opt" onclick="multi('q10',this,'articulaires')">Articulaires</div>
-      <div class="opt" onclick="multi('q10',this,'digestifs')">Digestifs</div>
-      <div class="opt" onclick="multi('q10',this,'peau')">Peau</div>
-      <div class="opt" onclick="multi('q10',this,'rénaux')">Rénaux</div>
-      <div class="opt" onclick="multi('q10',this,'cardiaques')">Cardiaques</div>
-      <div class="opt" onclick="multi('q10',this,'surpoids')">Surpoids</div>
-      <div class="opt" onclick="multi('q10',this,'diabète')">Diabète</div>
-      <div class="opt" onclick="multi('q10',this,'autre')">Autre</div>
+      <div class="opt" onclick="multi('q10',this,'aucun')">Aucun — tout va bien</div>
+      <div class="opt" onclick="multi('q10',this,'peau irritée')">Peau irritée / rougeurs</div>
+      <div class="opt" onclick="multi('q10',this,'démangeaisons')">Démangeaisons fréquentes</div>
+      <div class="opt" onclick="multi('q10',this,'pelage terne')">Pelage terne ou cassant</div>
+      <div class="opt" onclick="multi('q10',this,'chute de poils excessive')">Chute de poils excessive</div>
+      <div class="opt" onclick="multi('q10',this,'selles molles')">Selles molles ou irrégulières</div>
+      <div class="opt" onclick="multi('q10',this,'vomissements')">Vomissements occasionnels</div>
+      <div class="opt" onclick="multi('q10',this,'haleine marquée')">Haleine marquée</div>
+      <div class="opt" onclick="multi('q10',this,'tartre')">Tartre / plaque dentaire</div>
+      <div class="opt" onclick="multi('q10',this,'otites')">Otites régulières</div>
+      <div class="opt" onclick="multi('q10',this,'odeur corporelle')">Odeur corporelle forte</div>
+      <div class="opt" onclick="multi('q10',this,'glandes anales')">Problèmes de glandes anales</div>
+      <div class="opt" onclick="multi('q10',this,'fragilité articulaire')">Raideur / fragilité articulaire</div>
     </div>
+    <div class="tip-box" id="tip10"></div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(10)">←</button>
       <button class="btn-next" onclick="next(10)">Continuer →</button>
     </div>
   </div>
 
-  <!-- Q11 -->
+  <!-- Q11 — RÉACTIONS ALLERGIQUES -->
   <div class="step" data-step="11">
-    <div class="step-num">Question 11 / 35</div>
-    <h2 class="step-question">Est-il sous<br><em>traitement ?</em></h2>
-    <p class="step-hint">Médicaments, antiparasitaires, compléments. Certains interagissent avec l'alimentation.</p>
-    <div class="field-card">
-      <input type="text" id="q11" placeholder="Ex : antiparasitaire mensuel, Metacam, aucun…">
+    <div class="step-num">Santé · 5 / 7</div>
+    <h2 class="step-question">A-t-il déjà eu des<br><em>réactions allergiques ?</em></h2>
+    <p class="step-hint">Cutanées, digestives ou les deux.</p>
+    <div class="options" id="q11">
+      <div class="opt" onclick="radio('q11',this,'jamais'); showReactionSub(false)">Jamais</div>
+      <div class="opt" onclick="radio('q11',this,'cutanée'); showReactionSub(true)">Cutanée (démangeaisons, rougeurs)</div>
+      <div class="opt" onclick="radio('q11',this,'digestive'); showReactionSub(true)">Digestive (vomissements, diarrhée)</div>
+      <div class="opt" onclick="radio('q11',this,'les deux'); showReactionSub(true)">Les deux</div>
+      <div class="opt" onclick="radio('q11',this,'je ne sais pas'); showReactionSub(false)">Je ne sais pas</div>
+    </div>
+    <div class="sub-question" id="reactionSub">
+      <div class="sub-label">C'est toujours en cours ?</div>
+      <div class="options" id="q11statut" style="margin-top:8px;">
+        <div class="opt" onclick="radio('q11statut',this,'en cours')">Oui, toujours présent</div>
+        <div class="opt" onclick="radio('q11statut',this,'résolu')">Non, c'est résolu</div>
+        <div class="opt" onclick="radio('q11statut',this,'intermittent')">Intermittent</div>
+      </div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(11)">←</button>
@@ -713,17 +450,27 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q12 -->
+  <!-- Q12 — INTOLÉRANCES -->
   <div class="step" data-step="12">
-    <div class="step-num">Question 12 / 35</div>
-    <h2 class="step-question">Comment est<br><em>son pelage ?</em></h2>
-    <p class="step-hint">Plusieurs choix. Le pelage est un des meilleurs indicateurs de l'état nutritionnel.</p>
+    <div class="step-num">Santé · 6 / 7</div>
+    <h2 class="step-question">Des intolérances<br><em>alimentaires connues ?</em></h2>
+    <p class="step-hint">Ces ingrédients seront exclus de tous ses menus, y compris dans les compléments.</p>
     <div class="options" id="q12">
-      <div class="opt" onclick="multi('q12',this,'brillant')">Brillant et dense</div>
-      <div class="opt" onclick="multi('q12',this,'terne')">Terne</div>
-      <div class="opt" onclick="multi('q12',this,'chute excessive')">Chute excessive</div>
-      <div class="opt" onclick="multi('q12',this,'pellicules')">Pellicules</div>
-      <div class="opt" onclick="multi('q12',this,'irritations cutanées')">Irritations cutanées</div>
+      <div class="opt" onclick="multi('q12',this,'aucune')">Aucune connue</div>
+      <div class="opt" onclick="multi('q12',this,'bœuf')">Bœuf</div>
+      <div class="opt" onclick="multi('q12',this,'poulet')">Poulet</div>
+      <div class="opt" onclick="multi('q12',this,'poisson')">Poisson</div>
+      <div class="opt" onclick="multi('q12',this,'agneau')">Agneau</div>
+      <div class="opt" onclick="multi('q12',this,'gluten')">Gluten / céréales</div>
+      <div class="opt" onclick="multi('q12',this,'laitages')">Laitages</div>
+      <div class="opt" onclick="multi('q12',this,'soja')">Soja</div>
+      <div class="opt" onclick="multi('q12',this,'œuf')">Œuf</div>
+      <div class="opt" onclick="multi('q12',this,'huile de poisson')">Huile de poisson (oméga-3)</div>
+      <div class="opt" onclick="multi('q12',this,'levure')">Levure</div>
+      <div class="opt" onclick="multi('q12',this,'autre'); toggleAutre('q12')">Autre</div>
+    </div>
+    <div class="field-card" id="q12-autre-wrap" style="display:none;margin-top:14px;">
+      <input type="text" id="q12-autre" placeholder="Précise l'intolérance…" autocomplete="off">
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(12)">←</button>
@@ -731,16 +478,21 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q13 -->
+  <!-- Q13 — COMPORTEMENT + STRESS -->
   <div class="step" data-step="13">
-    <div class="step-num">Question 13 / 35</div>
-    <h2 class="step-question">Comment sont<br><em>ses selles ?</em></h2>
-    <p class="step-hint">Les selles révèlent la qualité de la digestion et l'assimilation des nutriments.</p>
+    <div class="step-num">Santé · 7 / 7</div>
+    <h2 class="step-question">Son comportement<br><em>et son caractère ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Certains comportements sont liés à des carences nutritionnelles.</p>
     <div class="options" id="q13">
-      <div class="opt" onclick="radio('q13',this,'normales')">Normales et moulées</div>
-      <div class="opt" onclick="radio('q13',this,'molles')">Souvent molles</div>
-      <div class="opt" onclick="radio('q13',this,'dures')">Souvent dures</div>
-      <div class="opt" onclick="radio('q13',this,'irrégulières')">Irrégulières</div>
+      <div class="opt" onclick="multi('q13',this,'très calme')">Très calme et serein</div>
+      <div class="opt" onclick="multi('q13',this,'mange vite')">Mange très vite</div>
+      <div class="opt" onclick="multi('q13',this,'difficile')">Difficile / capricieux</div>
+      <div class="opt" onclick="multi('q13',this,'anxieux')">Anxieux / stressé</div>
+      <div class="opt" onclick="multi('q13',this,'hyperactif')">Hyperactif</div>
+      <div class="opt" onclick="multi('q13',this,'agressif')">Parfois agressif</div>
+      <div class="opt" onclick="multi('q13',this,'mange tout')">Mange absolument tout</div>
+      <div class="opt" onclick="multi('q13',this,'peurs')">Peurs / phobies</div>
+      <div class="opt" onclick="multi('q13',this,'destructeur')">Comportements destructeurs</div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(13)">←</button>
@@ -748,16 +500,16 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q14 -->
+  <!-- Q14 — MODE ALIMENTAIRE -->
   <div class="step" data-step="14">
-    <div class="step-num">Question 14 / 35</div>
-    <h2 class="step-question">Des odeurs<br><em>inhabituelles ?</em></h2>
-    <p class="step-hint">Plusieurs choix. Souvent liées à des déséquilibres nutritionnels ou digestifs.</p>
+    <div class="step-num">Projet · 1 / 6</div>
+    <h2 class="step-question">Quel mode de cuisine<br><em>t'attire ?</em></h2>
+    <p class="step-hint">Les menus seront entièrement adaptés à ton choix et tes contraintes.</p>
     <div class="options" id="q14">
-      <div class="opt" onclick="multi('q14',this,'aucune')">Aucune odeur particulière</div>
-      <div class="opt" onclick="multi('q14',this,'haleine')">Haleine marquée</div>
-      <div class="opt" onclick="multi('q14',this,'corporelle')">Odeur corporelle forte</div>
-      <div class="opt" onclick="multi('q14',this,'oreilles')">Odeur des oreilles</div>
+      <div class="opt" onclick="radio('q14',this,'ration cuite')">🍳 Ration ménagère cuite<small>Recettes cuisinées toi-même</small></div>
+      <div class="opt" onclick="radio('q14',this,'BARF')">🥩 BARF (cru)<small>Viandes et légumes crus</small></div>
+      <div class="opt" onclick="radio('q14',this,'mixte')">⚖️ Mixte cuit + cru<small>Le meilleur des deux</small></div>
+      <div class="opt" onclick="radio('q14',this,'je ne sais pas')">🤷 Je ne sais pas encore<small>Kyno te guidera</small></div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(14)">←</button>
@@ -765,17 +517,33 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q15 -->
+  <!-- Q15 — BUDGET -->
   <div class="step" data-step="15">
-    <div class="step-num">Question 15 / 35</div>
-    <h2 class="step-question">Son comportement<br><em>alimentaire ?</em></h2>
-    <p class="step-hint">Plusieurs choix. Révèle des habitudes digestives et des besoins spécifiques.</p>
-    <div class="options" id="q15">
-      <div class="opt" onclick="multi('q15',this,'mange vite')">Mange très vite</div>
-      <div class="opt" onclick="multi('q15',this,'mange lentement')">Mange lentement</div>
-      <div class="opt" onclick="multi('q15',this,'difficile')">Difficile / capricieux</div>
-      <div class="opt" onclick="multi('q15',this,'mange tout')">Mange absolument tout</div>
-      <div class="opt" onclick="multi('q15',this,'vole la nourriture')">Vole la nourriture</div>
+    <div class="step-num">Projet · 2 / 6</div>
+    <h2 class="step-question">Quel budget pour<br><em>son alimentation ?</em></h2>
+    <p class="step-hint">Par semaine, pour les ingrédients frais. Le coût varie selon la taille de ton chien.</p>
+    <div class="budget-grid">
+      <div class="budget-opt" onclick="selectBudget(this,'économique')">
+        <div class="budget-opt-left">
+          <span class="budget-name">Économique</span>
+          <span class="budget-desc">Ingrédients simples et accessibles, supermarché</span>
+        </div>
+        <span class="budget-badge">💚</span>
+      </div>
+      <div class="budget-opt" onclick="selectBudget(this,'raisonnable')">
+        <div class="budget-opt-left">
+          <span class="budget-name">Raisonnable</span>
+          <span class="budget-desc">Bon rapport qualité/prix, viandes et légumes frais</span>
+        </div>
+        <span class="budget-badge">⭐</span>
+      </div>
+      <div class="budget-opt" onclick="selectBudget(this,'premium')">
+        <div class="budget-opt-left">
+          <span class="budget-name">Premium</span>
+          <span class="budget-desc">Meilleurs ingrédients, bio, viandes de qualité supérieure</span>
+        </div>
+        <span class="budget-badge">✨</span>
+      </div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(15)">←</button>
@@ -783,22 +551,18 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q16 -->
+  <!-- Q16 — ÉQUIPEMENT -->
   <div class="step" data-step="16">
-    <div class="step-num">Question 16 / 35</div>
-    <h2 class="step-question">Des troubles<br><em>du comportement ?</em></h2>
-    <p class="step-hint">Plusieurs choix. Certains comportements sont liés à des carences nutritionnelles.</p>
+    <div class="step-num">Projet · 3 / 6</div>
+    <h2 class="step-question">Quel équipement<br><em>en cuisine ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Les recettes s'adapteront à ce que tu as.</p>
     <div class="options" id="q16">
-      <div class="opt" onclick="multi('q16',this,'aucun')">Aucun</div>
-      <div class="opt" onclick="multi('q16',this,'hyperactivité')">Hyperactivité</div>
-      <div class="opt" onclick="multi('q16',this,'anxiété')">Anxiété</div>
-      <div class="opt" onclick="multi('q16',this,'agressivité')">Agressivité</div>
-      <div class="opt" onclick="multi('q16',this,'peurs')">Peurs / phobies</div>
-      <div class="opt" onclick="multi('q16',this,'destruction')">Comportements destructeurs</div>
-      <div class="opt" onclick="multi('q16',this,'autre'); toggleAutre('q16')">Autre</div>
-    </div>
-    <div class="field-card" id="q16-autre-wrap" style="display:none;margin-top:14px;">
-      <input type="text" id="q16-autre" placeholder="Précise le trouble du comportement…" autocomplete="off">
+      <div class="opt" onclick="multi('q16',this,'casserole')">🥘 Casserole</div>
+      <div class="opt" onclick="multi('q16',this,'vapeur')">♨️ Cuiseur vapeur</div>
+      <div class="opt" onclick="multi('q16',this,'cocotte')">🫕 Cocotte / Mijoteuse</div>
+      <div class="opt" onclick="multi('q16',this,'four')">🔥 Four</div>
+      <div class="opt" onclick="multi('q16',this,'mixeur')">🌀 Mixeur / Blender</div>
+      <div class="opt" onclick="multi('q16',this,'sous vide')">🧊 Sous vide</div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(16)">←</button>
@@ -806,16 +570,16 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q17 -->
+  <!-- Q17 — TEMPS -->
   <div class="step" data-step="17">
-    <div class="step-num">Question 17 / 35</div>
-    <h2 class="step-question">État de<br><em>ses dents ?</em></h2>
-    <p class="step-hint">La santé dentaire influence directement la capacité à mastiquer et assimiler les aliments.</p>
+    <div class="step-num">Projet · 4 / 6</div>
+    <h2 class="step-question">Combien de temps<br><em>pour cuisiner par semaine ?</em></h2>
+    <p class="step-hint">Honnêtement — les menus seront adaptés à ta réalité.</p>
     <div class="options" id="q17">
-      <div class="opt" onclick="radio('q17',this,'blanches et propres')">Blanches et propres</div>
-      <div class="opt" onclick="radio('q17',this,'tartre léger')">Tartre léger</div>
-      <div class="opt" onclick="radio('q17',this,'tartre important')">Tartre important</div>
-      <div class="opt" onclick="radio('q17',this,'haleine sévère')">Haleine sévère</div>
+      <div class="opt" onclick="radio('q17',this,'moins de 30 min')">Moins de 30 min</div>
+      <div class="opt" onclick="radio('q17',this,'30 min à 1h')">30 min – 1h</div>
+      <div class="opt" onclick="radio('q17',this,'1h à 2h')">1h – 2h</div>
+      <div class="opt" onclick="radio('q17',this,'plus de 2h')">Plus de 2h, pas de problème</div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(17)">←</button>
@@ -823,17 +587,19 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q18 -->
+  <!-- Q18 — COURSES -->
   <div class="step" data-step="18">
-    <div class="step-num">Question 18 / 35</div>
-    <h2 class="step-question">Personnes vulnérables<br><em>dans le foyer ?</em></h2>
-    <p class="step-hint">Plusieurs choix. Important pour adapter les recommandations sanitaires (BARF notamment).</p>
+    <div class="step-num">Projet · 5 / 6</div>
+    <h2 class="step-question">Où fais-tu<br><em>tes courses ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Les ingrédients recommandés tiendront compte de tes habitudes.</p>
     <div class="options" id="q18">
-      <div class="opt" onclick="multi('q18',this,'aucune')">Aucune</div>
-      <div class="opt" onclick="multi('q18',this,'enfants moins de 5 ans')">Enfants &lt; 5 ans</div>
-      <div class="opt" onclick="multi('q18',this,'personnes âgées')">Personnes âgées</div>
-      <div class="opt" onclick="multi('q18',this,'femme enceinte')">Femme enceinte</div>
-      <div class="opt" onclick="multi('q18',this,'immunodéprimé')">Personne immunodéprimée</div>
+      <div class="opt" onclick="multi('q18',this,'supermarché')">🏬 Supermarché</div>
+      <div class="opt" onclick="multi('q18',this,'magasin bio')">🌿 Magasin bio</div>
+      <div class="opt" onclick="multi('q18',this,'marché local')">🛒 Marché local</div>
+      <div class="opt" onclick="multi('q18',this,'boucherie')">🥩 Boucherie</div>
+      <div class="opt" onclick="multi('q18',this,'drive')">🚗 Drive / Livraison</div>
+      <div class="opt" onclick="multi('q18',this,'internet')">📦 Internet (ingrédients spéciaux)</div>
+      <div class="opt" onclick="multi('q18',this,'mixte')">🔀 Un peu de tout</div>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(18)">←</button>
@@ -841,21 +607,23 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q19 -->
+  <!-- Q19 — OBJECTIFS -->
   <div class="step" data-step="19">
-    <div class="step-num">Question 19 / 35</div>
-    <h2 class="step-question">Des réactions allergiques<br><em>dans le passé ?</em></h2>
-    <p class="step-hint">Cutanées, digestives ou les deux.</p>
+    <div class="step-num">Projet · 6 / 6</div>
+    <h2 class="step-question">Quel est ton<br><em>objectif principal ?</em></h2>
+    <p class="step-hint">Plusieurs choix. Ce qui t'a amené à chercher une meilleure alimentation pour ton chien.</p>
     <div class="options" id="q19">
-      <div class="opt" onclick="radio('q19',this,'jamais')">Jamais</div>
-      <div class="opt" onclick="radio('q19',this,'cutanée')">Cutanée (démangeaisons, rougeurs)</div>
-      <div class="opt" onclick="radio('q19',this,'digestive')">Digestive (vomissements, diarrhée)</div>
-      <div class="opt" onclick="radio('q19',this,'les deux')">Les deux</div>
-      <div class="opt" onclick="radio('q19',this,'je ne sais pas')">Je ne sais pas</div>
-      <div class="opt" onclick="radio('q19',this,'autre'); toggleAutre('q19')">Autre</div>
+      <div class="opt" onclick="multi('q19',this,'santé générale')">💚 Santé générale</div>
+      <div class="opt" onclick="multi('q19',this,'perte de poids')">⬇️ Perte de poids</div>
+      <div class="opt" onclick="multi('q19',this,'prise de masse')">⬆️ Prise de masse</div>
+      <div class="opt" onclick="multi('q19',this,'pelage et peau')">✨ Pelage et peau</div>
+      <div class="opt" onclick="multi('q19',this,'digestion')">🌱 Digestion</div>
+      <div class="opt" onclick="multi('q19',this,'sport et performance')">⚡ Sport et performance</div>
+      <div class="opt" onclick="multi('q19',this,'senior et longévité')">♥️ Senior et longévité</div>
+      <div class="opt" onclick="multi('q19',this,'problème spécifique'); toggleAutre('q19')">🔍 Problème spécifique</div>
     </div>
     <div class="field-card" id="q19-autre-wrap" style="display:none;margin-top:14px;">
-      <input type="text" id="q19-autre" placeholder="Précise la réaction observée…" autocomplete="off">
+      <input type="text" id="q19-autre" placeholder="Quel problème veux-tu résoudre ?" autocomplete="off">
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(19)">←</button>
@@ -863,23 +631,13 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q20 -->
+  <!-- Q20 — ATTENTES LIBRES -->
   <div class="step" data-step="20">
-    <div class="step-num">Question 20 / 35</div>
-    <h2 class="step-question">Des intolérances<br><em>alimentaires connues ?</em></h2>
-    <p class="step-hint">Plusieurs choix. Ces aliments seront exclus de tous ses menus.</p>
-    <div class="options" id="q20">
-      <div class="opt" onclick="multi('q20',this,'aucune')">Aucune connue</div>
-      <div class="opt" onclick="multi('q20',this,'bœuf')">Bœuf</div>
-      <div class="opt" onclick="multi('q20',this,'poulet')">Poulet</div>
-      <div class="opt" onclick="multi('q20',this,'poisson')">Poisson</div>
-      <div class="opt" onclick="multi('q20',this,'gluten')">Gluten / céréales</div>
-      <div class="opt" onclick="multi('q20',this,'laitages')">Laitages</div>
-      <div class="opt" onclick="multi('q20',this,'soja')">Soja</div>
-      <div class="opt" onclick="multi('q20',this,'autre'); toggleAutre('q20')">Autre</div>
-    </div>
-    <div class="field-card" id="q20-autre-wrap" style="display:none;margin-top:14px;">
-      <input type="text" id="q20-autre" placeholder="Précise l'intolérance…" autocomplete="off">
+    <div class="step-num">Dernière ligne droite</div>
+    <h2 class="step-question">Ce que tu n'as pas<br><em>pu dire ailleurs</em></h2>
+    <p class="step-hint">Tout ce que tu penses important pour <span id="prenomQ20">ton chien</span> et qui n'était pas dans les questions. Optionnel.</p>
+    <div class="field-card">
+      <textarea id="q20" placeholder="Ex : il vomit souvent le matin à jeun, il adore les carottes, il a été opéré du genou l'année dernière…"></textarea>
     </div>
     <div class="step-nav">
       <button class="btn-back" onclick="prev(20)">←</button>
@@ -887,274 +645,17 @@ textarea{resize:vertical;min-height:110px;}
     </div>
   </div>
 
-  <!-- Q21 -->
+  <!-- Q21 — EMAIL -->
   <div class="step" data-step="21">
-    <div class="step-num">Question 21 / 35</div>
-    <h2 class="step-question">Des problèmes<br><em>d'oreilles ?</em></h2>
-    <p class="step-hint">Plusieurs choix possibles. Les otites chroniques sont souvent liées à des déséquilibres nutritionnels ou des allergies alimentaires.</p>
-    <div class="options" id="q21">
-      <div class="opt" onclick="multi('q21',this,'non')">Aucun problème</div>
-      <div class="opt" onclick="multi('q21',this,'otites régulières')">Otites régulières</div>
-      <div class="opt" onclick="multi('q21',this,'odeur forte')">Odeur forte des oreilles</div>
-      <div class="opt" onclick="multi('q21',this,'grattage fréquent')">Se gratte fréquemment les oreilles</div>
-      <div class="opt" onclick="multi('q21',this,'autre'); toggleAutre('q21')">Autre</div>
-    </div>
-    <div class="field-card" id="q21-autre-wrap" style="display:none;margin-top:14px;">
-      <input type="text" id="q21-autre" placeholder="Précise le problème d'oreilles…" autocomplete="off">
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(21)">←</button>
-      <button class="btn-next" onclick="next(21)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q22 -->
-  <div class="step" data-step="22">
-    <div class="step-num">Question 22 / 35</div>
-    <h2 class="step-question">Des problèmes<br><em>de glandes anales ?</em></h2>
-    <p class="step-hint">Directement lié à la qualité des fibres dans l'alimentation.</p>
-    <div class="options" id="q22">
-      <div class="opt" onclick="radio('q22',this,'aucun')">Aucun problème</div>
-      <div class="opt" onclick="radio('q22',this,'scooting')">Scooting (se traîne les fesses)</div>
-      <div class="opt" onclick="radio('q22',this,'expressions fréquentes')">Expressions fréquentes chez le vétérinaire</div>
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(22)">←</button>
-      <button class="btn-next" onclick="next(22)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q23 -->
-  <div class="step" data-step="23">
-    <div class="step-num">Question 23 / 35</div>
-    <h2 class="step-question">Des calculs<br><em>urinaires ?</em></h2>
-    <p class="step-hint">Chaque type de calcul nécessite une adaptation nutritionnelle spécifique.</p>
-    <div class="options" id="q23">
-      <div class="opt" onclick="radio('q23',this,'non')">Non</div>
-      <div class="opt" onclick="radio('q23',this,'struvite')">Oui — struvite</div>
-      <div class="opt" onclick="radio('q23',this,'oxalate')">Oui — oxalate de calcium</div>
-      <div class="opt" onclick="radio('q23',this,'inconnu')">Oui — type inconnu</div>
-      <div class="opt" onclick="radio('q23',this,'infections récurrentes')">Infections urinaires récurrentes</div>
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(23)">←</button>
-      <button class="btn-next" onclick="next(23)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q24 -->
-  <div class="step" data-step="24">
-    <div class="step-num">Question 24 / 35</div>
-    <h2 class="step-question">Son niveau<br><em>de stress général ?</em></h2>
-    <p class="step-hint">Le stress chronique impacte le microbiote intestinal et les besoins en certains nutriments.</p>
-    <div class="options" id="q24">
-      <div class="opt" onclick="radio('q24',this,'très calme')">Très calme et serein</div>
-      <div class="opt" onclick="radio('q24',this,'légèrement anxieux')">Légèrement anxieux</div>
-      <div class="opt" onclick="radio('q24',this,'anxieux')">Anxieux</div>
-      <div class="opt" onclick="radio('q24',this,'très anxieux')">Très anxieux</div>
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(24)">←</button>
-      <button class="btn-next" onclick="next(24)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q25 -->
-  <div class="step" data-step="25">
-    <div class="step-num">Question 25 / 35</div>
-    <h2 class="step-question">Quel mode alimentaire<br><em>t'attire ?</em></h2>
-    <p class="step-hint">Les menus seront entièrement adaptés à ton choix et tes contraintes.</p>
-    <div class="options" id="q25">
-      <div class="opt" onclick="radio('q25',this,'ration cuite')">Ration ménagère cuite</div>
-      <div class="opt" onclick="radio('q25',this,'BARF')">BARF (cru)</div>
-      <div class="opt" onclick="radio('q25',this,'mixte')">Mixte cuit + cru</div>
-      <div class="opt" onclick="radio('q25',this,'je ne sais pas')">Je ne sais pas encore</div>
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(25)">←</button>
-      <button class="btn-next" onclick="next(25)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q26 -->
-  <div class="step" data-step="26">
-    <div class="step-num">Question 26 / 35</div>
-    <h2 class="step-question">Quel budget mensuel<br><em>pour son alimentation ?</em></h2>
-    <p class="step-hint">Pour les ingrédients frais — hors croquettes actuelles.</p>
-    <div class="options" id="q26">
-      <div class="opt" onclick="radio('q26',this,'moins de 30€')">Moins de 30 €</div>
-      <div class="opt" onclick="radio('q26',this,'30 à 60€')">30 – 60 €</div>
-      <div class="opt" onclick="radio('q26',this,'60 à 100€')">60 – 100 €</div>
-      <div class="opt" onclick="radio('q26',this,'plus de 100€')">Plus de 100 €</div>
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(26)">←</button>
-      <button class="btn-next" onclick="next(26)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q27 -->
-  <div class="step" data-step="27">
-    <div class="step-num">Question 27 / 35</div>
-    <h2 class="step-question">Quel équipement<br><em>en cuisine ?</em></h2>
-    <p class="step-hint">Plusieurs choix. Les recettes s'adapteront à ce que tu as.</p>
-    <div class="options" id="q27">
-      <div class="opt" onclick="multi('q27',this,'casserole')">Casserole</div>
-      <div class="opt" onclick="multi('q27',this,'vapeur')">Cuiseur vapeur</div>
-      <div class="opt" onclick="multi('q27',this,'cocotte')">Cocotte / Mijoteuse</div>
-      <div class="opt" onclick="multi('q27',this,'four')">Four</div>
-      <div class="opt" onclick="multi('q27',this,'sous vide')">Sous vide</div>
-      <div class="opt" onclick="multi('q27',this,'mixeur')">Mixeur / Blender</div>
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(27)">←</button>
-      <button class="btn-next" onclick="next(27)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q28 -->
-  <div class="step" data-step="28">
-    <div class="step-num">Question 28 / 35</div>
-    <h2 class="step-question">Combien de temps<br><em>pour cuisiner par semaine ?</em></h2>
-    <p class="step-hint">Honnêtement — les menus seront adaptés à ta réalité, pas à un idéal.</p>
-    <div class="options" id="q28">
-      <div class="opt" onclick="radio('q28',this,'moins de 30 min')">Moins de 30 min</div>
-      <div class="opt" onclick="radio('q28',this,'30 min à 1h')">30 min – 1h</div>
-      <div class="opt" onclick="radio('q28',this,'1h à 2h')">1h – 2h</div>
-      <div class="opt" onclick="radio('q28',this,'plus de 2h')">Plus de 2h</div>
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(28)">←</button>
-      <button class="btn-next" onclick="next(28)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q29 -->
-  <div class="step" data-step="29">
-    <div class="step-num">Question 29 / 35</div>
-    <h2 class="step-question">Tes connaissances<br><em>en nutrition canine ?</em></h2>
-    <p class="step-hint">Le rapport sera adapté à ton niveau — plus ou moins technique.</p>
-    <div class="options" id="q29">
-      <div class="opt" onclick="radio('q29',this,'aucune')">Aucune — je pars de zéro</div>
-      <div class="opt" onclick="radio('q29',this,'quelques bases')">Quelques bases</div>
-      <div class="opt" onclick="radio('q29',this,'formé')">Formé(e) / documenté(e)</div>
-      <div class="opt" onclick="radio('q29',this,'expert')">Expert(e)</div>
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(29)">←</button>
-      <button class="btn-next" onclick="next(29)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q30 -->
-  <div class="step" data-step="30">
-    <div class="step-num">Question 30 / 35</div>
-    <h2 class="step-question">Où fais-tu<br><em>tes courses ?</em></h2>
-    <p class="step-hint">Plusieurs choix. Les ingrédients recommandés tiendront compte de tes habitudes.</p>
-    <div class="options" id="q30">
-      <div class="opt" onclick="multi('q30',this,'supermarché')">Supermarché</div>
-      <div class="opt" onclick="multi('q30',this,'magasin bio')">Magasin bio</div>
-      <div class="opt" onclick="multi('q30',this,'aldi lidl')">Aldi / Lidl</div>
-      <div class="opt" onclick="multi('q30',this,'marché local')">Marché local</div>
-      <div class="opt" onclick="multi('q30',this,'boucherie')">Boucherie</div>
-      <div class="opt" onclick="multi('q30',this,'drive')">Drive / Livraison</div>
-      <div class="opt" onclick="multi('q30',this,'mixte')">Un peu de tout</div>
-      <div class="opt" onclick="multi('q30',this,'autre'); toggleAutre('q30')">Autre</div>
-    </div>
-    <div class="field-card" id="q30-autre-wrap" style="display:none;margin-top:14px;">
-      <input type="text" id="q30-autre" placeholder="Précise où…" autocomplete="off">
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(30)">←</button>
-      <button class="btn-next" onclick="next(30)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q31 -->
-  <div class="step" data-step="31">
-    <div class="step-num">Question 31 / 35</div>
-    <h2 class="step-question">D'autres animaux<br><em>à la maison ?</em></h2>
-    <p class="step-hint">Peut influencer certaines recommandations sanitaires.</p>
-    <div class="options" id="q31">
-      <div class="opt" onclick="multi('q31',this,'aucun')">Aucun</div>
-      <div class="opt" onclick="multi('q31',this,'autre chien')">Autre chien</div>
-      <div class="opt" onclick="multi('q31',this,'chat')">Chat</div>
-      <div class="opt" onclick="multi('q31',this,'autres'); toggleAutre('q31')">Autres animaux</div>
-    </div>
-    <div class="field-card" id="q31-autre-wrap" style="display:none;margin-top:14px;">
-      <input type="text" id="q31-autre" placeholder="Précise quels animaux…" autocomplete="off">
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(31)">←</button>
-      <button class="btn-next" onclick="next(31)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q32 -->
-  <div class="step" data-step="32">
-    <div class="step-num">Question 32 / 35</div>
-    <h2 class="step-question">À quelle fréquence<br><em>veux-tu les menus ?</em></h2>
-    <p class="step-hint">Le suivi mensuel s'adaptera à ton rythme.</p>
-    <div class="options" id="q32">
-      <div class="opt" onclick="radio('q32',this,'chaque semaine')">Chaque semaine</div>
-      <div class="opt" onclick="radio('q32',this,'toutes les 2 semaines')">Toutes les 2 semaines</div>
-      <div class="opt" onclick="radio('q32',this,'chaque mois')">Chaque mois</div>
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(32)">←</button>
-      <button class="btn-next" onclick="next(32)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q33 -->
-  <div class="step" data-step="33">
-    <div class="step-num">Question 33 / 35</div>
-    <h2 class="step-question">Quel est ton<br><em>objectif principal ?</em></h2>
-    <p class="step-hint">Plusieurs choix possibles. Ce qui t'a amené à chercher une meilleure alimentation pour ton chien.</p>
-    <div class="options" id="q33">
-      <div class="opt" onclick="multi('q33',this,'santé générale')">Santé générale</div>
-      <div class="opt" onclick="multi('q33',this,'perte de poids')">Perte de poids</div>
-      <div class="opt" onclick="multi('q33',this,'pelage et peau')">Pelage et peau</div>
-      <div class="opt" onclick="multi('q33',this,'digestion')">Digestion</div>
-      <div class="opt" onclick="multi('q33',this,'sport et performance')">Sport et performance</div>
-      <div class="opt" onclick="multi('q33',this,'senior et longévité')">Senior et longévité</div>
-      <div class="opt" onclick="multi('q33',this,'problème spécifique')">Problème spécifique</div>
-      <div class="opt" onclick="multi('q33',this,'autre'); toggleAutre('q33')">Autre</div>
-    </div>
-    <div class="field-card" id="q33-autre-wrap" style="display:none;margin-top:14px;">
-      <input type="text" id="q33-autre" placeholder="Précise ton objectif…" autocomplete="off">
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(33)">←</button>
-      <button class="btn-next" onclick="next(33)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q34 -->
-  <div class="step" data-step="34">
-    <div class="step-num">Question 34 / 35</div>
-    <h2 class="step-question">Tes attentes<br><em>libres ?</em></h2>
-    <p class="step-hint">Ce que tu n'as pas pu exprimer dans les questions précédentes. Optionnel.</p>
+    <div class="step-num">Question finale</div>
+    <h2 class="step-question">Où envoyer<br><em>le plan de <span id="prenomQ21">ton chien</span> ?</em></h2>
+    <p class="step-hint">Le rapport nutritionnel complet arrive dans les 2 minutes. Vérifie tes spams si besoin.</p>
     <div class="field-card">
-      <textarea id="q34" placeholder="Ex : mon chien a tendance à vomir le matin à jeun, je cherche des recettes simples avec peu d'ingrédients…"></textarea>
-    </div>
-    <div class="step-nav">
-      <button class="btn-back" onclick="prev(34)">←</button>
-      <button class="btn-next" onclick="next(34)">Continuer →</button>
-    </div>
-  </div>
-
-  <!-- Q35 — EMAIL -->
-  <div class="step" data-step="35">
-    <div class="step-num">Dernière question</div>
-    <h2 class="step-question">Où envoyer<br><em>le plan de ton chien ?</em></h2>
-    <p class="step-hint">Le rapport nutritionnel complet + le menu du premier mois seront envoyés gratuitement à cette adresse dans les prochaines minutes.</p>
-    <div class="field-card">
-      <input type="email" id="q35" placeholder="ton@email.com">
+      <input type="email" id="q21" placeholder="ton@email.com" inputmode="email">
     </div>
     <div class="error-msg" id="errorMsg"></div>
     <div class="step-nav">
-      <button class="btn-back" onclick="prev(35)">←</button>
+      <button class="btn-back" onclick="prev(21)">←</button>
       <button class="btn-next" id="submitBtn" onclick="submitQuiz()">Recevoir mon plan gratuitement →</button>
     </div>
   </div>
@@ -1163,99 +664,61 @@ textarea{resize:vertical;min-height:110px;}
 
 <!-- LOADING -->
 <div class="loading" id="loadingScreen">
-  <svg class="loading-viva" viewBox="0 0 440 500" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration de Viva">
+  <svg class="loading-viva" viewBox="0 0 440 500" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g stroke="#3A2A20" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-      <path d="M336 326 q56 -4 72 -50 q10 -28 -16 -36 q-26 -8 -34 22 q-8 30 -38 34 q-4 16 16 30 Z" fill="#BE6B41"></path>
-      <path d="M120 470 q-26 -150 28 -208 q40 -42 132 -34 q70 8 86 78 q16 70 -10 164 Z" fill="#FFFFFF"></path>
-      <path d="M250 252 q66 0 84 64 q12 44 4 96 q-44 14 -86 6 q14 -90 -22 -150 q9 -12 16 -16 Z" fill="#BE6B41"></path>
-      <path d="M150 470 q-8 -64 8 -104 q24 -22 46 -2 q14 40 8 106 Z" fill="#FFFFFF"></path>
-      <path d="M232 470 q-6 -62 10 -100 q24 -20 44 0 q12 40 8 100 Z" fill="#FFFFFF"></path>
-      <g stroke-width="3.5">
-        <path d="M150 470 h54" stroke="#CFC8BB"></path>
-        <path d="M168 452 v18 M186 452 v18" stroke="#CFC8BB"></path>
-        <path d="M236 470 h54" stroke="#CFC8BB"></path>
-        <path d="M254 452 v18 M272 452 v18" stroke="#CFC8BB"></path>
-      </g>
-      <path d="M118 150 q-58 8 -64 88 q-4 64 40 104 q40 18 58 -16 q16 -64 6 -132 q-6 -36 -40 -44 Z" fill="#BE6B41"></path>
-      <path d="M320 150 q58 8 64 88 q4 64 -40 104 q-40 18 -58 -16 q-16 -64 -6 -132 q6 -36 40 -44 Z" fill="#BE6B41"></path>
-      <g stroke="#9A5230" stroke-width="3" fill="none" opacity="0.4">
-        <path d="M86 224 q-4 42 18 78"></path>
-        <path d="M354 224 q4 42 -18 78"></path>
-      </g>
-      <path d="M220 86 q104 0 120 92 q12 74 -36 122 q-38 36 -84 36 q-46 0 -84 -36 q-48 -48 -36 -122 q16 -92 120 -92 Z" fill="#FFFFFF"></path>
-      <path d="M220 86 q70 0 102 56 q-30 22 -70 18 q-44 -6 -70 8 q-22 -16 -28 -26 q22 -56 66 -56 Z" fill="#BE6B41"></path>
-      <path d="M256 150 q40 -6 54 22 q10 30 -10 50 q-30 14 -50 -8 q-16 -34 6 -64 Z" fill="#BE6B41"></path>
-      <path d="M220 196 q40 0 48 38 q4 34 -48 44 q-52 -10 -48 -44 q8 -38 48 -38 Z" fill="#FFFFFF"></path>
-      <g stroke="none">
-        <ellipse cx="160" cy="210" rx="13" ry="8" fill="#EFC3A6" opacity="0.7"></ellipse>
-        <ellipse cx="286" cy="210" rx="13" ry="8" fill="#EFC3A6" opacity="0.7"></ellipse>
-      </g>
-      <g stroke="none" fill="#3A2A20">
-        <ellipse cx="178" cy="168" rx="12" ry="15"></ellipse>
-        <ellipse cx="262" cy="168" rx="12" ry="15"></ellipse>
-      </g>
-      <g stroke="none" fill="#FFFFFF">
-        <circle cx="183" cy="162" r="4"></circle>
-        <circle cx="267" cy="162" r="4"></circle>
-      </g>
-      <path d="M163 147 q15 -9 30 -2" stroke-width="4.5"></path>
-      <path d="M247 145 q15 -8 30 2" stroke-width="4.5"></path>
-      <path d="M220 196 q17 0 17 13 q0 11 -17 13 q-17 -2 -17 -13 q0 -13 17 -13 Z" fill="#2E211A" stroke="none"></path>
-      <path d="M220 222 v8" stroke-width="4.5"></path>
-      <path d="M220 230 q-20 13 -38 4" stroke-width="4.5"></path>
-      <path d="M220 230 q20 14 38 3" stroke-width="4.5"></path>
-      <path d="M212 234 q8 18 18 18 q10 0 14 -13 q-16 6 -32 -5 Z" fill="#D98E80"></path>
+      <path d="M336 326 q56 -4 72 -50 q10 -28 -16 -36 q-26 -8 -34 22 q-8 30 -38 34 q-4 16 16 30 Z" fill="#BE6B41"/>
+      <path d="M120 470 q-26 -150 28 -208 q40 -42 132 -34 q70 8 86 78 q16 70 -10 164 Z" fill="#FFFFFF"/>
+      <path d="M250 252 q66 0 84 64 q12 44 4 96 q-44 14 -86 6 q14 -90 -22 -150 q9 -12 16 -16 Z" fill="#BE6B41"/>
+      <path d="M150 470 q-8 -64 8 -104 q24 -22 46 -2 q14 40 8 106 Z" fill="#FFFFFF"/>
+      <path d="M232 470 q-6 -62 10 -100 q24 -20 44 0 q12 40 8 100 Z" fill="#FFFFFF"/>
+      <g stroke-width="3.5"><path d="M150 470 h54" stroke="#CFC8BB"/><path d="M168 452 v18 M186 452 v18" stroke="#CFC8BB"/><path d="M236 470 h54" stroke="#CFC8BB"/><path d="M254 452 v18 M272 452 v18" stroke="#CFC8BB"/></g>
+      <path d="M118 150 q-58 8 -64 88 q-4 64 40 104 q40 18 58 -16 q16 -64 6 -132 q-6 -36 -40 -44 Z" fill="#BE6B41"/>
+      <path d="M320 150 q58 8 64 88 q4 64 -40 104 q-40 18 -58 -16 q-16 -64 -6 -132 q6 -36 40 -44 Z" fill="#BE6B41"/>
+      <path d="M220 86 q104 0 120 92 q12 74 -36 122 q-38 36 -84 36 q-46 0 -84 -36 q-48 -48 -36 -122 q16 -92 120 -92 Z" fill="#FFFFFF"/>
+      <path d="M220 86 q70 0 102 56 q-30 22 -70 18 q-44 -6 -70 8 q-22 -16 -28 -26 q22 -56 66 -56 Z" fill="#BE6B41"/>
+      <path d="M256 150 q40 -6 54 22 q10 30 -10 50 q-30 14 -50 -8 q-16 -34 6 -64 Z" fill="#BE6B41"/>
+      <path d="M220 196 q40 0 48 38 q4 34 -48 44 q-52 -10 -48 -44 q8 -38 48 -38 Z" fill="#FFFFFF"/>
+      <g stroke="none"><ellipse cx="160" cy="210" rx="13" ry="8" fill="#EFB7A6" opacity="0.75"/><ellipse cx="286" cy="210" rx="13" ry="8" fill="#EFB7A6" opacity="0.75"/></g>
+      <g stroke="none" fill="#3A2A20"><ellipse cx="178" cy="168" rx="12" ry="15"/><ellipse cx="262" cy="168" rx="12" ry="15"/></g>
+      <g stroke="none" fill="#FFFFFF"><circle cx="183" cy="162" r="4"/><circle cx="267" cy="162" r="4"/></g>
+      <path d="M163 147 q15 -9 30 -2" stroke-width="4.5"/>
+      <path d="M247 145 q15 -8 30 2" stroke-width="4.5"/>
+      <path d="M220 196 q17 0 17 13 q0 11 -17 13 q-17 -2 -17 -13 q0 -13 17 -13 Z" fill="#2E211A" stroke="none"/>
+      <path d="M220 222 v8" stroke-width="4.5"/>
+      <path d="M220 230 q-20 13 -38 4" stroke-width="4.5"/><path d="M220 230 q20 14 38 3" stroke-width="4.5"/>
+      <path d="M212 234 q8 18 18 18 q10 0 14 -13 q-16 6 -32 -5 Z" fill="#D98E80"/>
     </g>
   </svg>
   <div class="loading-ring"></div>
   <h2>Kyno analyse le profil de <span id="loadingName">ton chien</span>…</h2>
-  <p>Notre IA nutritionniste calcule ses besoins énergétiques,<br>analyse ses prédispositions raciales et compose<br>son menu de saison. Ça peut prendre une à deux minutes.</p>
+  <p>Notre IA nutritionniste calcule ses besoins énergétiques,<br>analyse ses prédispositions raciales et compose<br>son menu de saison. Ça peut prendre 1 à 2 minutes.</p>
 </div>
 
 <!-- SUCCÈS -->
 <div class="success" id="successScreen">
-  <svg class="success-viva" viewBox="0 0 440 500" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration de Viva qui salue">
+  <svg class="success-viva" viewBox="0 0 440 500" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g stroke="#3A2A20" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
-      <path d="M336 326 q56 -4 72 -50 q10 -28 -16 -36 q-26 -8 -34 22 q-8 30 -38 34 q-4 16 16 30 Z" fill="#BE6B41"></path>
-      <path d="M120 470 q-26 -150 28 -208 q40 -42 132 -34 q70 8 86 78 q16 70 -10 164 Z" fill="#FFFFFF"></path>
-      <path d="M250 252 q66 0 84 64 q12 44 4 96 q-44 14 -86 6 q14 -90 -22 -150 q9 -12 16 -16 Z" fill="#BE6B41"></path>
-      <path d="M150 470 q-8 -64 8 -104 q24 -22 46 -2 q14 40 8 106 Z" fill="#FFFFFF"></path>
-      <path d="M232 470 q-6 -62 10 -100 q24 -20 44 0 q12 40 8 100 Z" fill="#FFFFFF"></path>
-      <g stroke-width="3.5">
-        <path d="M150 470 h54" stroke="#CFC8BB"></path>
-        <path d="M168 452 v18 M186 452 v18" stroke="#CFC8BB"></path>
-        <path d="M236 470 h54" stroke="#CFC8BB"></path>
-        <path d="M254 452 v18 M272 452 v18" stroke="#CFC8BB"></path>
-      </g>
-      <path d="M118 150 q-58 8 -64 88 q-4 64 40 104 q40 18 58 -16 q16 -64 6 -132 q-6 -36 -40 -44 Z" fill="#BE6B41"></path>
-      <path d="M320 150 q58 8 64 88 q4 64 -40 104 q-40 18 -58 -16 q-16 -64 -6 -132 q6 -36 40 -44 Z" fill="#BE6B41"></path>
-      <g stroke="#9A5230" stroke-width="3" fill="none" opacity="0.4">
-        <path d="M86 224 q-4 42 18 78"></path>
-        <path d="M354 224 q4 42 -18 78"></path>
-      </g>
-      <path d="M220 86 q104 0 120 92 q12 74 -36 122 q-38 36 -84 36 q-46 0 -84 -36 q-48 -48 -36 -122 q16 -92 120 -92 Z" fill="#FFFFFF"></path>
-      <path d="M220 86 q70 0 102 56 q-30 22 -70 18 q-44 -6 -70 8 q-22 -16 -28 -26 q22 -56 66 -56 Z" fill="#BE6B41"></path>
-      <path d="M256 150 q40 -6 54 22 q10 30 -10 50 q-30 14 -50 -8 q-16 -34 6 -64 Z" fill="#BE6B41"></path>
-      <path d="M220 196 q40 0 48 38 q4 34 -48 44 q-52 -10 -48 -44 q8 -38 48 -38 Z" fill="#FFFFFF"></path>
-      <g stroke="none">
-        <ellipse cx="160" cy="210" rx="13" ry="8" fill="#EFC3A6" opacity="0.7"></ellipse>
-        <ellipse cx="286" cy="210" rx="13" ry="8" fill="#EFC3A6" opacity="0.7"></ellipse>
-      </g>
-      <g stroke="none" fill="#3A2A20">
-        <ellipse cx="178" cy="168" rx="12" ry="15"></ellipse>
-        <ellipse cx="262" cy="168" rx="12" ry="15"></ellipse>
-      </g>
-      <g stroke="none" fill="#FFFFFF">
-        <circle cx="183" cy="162" r="4"></circle>
-        <circle cx="267" cy="162" r="4"></circle>
-      </g>
-      <path d="M163 147 q15 -9 30 -2" stroke-width="4.5"></path>
-      <path d="M247 145 q15 -8 30 2" stroke-width="4.5"></path>
-      <path d="M220 196 q17 0 17 13 q0 11 -17 13 q-17 -2 -17 -13 q0 -13 17 -13 Z" fill="#2E211A" stroke="none"></path>
-      <path d="M220 222 v8" stroke-width="4.5"></path>
-      <path d="M220 230 q-20 13 -38 4" stroke-width="4.5"></path>
-      <path d="M220 230 q20 14 38 3" stroke-width="4.5"></path>
-      <path d="M212 234 q8 18 18 18 q10 0 14 -13 q-16 6 -32 -5 Z" fill="#D98E80"></path>
+      <path d="M336 326 q56 -4 72 -50 q10 -28 -16 -36 q-26 -8 -34 22 q-8 30 -38 34 q-4 16 16 30 Z" fill="#BE6B41"/>
+      <path d="M120 470 q-26 -150 28 -208 q40 -42 132 -34 q70 8 86 78 q16 70 -10 164 Z" fill="#FFFFFF"/>
+      <path d="M250 252 q66 0 84 64 q12 44 4 96 q-44 14 -86 6 q14 -90 -22 -150 q9 -12 16 -16 Z" fill="#BE6B41"/>
+      <path d="M150 470 q-8 -64 8 -104 q24 -22 46 -2 q14 40 8 106 Z" fill="#FFFFFF"/>
+      <path d="M232 470 q-6 -62 10 -100 q24 -20 44 0 q12 40 8 100 Z" fill="#FFFFFF"/>
+      <g stroke-width="3.5"><path d="M150 470 h54" stroke="#CFC8BB"/><path d="M168 452 v18 M186 452 v18" stroke="#CFC8BB"/><path d="M236 470 h54" stroke="#CFC8BB"/><path d="M254 452 v18 M272 452 v18" stroke="#CFC8BB"/></g>
+      <path d="M118 150 q-58 8 -64 88 q-4 64 40 104 q40 18 58 -16 q16 -64 6 -132 q-6 -36 -40 -44 Z" fill="#BE6B41"/>
+      <path d="M320 150 q58 8 64 88 q4 64 -40 104 q-40 18 -58 -16 q-16 -64 -6 -132 q6 -36 40 -44 Z" fill="#BE6B41"/>
+      <path d="M220 86 q104 0 120 92 q12 74 -36 122 q-38 36 -84 36 q-46 0 -84 -36 q-48 -48 -36 -122 q16 -92 120 -92 Z" fill="#FFFFFF"/>
+      <path d="M220 86 q70 0 102 56 q-30 22 -70 18 q-44 -6 -70 8 q-22 -16 -28 -26 q22 -56 66 -56 Z" fill="#BE6B41"/>
+      <path d="M256 150 q40 -6 54 22 q10 30 -10 50 q-30 14 -50 -8 q-16 -34 6 -64 Z" fill="#BE6B41"/>
+      <path d="M220 196 q40 0 48 38 q4 34 -48 44 q-52 -10 -48 -44 q8 -38 48 -38 Z" fill="#FFFFFF"/>
+      <g stroke="none"><ellipse cx="160" cy="210" rx="13" ry="8" fill="#EFB7A6" opacity="0.75"/><ellipse cx="286" cy="210" rx="13" ry="8" fill="#EFB7A6" opacity="0.75"/></g>
+      <g stroke="none" fill="#3A2A20"><ellipse cx="178" cy="168" rx="12" ry="15"/><ellipse cx="262" cy="168" rx="12" ry="15"/></g>
+      <g stroke="none" fill="#FFFFFF"><circle cx="183" cy="162" r="4"/><circle cx="267" cy="162" r="4"/></g>
+      <path d="M163 147 q15 -9 30 -2" stroke-width="4.5"/>
+      <path d="M247 145 q15 -8 30 2" stroke-width="4.5"/>
+      <path d="M220 196 q17 0 17 13 q0 11 -17 13 q-17 -2 -17 -13 q0 -13 17 -13 Z" fill="#2E211A" stroke="none"/>
+      <path d="M220 222 v8" stroke-width="4.5"/>
+      <path d="M220 230 q-20 13 -38 4" stroke-width="4.5"/><path d="M220 230 q20 14 38 3" stroke-width="4.5"/>
+      <path d="M212 234 q8 18 18 18 q10 0 14 -13 q-16 6 -32 -5 Z" fill="#D98E80"/>
     </g>
   </svg>
   <div class="success-tag"><span style="width:6px;height:6px;border-radius:50%;background:var(--sage);display:block;"></span>Profil envoyé</div>
@@ -1269,14 +732,16 @@ textarea{resize:vertical;min-height:110px;}
 <script>
 const answers = {};
 let current = 1;
-const total = 35;
+const total = 21;
 
+// ── RADIO ───────────────────────────────────────────────────
 function radio(id, el, val) {
   document.querySelectorAll(`#${id} .opt`).forEach(o => o.classList.remove('selected'));
   el.classList.add('selected');
   answers[id] = val;
 }
 
+// ── MULTI ───────────────────────────────────────────────────
 function multi(id, el, val) {
   const noneVals = ['aucun','aucune','non'];
   if (noneVals.includes(val)) {
@@ -1286,35 +751,140 @@ function multi(id, el, val) {
     return;
   }
   document.querySelectorAll(`#${id} .opt`).forEach(o => {
-    const v = o.getAttribute('onclick').match(/multi\('[^']+',\s*this,\s*'([^']+)'\)/)?.[1];
+    const v = o.getAttribute('onclick')?.match(/multi\('[^']+',\s*this,\s*'([^']+)'\)/)?.[1];
     if (noneVals.includes(v)) o.classList.remove('selected');
   });
   el.classList.toggle('selected');
   answers[id] = [...document.querySelectorAll(`#${id} .opt.selected`)]
-    .map(o => o.getAttribute('onclick').match(/multi\('[^']+',\s*this,\s*'([^']+)'\)/)?.[1])
+    .map(o => o.getAttribute('onclick')?.match(/multi\('[^']+',\s*this,\s*'([^']+)'\)/)?.[1])
     .filter(Boolean);
+  // Tips contextuels pour Q10
+  if (id === 'q10') updateTip10();
 }
 
+// ── TOGGLE AUTRE ────────────────────────────────────────────
 function toggleAutre(id) {
   const wrap = document.getElementById(`${id}-autre-wrap`);
   if (!wrap) return;
   const isSelected = [...document.querySelectorAll(`#${id} .opt.selected`)]
-    .some(o => (o.getAttribute('onclick')||'').includes("'autre'") || (o.getAttribute('onclick')||'').includes("'autres'"));
+    .some(o => (o.getAttribute('onclick')||'').includes("'autre'") ||
+               (o.getAttribute('onclick')||'').includes("'autre maladie'") ||
+               (o.getAttribute('onclick')||'').includes("'problème spécifique'"));
   wrap.style.display = isSelected ? 'block' : 'none';
-  if (!isSelected) {
-    const input = document.getElementById(`${id}-autre`);
-    if (input) input.value = '';
+  if (!isSelected) { const i = document.getElementById(`${id}-autre`); if(i) i.value=''; }
+}
+
+// ── ACTIVITÉ ────────────────────────────────────────────────
+function selectActivite(el, val) {
+  document.querySelectorAll('.activite-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.activite = val;
+}
+
+// ── BUDGET ──────────────────────────────────────────────────
+function selectBudget(el, val) {
+  document.querySelectorAll('.budget-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.budget = val;
+}
+
+// ── POIDS VISUEL ─────────────────────────────────────────────
+function updatePoidsVisual() {
+  const val = parseFloat(document.getElementById('q4').value);
+  const label = document.getElementById('poidsLabel');
+  const sublabel = document.getElementById('poidsSublabel');
+  const bar = document.getElementById('poidsBarFill');
+  const dog = document.getElementById('poidsDog');
+
+  if (!val || isNaN(val)) {
+    label.textContent = 'Saisis son poids';
+    sublabel.textContent = 'pour voir son profil morphologique';
+    bar.style.width = '0%';
+    bar.style.background = 'var(--sand)';
+    return;
+  }
+
+  const categories = [
+    { max:5, label:'Très petit chien', sub:'Chihuahua, Yorkshire…', color:'var(--blue)', pct:15 },
+    { max:10, label:'Petit chien', sub:'Bichon, Jack Russell…', color:'var(--sage)', pct:30 },
+    { max:20, label:'Chien de taille moyenne', sub:'Épagneul, Beagle…', color:'var(--sage)', pct:50 },
+    { max:35, label:'Grand chien', sub:'Labrador, Berger Allemand…', color:'var(--banana)', pct:70 },
+    { max:50, label:'Très grand chien', sub:'Berger Blanc, Rottweiler…', color:'var(--orange)', pct:85 },
+    { max:999, label:'Chien géant', sub:'Dogue, Montagne des Pyrénées…', color:'var(--peach)', pct:100 }
+  ];
+
+  const cat = categories.find(c => val <= c.max) || categories[categories.length-1];
+  label.textContent = cat.label;
+  sublabel.textContent = cat.sub;
+  bar.style.width = cat.pct + '%';
+  bar.style.background = cat.color;
+
+  // Taille du SVG chien proportionnelle au poids
+  const scale = Math.min(1.4, 0.6 + val / 50);
+  dog.style.transform = `scale(${scale})`;
+}
+
+// ── SEXE SOUS-QUESTION ───────────────────────────────────────
+function showSexeSub(sexe) {
+  const sub = document.getElementById('q5sub');
+  const label = document.getElementById('q5subLabel');
+  sub.classList.add('visible');
+  label.textContent = sexe === 'femelle' ? 'Est-elle stérilisée ?' : 'Est-il castré ?';
+}
+
+// ── MALADIE SOUS-QUESTION ────────────────────────────────────
+function showMaladies(show) {
+  const sub = document.getElementById('maladiesSub');
+  if (show) sub.classList.add('visible');
+  else sub.classList.remove('visible');
+}
+
+// ── TRAITEMENT SOUS-QUESTION ─────────────────────────────────
+function showTraitement(show) {
+  const sub = document.getElementById('traitementSub');
+  if (show) sub.classList.add('visible');
+  else sub.classList.remove('visible');
+}
+
+// ── RÉACTION SUB ─────────────────────────────────────────────
+function showReactionSub(show) {
+  const sub = document.getElementById('reactionSub');
+  if (show) sub.classList.add('visible');
+  else sub.classList.remove('visible');
+}
+
+// ── TIP CONTEXTUEL Q10 ───────────────────────────────────────
+function updateTip10() {
+  const sel = answers.q10 || [];
+  const tip = document.getElementById('tip10');
+  const tips = {
+    'selles molles': 'Les selles molles peuvent indiquer une sensibilité digestive. Kyno adaptera les fibres et les protéines pour stabiliser le transit.',
+    'vomissements': 'Les vomissements réguliers peuvent être liés à une intolérance ou à une vitesse de prise de repas. On creusera ça dans le plan.',
+    'peau irritée': 'La peau irritée est souvent liée à des intolérances alimentaires ou un manque d\'acides gras essentiels (oméga-3). Le menu les intégrera.',
+    'otites': 'Les otites répétées peuvent être un signe d\'intolérance alimentaire. Kyno en tiendra compte dans les recommandations.',
+    'pelage terne': 'Un pelage terne indique souvent un manque d\'oméga-3 ou de zinc. On renforcera ces apports dans son menu.'
+  };
+  const found = Object.keys(tips).find(k => sel.includes(k));
+  if (found) {
+    tip.textContent = found === 'selles molles' ? '💡 ' + tips[found] : '💡 ' + tips[found];
+    tip.classList.add('visible');
+  } else {
+    tip.classList.remove('visible');
   }
 }
 
+// ── NAVIGATION ───────────────────────────────────────────────
 function next(step) {
   if (!validate(step)) return;
   saveText(step);
-  if (step === 1) {
-    const name = answers.q1 || 'ton chien';
-    document.getElementById('loadingName').textContent = name;
-    document.getElementById('successName').textContent = name;
-  }
+
+  // Mettre à jour prénoms dynamiques
+  const nom = answers.q1 || 'ton chien';
+  document.getElementById('loadingName').textContent = nom;
+  document.getElementById('successName').textContent = nom;
+  document.getElementById('prenomQ20').textContent = nom;
+  document.getElementById('prenomQ21').textContent = nom;
+
   current = step + 1;
   if (current > total) return;
   show(current);
@@ -1339,29 +909,38 @@ function saveText(step) {
   if (el && el.tagName !== 'DIV') answers[`q${step}`] = el.value.trim();
 }
 
+// ── VALIDATION ───────────────────────────────────────────────
 function validate(step) {
   clearErrors(step);
-  if ([1,2,4].includes(step)) {
+
+  if ([1,2].includes(step)) {
     const val = document.getElementById(`q${step}`)?.value.trim();
     if (!val) { showErr(step,'Ce champ est requis.'); return false; }
-    if (step===4 && (isNaN(val)||val<=0||val>100)) { showErr(step,'Poids valide entre 0.5 et 100 kg.'); return false; }
   }
-  const radioSteps = [3,5,6,7,13,17,19,22,23,24,25,26,28,29,32];
-  if (radioSteps.includes(step) && !answers[`q${step}`]) {
-    showErr(step,'Sélectionne une option.'); return false;
+  if (step === 4) {
+    const val = document.getElementById('q4')?.value;
+    if (!val || isNaN(val) || val <= 0 || val > 100) { showErr(step,'Saisis un poids valide (entre 0.5 et 100 kg).'); return false; }
   }
-  const multiSteps = [8,10,12,14,15,16,18,20,21,27,30,31,33];
-  if (multiSteps.includes(step) && (!answers[`q${step}`]||answers[`q${step}`].length===0)) {
-    showErr(step,'Sélectionne au moins une option.'); return false;
+  const radioSteps = [3,6,11,14,15,17];
+  if (radioSteps.includes(step)) {
+    const map = {3:'q3',6:'activite',11:'q11',14:'q14',15:'budget',17:'q17'};
+    if (!answers[map[step]]) { showErr(step,'Sélectionne une option.'); return false; }
   }
-  if (step===35) {
-    const email = document.getElementById('q35')?.value.trim();
-    if (!email||!email.includes('@')||!email.includes('.')) {
+  const multiSteps = [7,10,12,13,16,18,19];
+  if (multiSteps.includes(step)) {
+    const map = {7:'q7',10:'q10',12:'q12',13:'q13',16:'q16',18:'q18',19:'q19'};
+    const val = answers[map[step]];
+    if (!val || val.length === 0) { showErr(step,'Sélectionne au moins une option.'); return false; }
+  }
+  if (step === 5 && !answers.q5) { showErr(step,'Indique si c\'est un garçon ou une fille.'); return false; }
+  if (step === 21) {
+    const email = document.getElementById('q21')?.value.trim();
+    if (!email || !email.includes('@') || !email.includes('.')) {
       document.getElementById('errorMsg').textContent = 'Entre une adresse email valide.';
       document.getElementById('errorMsg').style.display = 'block';
       return false;
     }
-    answers.q35 = email;
+    answers.q21 = email;
   }
   return true;
 }
@@ -1371,7 +950,7 @@ function showErr(step, msg) {
   err.className = 'step-error';
   err.textContent = msg;
   document.querySelector(`[data-step="${step}"] .step-nav`).before(err);
-  setTimeout(()=>err.remove(), 3000);
+  setTimeout(() => err.remove(), 3000);
 }
 
 function clearErrors(step) {
@@ -1380,65 +959,61 @@ function clearErrors(step) {
   if (em) em.style.display = 'none';
 }
 
+// ── SUBMIT ───────────────────────────────────────────────────
 async function submitQuiz() {
-  if (!validate(35)) return;
+  if (!validate(21)) return;
 
-  const environnementAutre = document.getElementById('q7-autre')?.value.trim() || '';
-  const alimentationAutre  = document.getElementById('q8-autre')?.value.trim() || '';
-  const troublesAutre      = document.getElementById('q16-autre')?.value.trim() || '';
-  const allergiesAutre     = document.getElementById('q19-autre')?.value.trim() || '';
-  const oreillesAutre      = document.getElementById('q21-autre')?.value.trim() || '';
-  const intolerancesAutre = document.getElementById('q20-autre')?.value.trim() || '';
-  const coursesAutre      = document.getElementById('q30-autre')?.value.trim() || '';
-  const animauxAutre      = document.getElementById('q31-autre')?.value.trim() || '';
-  const objectifAutre     = document.getElementById('q33-autre')?.value.trim() || '';
+  // Construire le sexe complet (combinaison sexe + castration)
+  const sexeBase = answers.q5 || '';
+  const castre = answers.q5b || '';
+  let sexeComplet = sexeBase;
+  if (sexeBase === 'male') {
+    sexeComplet = castre === 'oui' ? 'mâle castré' : castre === 'non' ? 'mâle entier' : 'mâle';
+  } else if (sexeBase === 'femelle') {
+    sexeComplet = castre === 'oui' ? 'femelle stérilisée' : castre === 'non' ? 'femelle entière' : 'femelle';
+  }
+
+  // Maladies diagnostiquées
+  const maladies = answers.q8 === 'oui' ? (answers.q8maladies || []) : [];
+  const maladiesAutre = document.getElementById('q8maladies-autre')?.value.trim() || '';
+  if (maladiesAutre) maladies.push(maladiesAutre);
+
+  // Traitement
+  const traitement = answers.q9 === 'oui' ? (document.getElementById('q9traitement')?.value.trim() || '') : '';
+
+  // Intolérances
+  const intolerances = (answers.q12 || []).filter(v => v !== 'aucune');
+  const intolerancesAutre = document.getElementById('q12-autre')?.value.trim() || '';
+
+  // Objectif
+  const objectifAutre = document.getElementById('q19-autre')?.value.trim() || '';
 
   const quizData = {
-    prenom:        answers.q1||'',
-    race:          answers.q2||'',
-    age:           answers.q3||'',
-    poids:         parseFloat(answers.q4)||null,
-    sexe:          answers.q5||'',
-    activite:      answers.q6||'',
-    environnement: answers.q7||'',
-    environnementAutre: environnementAutre,
-    alimentation:  answers.q8||[],
-    alimentationAutre: alimentationAutre,
-    antecedents:   answers.q9||'',
-    sante:         answers.q10||[],
-    traitements:   answers.q11||'',
-    pelage:        answers.q12||[],
-    selles:        answers.q13||'',
-    odeurs:        answers.q14||[],
-    comportementAlimentaire: answers.q15||[],
-    troublesComportement:    answers.q16||[],
-    troublesComportementAutre: troublesAutre,
-    etatDents:     answers.q17||'',
-    personnesVulnerables: answers.q18||[],
-    reactionsAllergiques: answers.q19||'',
-    reactionsAllergiquesAutre: allergiesAutre,
-    intolerances:  answers.q20||[],
+    prenom:        answers.q1 || '',
+    race:          answers.q2 || '',
+    age:           answers.q3 || '',
+    poids:         parseFloat(document.getElementById('q4')?.value) || null,
+    sexe:          sexeComplet,
+    activite:      answers.activite || '',
+    alimentation:  answers.q7 || [],
+    alimentationAutre: document.getElementById('q7-autre')?.value.trim() || '',
+    maladiesDiagnostiquees: maladies,
+    traitements:   traitement,
+    tracasQuotidiens: (answers.q10 || []).filter(v => v !== 'aucun'),
+    reactionsAllergiques: answers.q11 || '',
+    reactionStatut: answers.q11statut || '',
+    intolerances:  intolerances,
     intolerancesAutre: intolerancesAutre,
-    problemesOreilles: answers.q21||[],
-    problemesOreillesAutre: oreillesAutre,
-    glandesAnales: answers.q22||'',
-    calculsUrinaires: answers.q23||'',
-    stress:        answers.q24||'',
-    modeAlimentaire: answers.q25||'',
-    budget:        answers.q26||'',
-    equipement:    answers.q27||[],
-    tempsPrep:     answers.q28||'',
-    connaissances: answers.q29||'',
-    coursesOu:     answers.q30||[],
-    coursesOuAutre: coursesAutre,
-    autresAnimaux: answers.q31||[],
-    autresAnimauxAutre: animauxAutre,
-    frequenceMenus: answers.q32||'',
-    objectif:      answers.q33||[],
+    comportement:  answers.q13 || [],
+    modeAlimentaire: answers.q14 || '',
+    budget:        answers.budget || '',
+    equipement:    answers.q16 || [],
+    tempsPrep:     answers.q17 || '',
+    coursesOu:     answers.q18 || [],
+    objectif:      answers.q19 || [],
     objectifAutre: objectifAutre,
-    attentes:      answers.q34||'',
-
-    email:         answers.q35||'',
+    attentes:      document.getElementById('q20')?.value.trim() || '',
+    email:         answers.q21 || '',
     plan:          'beta',
   };
 
@@ -1457,9 +1032,7 @@ async function submitQuiz() {
     if (result.success) {
       document.getElementById('loadingScreen').style.display = 'none';
       document.getElementById('successScreen').style.display = 'block';
-    } else {
-      throw new Error(result.error||'Erreur inconnue');
-    }
+    } else throw new Error(result.error || 'Erreur inconnue');
   } catch(err) {
     console.error(err);
     document.getElementById('loadingScreen').style.display = 'none';
@@ -1469,6 +1042,5 @@ async function submitQuiz() {
   }
 }
 </script>
-
-
-</body></html>
+</body>
+</html>
