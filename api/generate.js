@@ -1,23 +1,103 @@
-// api/generate.js — v2
-// Nouveau parcours : rapport seul → bouton "Accéder à mon espace" → lien magique + menu
+// api/generate.js — v3
+// Aligné avec le nouveau quiz 21 questions (juin 2026)
+// Champs quiz → Supabase → espace client
 
-// ── SUPABASE ──────────────────────────────────────────────
+// ── HELPER : fusionner tableau + champ "autre" ─────────────
+function mergeAutre(arr, autre, excludeVals = []) {
+  const base = Array.isArray(arr)
+    ? arr.filter(v => !excludeVals.includes(v) && v !== 'autre' && v !== 'autres' && v !== 'autre maladie' && v !== 'problème spécifique')
+    : [];
+  if (autre && typeof autre === 'string' && autre.trim()) base.push(autre.trim());
+  return base;
+}
+
+// ── SAISON ─────────────────────────────────────────────────
+function getSaison() {
+  const m = new Date().getMonth() + 1;
+  if (m >= 3 && m <= 5) return 'Printemps';
+  if (m >= 6 && m <= 8) return 'Été';
+  if (m >= 9 && m <= 11) return 'Automne';
+  return 'Hiver';
+}
+
+// ── SUPABASE ───────────────────────────────────────────────
 async function saveToSupabase(data, statut) {
   const url = `${process.env.SUPABASE_URL}/rest/v1/user?on_conflict=email`;
 
-  // Fusion des champs "autre" avec leur liste correspondante
+  // ── Mapping nouveau quiz → colonnes Supabase ──────────────
+
+  // Intolérances alimentaires (Q12)
   const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
-  const sensibilites = mergeAutre(data.problemesOreilles, data.problemesOreillesAutre, ['non']);
-  const comportementParts = [
-    ...(Array.isArray(data.comportementAlimentaire) ? data.comportementAlimentaire : []),
-    ...mergeAutre(data.troublesComportement, data.troublesComportementAutre, ['aucun'])
-  ];
-  const environnement = data.environnement === 'autre' && data.environnementAutre
-    ? data.environnementAutre
-    : data.environnement;
-  const antecedentsTexte = data.antecedents && data.antecedents.trim()
-    ? data.antecedents.trim()
-    : 'Aucun antécédent particulier signalé';
+
+  // Sensibilités / tracas quotidiens (Q10) — était pointé vers problemesOreilles, corrigé
+  const sensibilites = mergeAutre(data.tracasQuotidiens, null, ['aucun']);
+
+  // Comportement (Q13)
+  const comportement = Array.isArray(data.comportement)
+    ? data.comportement.filter(v => v && v !== 'aucun')
+    : [];
+
+  // Maladies diagnostiquées (Q8)
+  const maladies = data.maladiesDiagnostiquees && Array.isArray(data.maladiesDiagnostiquees)
+    ? data.maladiesDiagnostiquees
+    : [];
+
+  // Objectifs (Q19)
+  const objectifs = mergeAutre(data.objectif, data.objectifAutre);
+
+  // Alimentation actuelle (Q7)
+  const alimentation = mergeAutre(data.alimentation, data.alimentationAutre);
+
+  // Lieux de courses (Q18)
+  const coursesOu = mergeAutre(data.coursesOu, null);
+
+  // Réactions allergiques (Q11)
+  const reactionsAllergiques = data.reactionsAllergiques || null;
+  const reactionStatut = data.reactionStatut || null;
+
+  // Attentes libres (Q20)
+  const attentes = data.attentes && data.attentes.trim() ? data.attentes.trim() : null;
+
+  // Traitements (Q9)
+  const traitements = data.traitements && data.traitements.trim() ? data.traitements.trim() : null;
+
+  // Comportement texte agrégé pour affichage
+  const comportementTexte = comportement.length > 0 ? comportement.join(', ') : null;
+
+  const body = {
+    email:                   data.email,
+    prenom_chien:            data.prenom || null,
+    race:                    data.race || null,
+    poids:                   data.poids ? parseFloat(data.poids) : null,
+    age:                     data.age || null,
+    sexe:                    data.sexe || null,
+    activite:                data.activite || null,
+    plan:                    data.plan || 'beta',
+    statut:                  statut,
+    rapport_envoye:          true,
+    menu_envoye:             false,
+
+    // Santé
+    allergies:               intolerances,          // Q12
+    sensibilites:            sensibilites,          // Q10 (tracas quotidiens)
+    comportement:            comportementTexte,     // Q13
+    maladies:                maladies,              // Q8
+    traitements:             traitements,           // Q9
+    reactions_allergiques:   reactionsAllergiques,  // Q11
+    reaction_statut:         reactionStatut,        // Q11 statut
+
+    // Projet
+    mode_alimentaire:        data.modeAlimentaire || null,   // Q14
+    budget:                  data.budget || null,            // Q15
+    equipement:              Array.isArray(data.equipement) ? data.equipement : [], // Q16
+    temps_prep:              data.tempsPrep || null,         // Q17
+    courses_ou:              coursesOu,                      // Q18
+    objectifs:               objectifs,                      // Q19
+    attentes:                attentes,                       // Q20
+
+    // Données contextuelles
+    alimentation_actuelle:   alimentation,
+  };
 
   const response = await fetch(url, {
     method: 'POST',
@@ -27,33 +107,9 @@ async function saveToSupabase(data, statut) {
       'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
       'Prefer': 'return=minimal,resolution=merge-duplicates'
     },
-    body: JSON.stringify({
-      email: data.email,
-      prenom: data.prenom,
-      prenom_chien: data.prenom,
-      race: data.race,
-      poids: data.poids,
-      age: data.age,
-      sexe: data.sexe,
-      plan: data.plan || 'beta',
-      statut: statut,
-      rapport_envoye: true,
-      menu_envoye: false, // le menu sera envoyé après connexion
-
-      // ── Données enrichies du quiz, utilisées par l'espace client ──
-      antecedents: antecedentsTexte,
-      allergies: intolerances,
-      sensibilites: sensibilites,
-      activite: data.activite || null,
-      environnement: environnement || null,
-      comportement: comportementParts.length > 0 ? comportementParts.join(', ') : 'Mange normalement',
-      frequence_repas: data.frequenceMenus || null,
-      objectifs: mergeAutre(data.objectif, data.objectifAutre)
-    })
+    body: JSON.stringify(body)
   });
 
-  // Vérification explicite : sans ça, une erreur Supabase (mauvais type de
-  // colonne, contrainte violée, etc.) passe complètement inaperçue.
   if (!response.ok) {
     const errBody = await response.text().catch(() => '');
     console.error('Erreur saveToSupabase:', response.status, errBody);
@@ -62,6 +118,107 @@ async function saveToSupabase(data, statut) {
   return response;
 }
 
+// ── PROMPT RAPPORT ─────────────────────────────────────────
+function buildRapportPrompt(data, saison, pm) {
+
+  // Mapping champs nouveau quiz
+  const alimentation    = mergeAutre(data.alimentation, data.alimentationAutre);
+  const intolerances    = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
+  const tracas          = mergeAutre(data.tracasQuotidiens, null, ['aucun']);
+  const comportement    = Array.isArray(data.comportement) ? data.comportement.filter(v => v && v !== 'aucun') : [];
+  const maladies        = Array.isArray(data.maladiesDiagnostiquees) ? data.maladiesDiagnostiquees : [];
+  const objectifs       = mergeAutre(data.objectif, data.objectifAutre);
+  const coursesOu       = mergeAutre(data.coursesOu, null);
+  const reactionsAllerg = data.reactionsAllergiques || 'aucune';
+  const traitements     = data.traitements || 'aucun';
+  const attentes        = data.attentes || null;
+
+  const nom = data.prenom || 'ton chien';
+
+  return `Tu es Kyno, expert en nutrition canine individualisée basé sur les références NRC 2006 et FEDIAF 2023. Ton ton est chaleureux, expert et direct. Tu tutoies le propriétaire et parles du chien par son prénom "${nom}". Tu ne donnes JAMAIS de quantités en grammes dans ce rapport — uniquement dans le menu séparé.
+
+## PROFIL DE ${nom.toUpperCase()}
+- Prénom : ${nom}
+- Race : ${data.race || 'non renseigné'}
+- Âge : ${data.age || 'non renseigné'}
+- Poids : ${data.poids ? data.poids + ' kg' : 'non renseigné'}
+- Poids métabolique : ${pm} kg PM
+- Sexe / Statut : ${data.sexe || 'non renseigné'}
+- Niveau d'activité : ${data.activite || 'non renseigné'}
+- Saison actuelle : ${saison}
+
+## SANTÉ
+- Alimentation actuelle : ${alimentation.length > 0 ? alimentation.join(', ') : 'non renseigné'}
+- Maladies diagnostiquées : ${maladies.length > 0 ? maladies.join(', ') : 'aucune'}
+- Traitements en cours : ${traitements}
+- Petits tracas quotidiens : ${tracas.length > 0 ? tracas.join(', ') : 'aucun'}
+- Réactions allergiques : ${reactionsAllerg}${data.reactionStatut ? ' (' + data.reactionStatut + ')' : ''}
+- Intolérances alimentaires : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
+- Comportement alimentaire / caractère : ${comportement.length > 0 ? comportement.join(', ') : 'non renseigné'}
+
+## PROJET
+- Mode souhaité : ${data.modeAlimentaire || 'non renseigné'}
+- Budget : ${data.budget || 'non renseigné'}
+- Équipement disponible : ${Array.isArray(data.equipement) && data.equipement.length > 0 ? data.equipement.join(', ') : 'non renseigné'}
+- Temps de préparation : ${data.tempsPrep || 'non renseigné'}
+- Lieux de courses : ${coursesOu.length > 0 ? coursesOu.join(', ') : 'non renseigné'}
+- Objectif(s) : ${objectifs.length > 0 ? objectifs.join(', ') : 'non renseigné'}
+- Attentes libres : ${attentes || 'aucune'}
+
+## CALCUL BEE
+Calcule BEE = 110 × (${data.poids || '?'})^0.75 et applique le coefficient selon l'activité (${data.activite || 'modéré'}).
+Exprime le résultat en kcal/jour de façon simple. Ne donne pas de quantités en grammes ici.
+
+## PRÉDISPOSITIONS RACIALES
+Identifie les alertes pour "${data.race || 'cette race'}" parmi : DCM/taurine, cuivre, MDR1, obésité, EPI, brachycéphales, épagneul breton (articulations, tendons).
+Si aucune prédisposition connue, ne pas inventer.
+
+## AJUSTEMENT SAISONNIER — ${saison.toUpperCase()}
+${saison === 'Printemps' ? 'Mue intense : renforcer oméga-3, zinc, biotine. Aliments de saison.' : ''}
+${saison === 'Été' ? 'Hydratation prioritaire. Repas aux heures fraîches. Aliments frais et humides.' : ''}
+${saison === 'Automne' ? 'Renforcement immunitaire : zinc, oméga-3, probiotiques.' : ''}
+${saison === 'Hiver' ? "Adapter les apports caloriques selon l'activité et l'environnement." : ''}
+
+## COMPLÉMENTS PRIORITAIRES
+Les 3-5 compléments clés avec dosages selon le poids métabolique (${pm} kg PM).
+Rappel : oméga-3 + vitamine E ensemble, CMV obligatoire en ration ménagère.
+${tracas.includes('otites') ? `Otites signalées : envisager réduction des sources d'intolérance et apport d'oméga-3.` : ''}
+${tracas.includes('selles molles') || tracas.includes('vomissements') ? `Troubles digestifs signalés : adapter les fibres et les sources protéiques.` : ''}
+${tracas.includes('pelage terne') || tracas.includes('chute de poils excessive') ? `Problème de pelage signalé : renforcer les apports en oméga-3 et zinc.` : ''}
+${tracas.includes('peau irritée') || tracas.includes('démangeaisons') ? `Peau irritée / démangeaisons : surveiller les intolérances et apporter des acides gras essentiels.` : ''}
+
+## LIENS NUTRITION / COMPORTEMENT
+${comportement.length > 0 ? `
+Comportements signalés : ${comportement.join(', ')}.
+Analyse les liens possibles avec l'alimentation (manque de tryptophane, excès de sucres rapides, carence en magnésium…).
+Sois concret et pratique.
+` : 'Le comportement de ce chien ne nécessite pas d\'ajustements nutritionnels spécifiques.'}
+
+## ALERTES
+- Aliments interdits : raisin, oignon/ail/poireau, chocolat, xylitol, os cuits, avocat, macadamia
+${intolerances.length > 0 ? `- Intolérances à éviter absolument : ${intolerances.join(', ')}` : ''}
+${traitements !== 'aucun' ? `- Traitements en cours (${traitements}) : vérifie les interactions possibles avec l'alimentation.` : ''}
+${maladies.length > 0 ? `- Maladies diagnostiquées (${maladies.join(', ')}) : adapter le plan en conséquence et consulter le vétérinaire.` : ''}
+
+## FORMAT DU RAPPORT (600-800 mots)
+Structure :
+1. Titre accrocheur personnalisé avec le prénom de ${nom}
+2. Résumé du profil en 3-4 lignes percutantes
+3. BEE calculé et expliqué simplement (sans grammes)
+4. Ce qui manque dans son alimentation actuelle (${alimentation.join(', ') || 'non renseigné'})
+5. Besoins nutritionnels spécifiques (sans grammes)
+6. Alertes raciales si pertinent pour ${data.race || 'cette race'}
+7. Ajustement saisonnier ${saison}
+8. Liens nutrition/comportement si pertinent
+9. Compléments prioritaires avec dosages
+10. Aliments à éviter absolument
+11. Ce que ça va changer en 4-6 semaines
+12. Phrase finale : "Ton menu de la semaine t'attend dans ton espace Kyno."
+
+Note légale : Ce rapport est éducatif et ne remplace pas un avis vétérinaire.`;
+}
+
+// ── HANDLER PRINCIPAL ──────────────────────────────────────
 module.exports = async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -73,12 +230,14 @@ module.exports = async function handler(req, res) {
 
   try {
     const data = req.body;
-    if (!data.prenom || !data.race) return res.status(400).json({ error: 'Données incomplètes' });
+    if (!data.prenom || !data.race) {
+      return res.status(400).json({ error: 'Données incomplètes — prénom et race requis' });
+    }
 
     const saison = getSaison();
-    const pm = data.poids ? Math.pow(data.poids, 0.75).toFixed(2) : 'à calculer';
+    const pm = data.poids ? Math.pow(parseFloat(data.poids), 0.75).toFixed(2) : 'à calculer';
 
-    // ── GÉNÉRATION DU RAPPORT UNIQUEMENT ─────────────────
+    // ── Génération du rapport ──────────────────────────────
     const rapportResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -96,17 +255,16 @@ module.exports = async function handler(req, res) {
 
     if (!rapportResponse.ok) {
       const err = await rapportResponse.json();
-      throw new Error(err.error?.message || 'Erreur API Anthropic rapport');
+      throw new Error(err.error?.message || 'Erreur API Anthropic');
     }
 
     const rapportResult = await rapportResponse.json();
     const rapport = rapportResult.content[0].text;
 
-    // ── SAUVEGARDE SUPABASE + ENVOI EMAIL RAPPORT ────────
-    // Les deux en parallèle pour la vitesse
-    const prenomChien = data.prenom || 'ton chien';
+    const prenomChien = data.prenom;
     const statut = data.plan === 'beta' ? 'beta' : 'waitlist';
 
+    // ── Sauvegarde + email en parallèle ───────────────────
     await Promise.all([
       data.email ? sendEmailRapport(data.email, prenomChien, rapport, data) : Promise.resolve(),
       data.email ? saveToSupabase(data, statut) : Promise.resolve()
@@ -120,117 +278,7 @@ module.exports = async function handler(req, res) {
   }
 };
 
-// ── HELPER : fusionner un tableau de valeurs avec un champ "autre" ──
-function mergeAutre(arr, autre, excludeVals = []) {
-  const base = Array.isArray(arr) ? arr.filter(v => !excludeVals.includes(v) && v !== 'autre' && v !== 'autres') : [];
-  if (autre && autre.trim()) base.push(autre.trim());
-  return base;
-}
-
-// ── PROMPT RAPPORT ────────────────────────────────────────
-function buildRapportPrompt(data, saison, pm) {
-  const alimentation = mergeAutre(data.alimentation, data.alimentationAutre);
-  const sante = Array.isArray(data.sante) ? data.sante.filter(v => v !== 'aucun') : [];
-  const pelage = Array.isArray(data.pelage) ? data.pelage.filter(v => v !== 'brillant') : [];
-  const odeurs = Array.isArray(data.odeurs) ? data.odeurs.filter(v => v !== 'aucune') : [];
-  const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
-  const comportement = mergeAutre(data.troublesComportement, data.troublesComportementAutre, ['aucun']);
-  const oreilles = mergeAutre(data.problemesOreilles, data.problemesOreillesAutre, ['non']);
-  const environnement = data.environnement === 'autre' && data.environnementAutre ? data.environnementAutre : data.environnement;
-  const reactionsAllergiques = data.reactionsAllergiques === 'autre' && data.reactionsAllergiquesAutre ? data.reactionsAllergiquesAutre : data.reactionsAllergiques;
-  const objectif = mergeAutre(data.objectif, data.objectifAutre);
-  const coursesOu = mergeAutre(data.coursesOu, data.coursesOuAutre);
-  const glandesAnales = data.glandesAnales && data.glandesAnales !== 'aucun' ? data.glandesAnales : null;
-  const antecedents = data.antecedents && data.antecedents.trim() ? data.antecedents.trim() : null;
-
-  return `Tu es Kyno, expert en nutrition canine individualisée basé sur les références NRC 2006 et FEDIAF 2023. Ton ton est chaleureux, expert et direct. Tu tutoies le propriétaire et parles du chien par son prénom. Tu ne donnes JAMAIS de quantités en grammes dans ce rapport — uniquement dans le menu séparé.
-
-## PROFIL DE ${data.prenom.toUpperCase()}
-- Prénom : ${data.prenom}
-- Race : ${data.race}
-- Âge : ${data.age}
-- Poids : ${data.poids ? data.poids + ' kg' : 'non renseigné'}
-- Poids métabolique : ${pm} kg PM
-- Sexe/Statut : ${data.sexe}
-- Niveau d'activité : ${data.activite}
-- Environnement : ${environnement}
-- Saison actuelle : ${saison}
-- Niveau de stress : ${data.stress || 'non renseigné'}
-
-## SANTÉ
-- Alimentation actuelle : ${alimentation.length > 0 ? alimentation.join(', ') : 'non renseigné'}
-- Antécédents médicaux : ${antecedents || 'aucun antécédent particulier signalé'}
-- Problèmes de santé : ${sante.length > 0 ? sante.join(', ') : 'aucun'}
-- Traitements : ${data.traitements || 'aucun'}
-- Pelage : ${pelage.length > 0 ? pelage.join(', ') : 'bon état'}
-- Selles : ${data.selles}
-- Odeurs : ${odeurs.length > 0 ? odeurs.join(', ') : 'aucune'}
-- Réactions allergiques passées : ${reactionsAllergiques || 'aucune'}
-- Intolérances : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
-- Problèmes d'oreilles : ${oreilles.length > 0 ? oreilles.join(', ') : 'aucun'}
-- Glandes anales : ${glandesAnales || 'aucun problème signalé'}
-- Troubles du comportement : ${comportement.length > 0 ? comportement.join(', ') : 'aucun'}
-
-## PROJET
-- Mode souhaité : ${data.modeAlimentaire}
-- Budget : ${data.budget}
-- Lieux de courses habituels : ${coursesOu.length > 0 ? coursesOu.join(', ') : 'non renseigné'}
-- Objectif : ${objectif.length > 0 ? objectif.join(', ') : 'non renseigné'}
-- Attentes libres : ${data.attentes || 'aucune'}
-
-## CALCUL BEE
-Calcule BEE = 110 × (${data.poids})^0.75 et applique le coefficient selon l'activité.
-Exprime le résultat en kcal/jour de façon simple et compréhensible.
-Ne donne pas de quantités en grammes ici.
-
-## PRÉDISPOSITIONS RACIALES
-Identifie les alertes pour "${data.race}" parmi : DCM/taurine, cuivre, MDR1, obésité, EPI, brachycéphales, épagneul breton (articulations/tendons).
-Si aucune prédisposition connue, ne pas inventer.
-
-## AJUSTEMENT SAISONNIER — ${saison.toUpperCase()}
-${saison === 'Printemps' ? 'Mue intense : oméga-3, zinc, biotine. Aliments de saison recommandés.' : ''}
-${saison === 'Été' ? 'Hydratation prioritaire. Repas aux heures fraîches. Aliments frais et humides.' : ''}
-${saison === 'Automne' ? 'Renforcement immunitaire : zinc, oméga-3, probiotiques.' : ''}
-${saison === 'Hiver' ? "Adapter les apports selon le niveau d'activité et l'environnement." : ''}
-
-## COMPLÉMENTS PRIORITAIRES
-Les 3-5 compléments clés avec dosages selon le poids métabolique.
-Rappel : oméga-3 + vitamine E ensemble, CMV obligatoire en ration ménagère.
-${glandesAnales ? `Si pertinent, mentionne l'apport en fibres (citrouille, psyllium) pour soutenir la fonction des glandes anales (signalé : ${glandesAnales}).` : ''}
-
-## NUTRITION & COMPORTEMENT
-${comportement.length > 0 || data.stress !== 'très calme' ? `
-Analyse les liens entre nutrition et comportement pour ce profil.
-Troubles déclarés : ${comportement.length > 0 ? comportement.join(', ') : 'aucun'}
-Niveau de stress : ${data.stress || 'non renseigné'}
-Sois concret et pratique — quels aliments intégrer, lesquels éviter.
-` : 'Le comportement de ce chien ne nécessite pas d\'ajustements nutritionnels spécifiques.'}
-
-## ALERTES
-- Aliments interdits : raisin, oignon/ail/poireau, chocolat, xylitol, os cuits, avocat, macadamia
-- Interactions médicaments si traitements : ${data.traitements || 'aucun'}
-${oreilles.length > 0 ? `- Problèmes d'oreilles signalés (${oreilles.join(', ')}) : évoque le lien possible avec une intolérance alimentaire.` : ''}
-${antecedents ? `- Antécédents médicaux signalés (${antecedents}) : prends-en compte dans les recommandations.` : ''}
-
-## FORMAT DU RAPPORT (600-800 mots)
-Structure :
-1. Titre accrocheur personnalisé avec le prénom
-2. Résumé du profil en 3-4 lignes percutantes
-3. BEE calculé et expliqué simplement (sans grammes)
-4. Ce qui manque dans l'alimentation actuelle
-5. Besoins nutritionnels spécifiques (sans grammes)
-6. Alertes raciales si pertinent
-7. Ajustement saisonnier ${saison}
-8. Nutrition & comportement (si pertinent)
-9. Compléments prioritaires avec dosages
-10. Aliments à éviter absolument
-11. Ce que ça va changer en 4-6 semaines
-12. Phrase finale : "Ton menu de la semaine t'attend dans ton espace Kyno."
-
-Note légale : Ce rapport est éducatif et ne remplace pas un avis vétérinaire.`;
-}
-
-// ── EMAIL RAPPORT ─────────────────────────────────────────
+// ── EMAIL RAPPORT ──────────────────────────────────────────
 async function sendEmailRapport(email, prenom, rapport, data) {
   const htmlRapport = rapport
     .replace(/\n\n/g, '</p><p style="margin:0 0 16px;">')
@@ -239,7 +287,6 @@ async function sendEmailRapport(email, prenom, rapport, data) {
     .replace(/^/, '<p style="margin:0 0 16px;">')
     .replace(/$/, '</p>');
 
-  // URL vers la page d'accès avec l'email pré-rempli
   const accessUrl = `https://project-jlc6z.vercel.app/acces.html?email=${encodeURIComponent(email)}`;
 
   await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -257,7 +304,7 @@ async function sendEmailRapport(email, prenom, rapport, data) {
   });
 }
 
-// ── TEMPLATE EMAIL RAPPORT ────────────────────────────────
+// ── TEMPLATE EMAIL ─────────────────────────────────────────
 function buildEmailHtml(prenom, htmlContent, accessUrl) {
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -279,8 +326,8 @@ function buildEmailHtml(prenom, htmlContent, accessUrl) {
 
       <tr>
         <td style="background:#2FA35E;padding:20px 48px;border-bottom:3px solid #F2843C;">
-          <p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Rapport personnalisé</p>
-          <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FBFDF7;">Le rapport nutritionnel de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em> est prêt</p>
+          <p style="margin:0 0 8px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Rapport personnalisé</p>
+          <p style="margin:0;font-size:26px;font-weight:700;color:#FBFDF7;">Le rapport nutritionnel de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em> est prêt</p>
         </td>
       </tr>
 
@@ -300,7 +347,6 @@ function buildEmailHtml(prenom, htmlContent, accessUrl) {
         </td>
       </tr>
 
-      <!-- CTA PRINCIPAL : accéder à l'espace + menu -->
       <tr>
         <td style="background:#FBFDF7;padding:32px 48px;">
           <div style="background:#2B3A2E;border-radius:14px;padding:36px;text-align:center;border:3px solid #F2843C;">
@@ -345,13 +391,4 @@ function buildEmailHtml(prenom, htmlContent, accessUrl) {
   </table>
 </body>
 </html>`;
-}
-
-// ── SAISON ────────────────────────────────────────────────
-function getSaison() {
-  const m = new Date().getMonth() + 1;
-  if (m >= 3 && m <= 5) return 'Printemps';
-  if (m >= 6 && m <= 8) return 'Été';
-  if (m >= 9 && m <= 11) return 'Automne';
-  return 'Hiver';
 }
