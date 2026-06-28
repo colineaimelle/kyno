@@ -1,6 +1,5 @@
-// api/chat.js — v2
-// Répond en JSON structuré : { reply, updates, generer_menu }
-// Met à jour le profil Supabase en temps réel + génère le menu au même format que magic-link.js
+// api/chat.js — v3
+// 1 seule recette par menu (donnée matin et soir)
 
 module.exports = async function handler(req, res) {
 
@@ -23,12 +22,10 @@ module.exports = async function handler(req, res) {
     const estFemelle = sexe.includes('femelle');
     const allergies = Array.isArray(profile.allergies) ? profile.allergies : [];
 
-    // ── Contexte du menu actuel ────────────────────────────────────────
     const recettesActuelles = Array.isArray(profile.recettes) && profile.recettes.length > 0
       ? profile.recettes.map(r => `- ${r.moment} : ${r.titre} (${r.ration}g/repas)`).join('\n')
       : 'Aucun menu actif pour le moment.';
 
-    // ── Prompt système ─────────────────────────────────────────────────
     const systemPrompt = `Tu es Kyno, expert en nutrition canine individualisée (NRC 2006, FEDIAF 2023).
 Tu suis l'évolution de ${nom} (${profile.race || 'race inconnue'}, ${profile.poids ? profile.poids + ' kg' : 'poids inconnu'}, ${profile.sexe || 'sexe inconnu'}).
 Tu es chaleureux, précis et direct. Tu tutoies toujours le propriétaire et parles du chien par son prénom.
@@ -61,21 +58,16 @@ Tu réponds TOUJOURS avec ce JSON exact, sans texte avant ni après, sans balise
 
 {
   "reply": "ta réponse au propriétaire, en texte naturel. Utilise **texte** pour le gras.",
-  "updates": {
-    // Uniquement les champs à mettre à jour, vide {} si rien ne change.
-    // Champs possibles : poids (number), allergies (array — nouvelles allergies SEULEMENT, pas les existantes),
-    // antecedents (string — texte complet mis à jour), activite (string), comportement (string), sexe (string)
-  },
+  "updates": {},
   "generer_menu": false
 }
 
 RÈGLES SUR generer_menu :
 - true UNIQUEMENT si les changements justifient un nouveau menu ET que tu l'annonces dans reply
 - Déclencheurs valides : nouvelle allergie/intolérance confirmée, changement de poids > 5%, problème digestif persistant, changement d'activité majeur, demande explicite du propriétaire
-- false pour tout le reste : questions de suivi, confirmations, encouragements, premier message
+- false pour tout le reste
 - Ne mets JAMAIS true deux fois dans la même conversation sauf si la première génération a eu lieu il y a plus de 7 messages`;
 
-    // ── Formater les messages pour l'API ──────────────────────────────
     const formattedMessages = messages
       .filter(m => m.role === 'user' || m.role === 'assistant')
       .map(m => ({ role: m.role, content: m.content }));
@@ -84,7 +76,6 @@ RÈGLES SUR generer_menu :
       return res.status(400).json({ error: "Le premier message doit être de l'utilisateur" });
     }
 
-    // ── Appel Claude — réponse JSON ───────────────────────────────────
     const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -107,8 +98,6 @@ RÈGLES SUR generer_menu :
 
     const claudeResult = await claudeRes.json();
     let rawText = claudeResult.content[0].text.trim();
-
-    // Nettoyer d'éventuelles balises markdown
     rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
     const first = rawText.indexOf('{');
     const last = rawText.lastIndexOf('}');
@@ -118,8 +107,7 @@ RÈGLES SUR generer_menu :
     try {
       parsed = JSON.parse(rawText);
     } catch (e) {
-      // Fallback : Claude n'a pas respecté le format JSON — on renvoie le texte brut
-      console.error('Parsing JSON réponse chat échoué:', e.message, '| texte:', rawText.slice(0, 300));
+      console.error('Parsing JSON réponse chat échoué:', e.message);
       return res.status(200).json({ success: true, reply: rawText, menuGenere: false });
     }
 
@@ -127,33 +115,23 @@ RÈGLES SUR generer_menu :
     const updates = parsed.updates || {};
     const genererMenu = parsed.generer_menu === true;
 
-    // ── Mettre à jour le profil Supabase si nécessaire ─────────────────
     if (email && Object.keys(updates).length > 0) {
       const patch = { ...updates };
-
-      // Fusionner les nouvelles allergies avec les existantes (sans doublons)
       if (Array.isArray(updates.allergies) && updates.allergies.length > 0) {
         const merged = [...new Set([...allergies, ...updates.allergies])];
         patch.allergies = merged;
       }
-
       await patchSupabase(email, patch);
-
-      // Mettre à jour le profil local pour la génération de menu qui suit
       Object.assign(profile, patch);
     }
 
-    // ── Générer et sauvegarder le menu si demandé ─────────────────────
     let menuGenere = false;
-
     if (genererMenu && email) {
       try {
-        // Les allergies fusionnées sont déjà dans profile (mis à jour ci-dessus)
         const updatedPm = profile.poids ? Math.pow(profile.poids, 0.75).toFixed(2) : pm;
         menuGenere = await generateAndSaveMenu(email, profile, saison, updatedPm);
       } catch (menuErr) {
         console.error('Erreur génération menu depuis chat:', menuErr);
-        // On ne fait pas échouer la requête : la réponse chat est déjà là
       }
     }
 
@@ -165,7 +143,6 @@ RÈGLES SUR generer_menu :
   }
 };
 
-// ── PATCH SUPABASE ────────────────────────────────────────────────────
 async function patchSupabase(email, fields) {
   const res = await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
@@ -186,7 +163,6 @@ async function patchSupabase(email, fields) {
   }
 }
 
-// ── GÉNÉRER, SAUVEGARDER ET ENVOYER LE MENU ──────────────────────────
 async function generateAndSaveMenu(email, profile, saison, pm) {
   const nom = profile.prenom_chien || profile.prenom || 'ton chien';
 
@@ -199,7 +175,7 @@ async function generateAndSaveMenu(email, profile, saison, pm) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
-      max_tokens: 8000,
+      max_tokens: 6000,
       system: buildMenuPrompt(profile, saison, pm),
       messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
     })
@@ -212,7 +188,6 @@ async function generateAndSaveMenu(email, profile, saison, pm) {
 
   const menuResult = await menuRes.json();
   let rawText = menuResult.content[0].text.trim();
-
   rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
   const first = rawText.indexOf('{');
   const last = rawText.lastIndexOf('}');
@@ -222,31 +197,29 @@ async function generateAndSaveMenu(email, profile, saison, pm) {
   try {
     menuData = JSON.parse(rawText);
   } catch (parseErr) {
-    console.error('Erreur parsing JSON menu (chat):', parseErr.message, '| fin:', rawText.slice(-200));
+    console.error('Erreur parsing JSON menu (chat):', parseErr.message);
     throw parseErr;
   }
 
-  // Sauvegarder dans Supabase
+  // ── 1 SEULE RECETTE sauvegardée ──
   await patchSupabase(email, {
-    menu_texte: menuData.email_html || '',
-    recettes: [menuData.recette_matin, menuData.recette_soir].filter(Boolean),
-    batch_steps: menuData.batch_steps || [],
-    courses: menuData.courses || [],
+    menu_texte:   menuData.email_html || '',
+    recettes:     menuData.recette ? [menuData.recette] : [],
+    batch_steps:  menuData.batch_steps || [],
+    batch_time:   menuData.batch_time || null,
+    batch_special: menuData.batch_special || null,
+    courses:      menuData.courses || [],
     cout_semaine: menuData.cout_semaine || null,
-    cout_indus: menuData.cout_indus || null,
-    economie: menuData.economie || null,
-    batch_time: menuData.batch_time || null,
-    menu_envoye: true
+    cout_indus:   menuData.cout_indus || null,
+    economie:     menuData.economie || null,
+    menu_envoye:  true
   });
 
-  // Envoyer par email
   await sendEmailMenu(email, nom, menuData.email_html || '');
-
   console.log(`Menu chat généré et sauvegardé pour ${nom} (${email})`);
   return true;
 }
 
-// ── PROMPT MENU — même format JSON que magic-link.js ─────────────────
 function buildMenuPrompt(profile, saison, pm) {
   const nom = profile.prenom_chien || profile.prenom || 'ton chien';
   const intolerances = Array.isArray(profile.allergies) ? profile.allergies : [];
@@ -256,13 +229,11 @@ function buildMenuPrompt(profile, saison, pm) {
     ? `⚠️ INTERDICTION ABSOLUE — LIS CECI EN PREMIER :
 Les ingrédients suivants sont STRICTEMENT INTERDITS dans ce menu : ${intolerances.join(', ')}.
 NE LES UTILISE JAMAIS, ni dans les recettes, ni dans la liste de courses, ni dans le email_html.
-Peu importe leur valeur nutritionnelle. Une violation de cette règle met la vie du chien en danger.
-Si tu n'as aucun autre choix pour une catégorie d'ingrédient, choisis une alternative totalement différente.
 
 `
     : '';
 
-  return `${interdictionBlock}Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown \`\`\`.
+  return `${interdictionBlock}Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown.
 
 ## PROFIL
 - Prénom : ${nom}
@@ -274,66 +245,55 @@ Si tu n'as aucun autre choix pour une catégorie d'ingrédient, choisis une alte
 - Budget : ${profile.budget || 'moyen'}
 - Équipement : ${equipement.join(', ') || 'standard'}
 - Temps préparation : ${profile.tempsPrep || profile.temps_prep || 'non renseigné'}
-- Intolérances INTERDITES (aucune exception) : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
+- Intolérances INTERDITES : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
 
 ## CONCEPT DU MENU
 Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
-- 2 recettes uniquement : une pour le repas du MATIN, une pour le repas du SOIR
-- Les recettes sont cuisinées en grande quantité pour toute la semaine (×7 jours)
-- Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur en portions
-- Les portions sont décongelées la veille au frigo
+- 1 SEULE RECETTE pour toute la semaine, servie matin et soir
+- Cuisinée en grande quantité pour 7 jours (×14 repas)
+- Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur
 - Adapte les légumes et protéines à la saison : ${saison}
 
-## STRUCTURE JSON EXACTE À RESPECTER
+## STRUCTURE JSON EXACTE
 
 {
-  "recette_matin": {
-    "moment": "Le matin",
-    "color": "#FFCE2E",
+  "recette": {
+    "moment": "Menu du jour",
+    "color": "#2B3A2E",
     "titre": "nom de la recette, court et appétissant",
-    "ration": nombre en grammes (ration par repas, pas le total semaine),
+    "ration": nombre en grammes par repas (matin = soir = même quantité),
     "ingredients": [
       { "name": "nom de l'ingrédient", "qty": "quantité par repas, ex: 80 g" }
     ],
     "note": "note nutritionnelle courte, 1 phrase, pourquoi cette recette est bonne pour ${nom}"
   },
-  "recette_soir": {
-    "moment": "Le soir",
-    "color": "#2FA35E",
-    "titre": "nom de la recette, court et appétissant",
-    "ration": nombre en grammes (ration par repas, pas le total semaine),
-    "ingredients": [
-      { "name": "nom de l'ingrédient", "qty": "quantité par repas, ex: 105 g" }
-    ],
-    "note": "note nutritionnelle courte, 1 phrase"
-  },
   "batch_time": "≈ XX min de prépa",
   "batch_steps": [
-    { "n": 1, "text": "étape détaillée et concrète, avec temps de cuisson si pertinent" },
+    { "n": 1, "text": "étape détaillée avec temps de cuisson" },
     { "n": 2, "text": "..." },
-    { "n": 3, "text": "..." },
-    { "n": 4, "text": "..." }
+    { "n": 3, "text": "..." }
   ],
+  "batch_special": "instruction spéciale au moment du repas (huile, CMV, etc.) — à ajouter JAMAIS à la cuisson",
   "courses": [
-    { "name": "ingrédient", "qty": "quantité totale pour 7 jours, ex: 560 g" }
+    { "cat": "Viandes & poissons", "items": [{ "name": "ingrédient", "qty": "quantité totale 7 jours" }] },
+    { "cat": "Légumes & féculents", "items": [{ "name": "ingrédient", "qty": "quantité totale 7 jours" }] },
+    { "cat": "Compléments", "items": [{ "name": "ingrédient", "qty": "quantité totale 7 jours" }] }
   ],
-  "cout_semaine": "XX,XX €",
+  "cout_semaine": "XX €",
   "cout_indus": "XX €",
-  "economie": "XX,XX €",
-  "email_html": "Texte complet du menu en Markdown. Utilise \\n pour les retours à la ligne et ** pour le gras. Commence par 'Voici le menu de la semaine de ${nom} !'"
+  "economie": "XX €",
+  "email_html": "Texte complet du menu en Markdown. Commence par 'Voici le menu de la semaine de ${nom} !'"
 }
 
-## RÈGLES IMPORTANTES
-- Les valeurs "ration" et "qty" dans recette_matin/recette_soir sont les quantités PAR REPAS
-- Les valeurs "qty" dans "courses" sont les quantités TOTALES pour 7 jours
-- "color" reste fixe : "#FFCE2E" pour le matin, "#2FA35E" pour le soir
-- "cout_indus" : estimation prix livraison industrielle (Butternut Box, Pet's Deli)
-- "economie" = cout_indus - cout_semaine
-- INTERDICTION ABSOLUE (rappel final) : ${intolerances.length > 0 ? `ces ingrédients ne doivent apparaître nulle part : ${intolerances.join(', ')}` : 'aucune intolérance déclarée'}
-- Le JSON doit être strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles`;
+## RÈGLES
+- "ration" dans recette = quantité PAR REPAS (matin et soir identiques)
+- "qty" dans ingredients = quantité par repas
+- "qty" dans courses = quantité TOTALE pour 7 jours (×14 repas)
+- batch_special : toujours mentionner huile + CMV à ajouter au bol au moment du repas
+- INTERDICTION ABSOLUE (rappel) : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune intolérance'}
+- JSON strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles`;
 }
 
-// ── EMAIL MENU ────────────────────────────────────────────────────────
 async function sendEmailMenu(email, prenom, menu) {
   const htmlMenu = menu
     .replace(/\n\n/g, '</p><p style="margin:0 0 16px;">')
@@ -405,7 +365,7 @@ function buildEmailMenuHtml(prenom, htmlContent) {
       <tr>
         <td style="background:#FBFDF7;padding:0 48px 32px;">
           <div style="border-top:1px solid #DDE8DA;padding-top:24px;">
-            <p style="margin:0;font-size:11px;color:#7E8C80;line-height:1.7;">⚠ Ce menu est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consulte ton vétérinaire avant tout changement alimentaire.</p>
+            <p style="margin:0;font-size:11px;color:#7E8C80;line-height:1.7;">⚠ Ce menu est éducatif et ne remplace pas un avis vétérinaire.</p>
           </div>
         </td>
       </tr>
@@ -413,8 +373,8 @@ function buildEmailMenuHtml(prenom, htmlContent) {
         <td style="background:#233028;border-radius:0 0 16px 16px;padding:28px 48px;border-top:3px solid #EC6592;">
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
-              <td><p style="margin:0;font-size:13px;font-weight:700;color:#FBFDF7;">kyno</p><p style="margin:4px 0 0;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(245,240,232,0.25);">Lyon, France</p></td>
-              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:rgba(245,240,232,0.35);text-decoration:none;">colinemngl@gmail.com</a><p style="margin:4px 0 0;font-size:10px;color:rgba(245,240,232,0.2);">© 2026 Kyno</p></td>
+              <td><p style="margin:0;font-size:13px;font-weight:700;color:#FBFDF7;">kyno</p></td>
+              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:rgba(245,240,232,0.35);text-decoration:none;">colinemngl@gmail.com</a></td>
             </tr>
           </table>
         </td>
@@ -426,7 +386,6 @@ function buildEmailMenuHtml(prenom, htmlContent) {
 </html>`;
 }
 
-// ── SAISON ────────────────────────────────────────────────────────────
 function getSaison() {
   const m = new Date().getMonth() + 1;
   if (m >= 3 && m <= 5) return 'Printemps';
