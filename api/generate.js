@@ -29,7 +29,7 @@ async function saveToSupabase(data, statut) {
   // Intolérances alimentaires (Q12)
   const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
 
-  // Sensibilités / tracas quotidiens (Q10) — était pointé vers problemesOreilles, corrigé
+  // Sensibilités / tracas quotidiens (Q10)
   const sensibilites = mergeAutre(data.tracasQuotidiens, null, ['aucun']);
 
   // Comportement (Q13)
@@ -88,7 +88,7 @@ async function saveToSupabase(data, statut) {
 
     // Projet
     mode_alimentaire:        data.modeAlimentaire || null,   // Q14
-    budget:                  data.budget || null,            // Q15
+    // budget omis — colonne absente du schéma Supabase (PGRST204)
     equipement:              Array.isArray(data.equipement) ? data.equipement : [], // Q16
     temps_prep:              data.tempsPrep || null,         // Q17
     courses_ou:              coursesOu,                      // Q18
@@ -246,7 +246,7 @@ module.exports = async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
+        model: 'claude-sonnet-4-6',
         max_tokens: 4000,
         system: buildRapportPrompt(data, saison, pm),
         messages: [{ role: 'user', content: 'Génère le rapport nutritionnel.' }]
