@@ -118,20 +118,18 @@ async function generateMenuInBackground(email) {
     return;
   }
 
-  const supabasePayload = {
-    menu_texte:    menuData.email_html || '',
-    recettes:      menuData.recette ? [menuData.recette] : [],
-    batch_special: menuData.batch_special || null,
-    batch_steps:   menuData.batch_steps || [],
-    courses:       menuData.courses || [],
-    cout_semaine:  menuData.cout_semaine || null,
-    cout_indus:    menuData.cout_indus || null,
-    economie:      menuData.economie || null,
-    batch_time:    menuData.batch_time || null,
-    menu_envoye:   true
+  // PATCH 1 — champs garantis existants en base
+  const corePayload = {
+    menu_texte:  menuData.email_html || '',
+    recettes:    menuData.recette ? [menuData.recette] : [],
+    batch_steps: menuData.batch_steps || [],
+    courses:     menuData.courses || [],
+    cout_semaine: menuData.cout_semaine || null,
+    cout_indus:  menuData.cout_indus || null,
+    economie:    menuData.economie || null,
+    batch_time:  menuData.batch_time || null,
+    menu_envoye: true
   };
-
-  console.log(`Sauvegarde Supabase pour ${email}:`, JSON.stringify(supabasePayload).slice(0, 200));
 
   const patchRes = await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
@@ -143,15 +141,36 @@ async function generateMenuInBackground(email) {
         'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
         'Prefer': 'return=minimal'
       },
-      body: JSON.stringify(supabasePayload)
+      body: JSON.stringify(corePayload)
     }
   );
 
   if (!patchRes.ok) {
     const errBody = await patchRes.text().catch(() => '');
-    console.error(`Erreur PATCH Supabase menu (${patchRes.status}):`, errBody);
+    console.error(`Erreur PATCH Supabase menu core (${patchRes.status}):`, errBody);
   } else {
-    console.log(`Supabase menu sauvegardé pour ${prenomChien} (${email})`);
+    console.log(`Supabase menu core sauvegardé pour ${prenomChien} (${email})`);
+  }
+
+  // PATCH 2 — batch_special (colonne optionnelle, PATCH séparé pour ne pas bloquer le core)
+  if (menuData.batch_special) {
+    const patchSpecial = await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': process.env.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ batch_special: menuData.batch_special })
+      }
+    );
+    if (!patchSpecial.ok) {
+      const errBody = await patchSpecial.text().catch(() => '');
+      console.error(`Erreur PATCH batch_special (${patchSpecial.status}) — colonne manquante en base ?:`, errBody);
+    }
   }
 
   await sendEmailMenu(email, prenomChien, menuData.email_html || '');
