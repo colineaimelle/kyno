@@ -127,15 +127,16 @@ async function generateMenuInBackground(email) {
       'Prefer': 'return=minimal'
     },
     body: JSON.stringify({
-      menu_texte: menuData.email_html || '',
-      recettes: [menuData.recette_matin, menuData.recette_soir].filter(Boolean),
-      batch_steps: menuData.batch_steps || [],
-      courses: menuData.courses || [],
+      menu_texte:   menuData.email_html || '',
+      recettes:     menuData.recette ? [menuData.recette] : [],
+      batch_special: menuData.batch_special || null,
+      batch_steps:  menuData.batch_steps || [],
+      courses:      menuData.courses || [],
       cout_semaine: menuData.cout_semaine || null,
-      cout_indus: menuData.cout_indus || null,
-      economie: menuData.economie || null,
-      batch_time: menuData.batch_time || null,
-      menu_envoye: true
+      cout_indus:   menuData.cout_indus || null,
+      economie:     menuData.economie || null,
+      batch_time:   menuData.batch_time || null,
+      menu_envoye:  true
     })
   });
 
@@ -180,35 +181,27 @@ Si tu n'as aucun autre choix pour une catégorie d'ingrédient, choisis une alte
 
 ## CONCEPT DU MENU
 Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
-- 2 recettes uniquement : une pour le repas du MATIN, une pour le repas du SOIR
-- Les recettes sont cuisinées en grande quantité pour toute la semaine (×7 jours)
+- 1 SEULE recette, servie matin ET soir (×14 portions : 7 jours × 2 repas)
+- La recette est cuisinée en grande quantité pour toute la semaine
 - Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur en portions
 - Les portions sont décongelées la veille au frigo
+- Les compléments sensibles (huile, CMV, etc.) sont ajoutés AU MOMENT DU REPAS, jamais à la cuisson
 - Adapte les légumes et protéines à la saison : ${saison}
 
 ## STRUCTURE JSON EXACTE À RESPECTER
 
 {
-  "recette_matin": {
-    "moment": "Le matin",
-    "color": "#FFCE2E",
+  "recette": {
+    "moment": "Matin et soir",
+    "color": "#2FA35E",
     "titre": "nom de la recette, court et appétissant",
-    "ration": nombre en grammes (ration par repas, pas le total semaine),
+    "ration": nombre en grammes par repas (matin = soir = même quantité),
     "ingredients": [
       { "name": "nom de l'ingrédient", "qty": "quantité par repas, ex: 80 g" }
     ],
     "note": "note nutritionnelle courte, 1 phrase, pourquoi cette recette est bonne pour ${nom}"
   },
-  "recette_soir": {
-    "moment": "Le soir",
-    "color": "#2FA35E",
-    "titre": "nom de la recette, court et appétissant",
-    "ration": nombre en grammes (ration par repas, pas le total semaine),
-    "ingredients": [
-      { "name": "nom de l'ingrédient", "qty": "quantité par repas, ex: 105 g" }
-    ],
-    "note": "note nutritionnelle courte, 1 phrase"
-  },
+  "batch_special": "instruction à ajouter UNIQUEMENT au moment du repas, jamais à la cuisson. Ex : Ajouter X ml d'huile de saumon et X g de CMV juste avant de servir. Ne jamais cuire ces compléments.",
   "batch_time": "≈ XX min de prépa",
   "batch_steps": [
     { "n": 1, "text": "étape détaillée et concrète, avec temps de cuisson si pertinent" },
@@ -217,21 +210,21 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
     { "n": 4, "text": "..." }
   ],
   "courses": [
-    { "name": "ingrédient", "qty": "quantité totale pour 7 jours, ex: 560 g" }
+    { "cat": "Viandes & poissons", "items": [{ "name": "ingrédient", "qty": "quantité totale pour 7 jours, ex: 560 g" }] },
+    { "cat": "Légumes & féculents", "items": [{ "name": "ingrédient", "qty": "quantité totale pour 7 jours" }] },
+    { "cat": "Compléments", "items": [{ "name": "ingrédient", "qty": "quantité totale pour 7 jours" }] }
   ],
   "cout_semaine": "XX,XX €",
   "cout_indus": "XX €",
   "economie": "XX,XX €",
-  "email_html": "Texte complet du menu en Markdown, formaté EXACTEMENT comme l'exemple ci-dessous, avec quantités pour 7 jours dans les recettes, préparation, batch cooking, conditionnement, liste de courses, coût. Utilise \\n pour les retours à la ligne et ** pour le gras. Commence par 'Voici le menu de la semaine de ${nom} !'"
+  "email_html": "Texte complet du menu en Markdown. Utilise \\n pour les retours à la ligne et ** pour le gras. Commence par 'Voici le menu de la semaine de ${nom} !'. Présente la recette unique servie matin et soir, le batch cooking, la liste de courses et le coût."
 }
 
-## EXEMPLE DE STRUCTURE POUR email_html (respecte ce niveau de détail)
-"# Voici le menu de la semaine de ${nom} !\\n\\n## 1. QUANTITÉ JOURNALIÈRE\\nTotal journalier : Xg par jour - Repas du matin (40%) : Xg - Repas du soir (60%) : Xg\\n\\n## 2. RECETTE MATIN — [titre]\\n### Ingrédients pour 7 jours (X total) :\\n- ...\\n### Préparation :\\n1. ...\\n\\n## 3. RECETTE SOIR — [titre]\\n[même format]\\n\\n## 4. SESSION BATCH COOKING\\nJour recommandé : ... Durée totale : ...\\n### Déroulé optimisé :\\n...\\n\\n## 5. CONDITIONNEMENT\\n### Stockage :\\n...\\n### Conseils :\\n...\\n\\n## 6. LISTE DE COURSES\\n### 🥩 Viandes & Poissons\\n...\\n### 🥕 Légumes & Féculents\\n...\\n### 🧴 Compléments & Huiles\\n...\\n\\n## 7. COÛT ESTIMÉ\\n...\\n💰 Total semaine : environ X€\\n\\n## 🎯 POINTS CLÉS POUR ${nom}\\n✅ ...\\n\\nBon appétit à ${nom} ! 🐾"
-
 ## RÈGLES IMPORTANTES
-- Les valeurs "ration" et "qty" dans recette_matin/recette_soir sont les quantités PAR REPAS (pas le total semaine)
-- Les valeurs "qty" dans "courses" sont les quantités TOTALES pour 7 jours
-- "color" reste fixe : "#FFCE2E" pour le matin, "#2FA35E" pour le soir
+- "ration" dans recette = quantité PAR REPAS (matin et soir identiques)
+- "qty" dans ingredients = quantité par repas
+- "qty" dans courses > items = quantité TOTALE pour 7 jours (×14 repas)
+- "batch_special" : compléments ajoutés au moment du repas uniquement (huile, CMV, levure, etc.) — jamais cuits
 - "cout_indus" est une estimation du prix d'un service de livraison industrielle équivalent (Butternut Box, Pet's Deli) pour comparaison
 - "economie" = cout_indus - cout_semaine
 - INTERDICTION ABSOLUE (rappel final) : ${intolerances.length > 0 ? `les ingrédients suivants ne doivent apparaître nulle part dans ta réponse : ${intolerances.join(', ')}` : 'aucune intolérance déclarée'}
