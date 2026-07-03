@@ -152,7 +152,30 @@ async function generateMenuInBackground(email) {
     console.log(`Supabase menu core sauvegardé pour ${prenomChien} (${email})`);
   }
 
-  // PATCH 2 — batch_special (colonne optionnelle, PATCH séparé pour ne pas bloquer le core)
+  // PATCH 2 — apports (colonne optionnelle, PATCH séparé pour ne pas bloquer le core)
+  if (menuData.apports && Array.isArray(menuData.apports) && menuData.apports.length > 0) {
+    const patchApports = await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': process.env.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ apports: menuData.apports })
+      }
+    );
+    if (!patchApports.ok) {
+      const errBody = await patchApports.text().catch(() => '');
+      console.error(`Erreur PATCH apports (${patchApports.status}) — colonne manquante en base ?:`, errBody);
+    } else {
+      console.log(`Apports nutritionnels sauvegardés pour ${prenomChien} (${email})`);
+    }
+  }
+
+  // PATCH 3 — batch_special (colonne optionnelle, PATCH séparé pour ne pas bloquer le core)
   if (menuData.batch_special) {
     const patchSpecial = await fetch(
       `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
@@ -250,6 +273,13 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
   "cout_semaine": "XX,XX €",
   "cout_indus": "XX €",
   "economie": "XX,XX €",
+  "apports": [
+    { "nom": "Calories", "unite": "kcal", "valeur": <kcal réels par repas estimés depuis les ingrédients>, "cible": <besoins journaliers / 2 selon NRC 2006 : 130 × PM^0.75 × facteur activité>, "pct": <arrondi valeur/cible×100>, "color": "#F2843C" },
+    { "nom": "Protéines", "unite": "g", "valeur": <g protéines par repas>, "cible": <cible par repas selon FEDIAF 2023>, "pct": <arrondi>, "color": "#2FA35E" },
+    { "nom": "Lipides", "unite": "g", "valeur": <g lipides par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#EC6592" },
+    { "nom": "Calcium", "unite": "g", "valeur": <g calcium par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#3E8FC4" },
+    { "nom": "Oméga-3", "unite": "g", "valeur": <g oméga-3 par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#FFCE2E" }
+  ],
   "email_html": "Texte complet du menu en Markdown. Utilise \\n pour les retours à la ligne et ** pour le gras. Commence par 'Voici le menu de la semaine de ${nom} !'. Présente la recette unique servie matin et soir, le batch cooking, la liste de courses et le coût."
 }
 
@@ -261,7 +291,8 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
 - "cout_indus" est une estimation du prix d'un service de livraison industrielle équivalent (Butternut Box, Pet's Deli) pour comparaison
 - "economie" = cout_indus - cout_semaine
 - INTERDICTION ABSOLUE (rappel final) : ${intolerances.length > 0 ? `les ingrédients suivants ne doivent apparaître nulle part dans ta réponse : ${intolerances.join(', ')}` : 'aucune intolérance déclarée'}
-- Le JSON doit être strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles`;
+- Le JSON doit être strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles
+- Pour "apports" : calcule les besoins énergétiques avec la formule NRC 2006 (130 × PM^0.75 × facteur d'activité : sédentaire 1.0, modéré 1.4, actif 1.8) divisés par 2 (= cible par repas). Estime les valeurs réelles à partir des ingrédients de la recette (protéines : viande ~20%, poisson ~18% ; lipides : viande ~8%, huile ~100% ; calcium : os crus ~8%, légumes vert ~0.1% ; oméga-3 : huile saumon ~22%, maquereau ~2%). "pct" = arrondi entier de valeur/cible×100. Les valeurs "valeur" et "cible" sont des nombres (pas de chaînes)`;
 }
 
 // ── SAISON ────────────────────────────────────────────────
