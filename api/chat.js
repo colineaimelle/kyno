@@ -63,8 +63,19 @@ Tu réponds TOUJOURS avec ce JSON exact, sans texte avant ni après, sans balise
     // Champs modifiables : poids (number), allergies (array — nouvelles allergies SEULEMENT),
     // sensibilites (array), objectifs (array), activite (string), comportement (string), antecedents (string), score_sante (number)
   },
+  "observations": [
+    // Observations informelles sur l'état de ${nom} mentionnées dans ce message du propriétaire.
+    // Ex: [{ "texte": "mange mieux depuis 3 jours" }, { "texte": "poils plus brillants" }]
+    // [] si aucune observation informelle dans ce message.
+  ],
   "generer_menu": false
 }
+
+RÈGLES SUR observations :
+- Extrais les informations informelles sur l'état de ${nom} mentionnées par le propriétaire, sans confirmation formelle
+- Exemples valides : "mange mieux", "moins d'énergie", "poils plus brillants", "dort plus", "boit davantage", "a vomi", "selles molles", etc.
+- Ne pas dupliquer ce qui va dans "updates" (les mises à jour formelles confirmées)
+- Tableau vide [] si aucune observation dans ce message
 
 RÈGLES DE MISE À JOUR DU PROFIL :
 - Si le propriétaire mentionne un changement (poids, nouvelle allergie, activité, etc.), demande TOUJOURS confirmation avant de mettre à jour : "Je note X, je mets à jour la fiche de ${nom} ?"
@@ -128,6 +139,7 @@ CAPACITÉS : Tu ES capable de générer et mettre à jour le menu de ${nom} dire
     const reply = parsed.reply || '';
     const updates = parsed.updates || {};
     const genererMenu = parsed.generer_menu === true;
+    const newObservations = Array.isArray(parsed.observations) ? parsed.observations : [];
 
     if (email && Object.keys(updates).length > 0) {
       const patch = { ...updates };
@@ -137,6 +149,15 @@ CAPACITÉS : Tu ES capable de générer et mettre à jour le menu de ${nom} dire
       }
       await patchSupabase(email, patch);
       Object.assign(profile, patch);
+    }
+
+    if (email) {
+      const updatedHistory = [...messages, { role: 'assistant', content: reply }];
+      await saveChatHistory(email, updatedHistory);
+    }
+
+    if (email && newObservations.length > 0) {
+      await saveObservations(email, newObservations);
     }
 
     let menuGenere = false;
@@ -174,6 +195,72 @@ async function patchSupabase(email, fields) {
   if (!res.ok) {
     const errBody = await res.text().catch(() => '');
     console.error('Erreur PATCH Supabase profil:', res.status, errBody);
+  }
+}
+
+async function saveChatHistory(email, messages) {
+  const res = await fetch(
+    `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': process.env.SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ chat_history: messages })
+    }
+  );
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => '');
+    console.error('Erreur PATCH chat_history:', res.status, errBody);
+  }
+}
+
+async function saveObservations(email, newObs) {
+  const getRes = await fetch(
+    `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}&select=observations`,
+    {
+      headers: {
+        'apikey': process.env.SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`
+      }
+    }
+  );
+
+  let existing = [];
+  if (getRes.ok) {
+    const data = await getRes.json().catch(() => []);
+    if (data && data[0] && Array.isArray(data[0].observations)) {
+      existing = data[0].observations;
+    }
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  const toAdd = newObs
+    .filter(o => o && typeof o.texte === 'string' && o.texte.trim())
+    .map(o => ({ date: today, texte: o.texte.trim(), source: 'chat' }));
+
+  const merged = [...existing, ...toAdd];
+  const res = await fetch(
+    `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': process.env.SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ observations: merged })
+    }
+  );
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => '');
+    console.error('Erreur PATCH observations:', res.status, errBody);
+  } else {
+    console.log(`${toAdd.length} observation(s) sauvegardée(s) pour ${email}`);
   }
 }
 
