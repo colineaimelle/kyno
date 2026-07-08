@@ -88,7 +88,7 @@ async function generateMenuForUser(profile, saison) {
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
       max_tokens: 8000,
-      system: buildMenuPrompt(profile, saison, pm),
+      system: buildMenuPrompt(profile, saison, pm, profile.proteine_principale || null),
       messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
     })
   });
@@ -125,7 +125,28 @@ async function generateMenuForUser(profile, saison) {
     menu_envoye:  true
   });
 
-  // ── 5. Apports (colonne optionnelle — PATCH séparé) ────────
+  // ── 5. proteine_principale (colonne optionnelle — PATCH séparé) ──
+  if (menuData.proteine_principale) {
+    const patchProteine = await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': process.env.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ proteine_principale: menuData.proteine_principale })
+      }
+    );
+    if (!patchProteine.ok) {
+      const errBody = await patchProteine.text().catch(() => '');
+      console.error(`Erreur PATCH proteine_principale pour ${email} (${patchProteine.status}):`, errBody);
+    }
+  }
+
+  // ── 6. Apports (colonne optionnelle — PATCH séparé) ────────
   if (Array.isArray(menuData.apports) && menuData.apports.length > 0) {
     const patchApports = await fetch(
       `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
@@ -211,7 +232,7 @@ function getSaison() {
   return 'Hiver';
 }
 
-function buildMenuPrompt(profile, saison, pm) {
+function buildMenuPrompt(profile, saison, pm, proteineActuelle = null) {
   const nom = profile.prenom_chien || profile.prenom || 'ton chien';
   const intolerances = Array.isArray(profile.allergies) ? profile.allergies : [];
   const equipement = Array.isArray(profile.equipement) ? profile.equipement : [];
@@ -226,7 +247,14 @@ Si tu n'as aucun autre choix pour une catégorie d'ingrédient, choisis une alte
 `
     : '';
 
-  return `${interdictionBlock}Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown \`\`\`.
+  const rotationBlock = proteineActuelle
+    ? `⚠️ ROTATION DES PROTÉINES — OBLIGATOIRE :
+Le menu précédent contenait : ${proteineActuelle}. Utilise OBLIGATOIREMENT une protéine principale différente cette semaine. Ne répète jamais la même protéine deux semaines de suite.
+
+`
+    : '';
+
+  return `${interdictionBlock}${rotationBlock}Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown \`\`\`.
 
 ## PROFIL
 - Prénom : ${nom}
@@ -285,6 +313,7 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
     { "nom": "Calcium", "unite": "g", "valeur": <g calcium par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#3E8FC4" },
     { "nom": "Oméga-3", "unite": "g", "valeur": <g oméga-3 par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#FFCE2E" }
   ],
+  "proteine_principale": "nom court de la protéine principale (ex: dinde, bœuf, saumon, agneau, poulet, cabillaud)",
   "email_html": "Texte complet du menu en Markdown. Utilise \\n pour les retours à la ligne et ** pour le gras. Commence par 'Voici le menu de la semaine de ${nom} !'."
 }
 
@@ -293,6 +322,7 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
 - "qty" dans ingredients = quantité par repas
 - "qty" dans courses > items = quantité TOTALE pour 7 jours (×14 repas)
 - "batch_special" : compléments ajoutés au moment du repas uniquement (huile, CMV, levure, etc.) — jamais cuits
+- "proteine_principale" : une seule protéine en minuscules, sans article (ex: "dinde" pas "de la dinde")${proteineActuelle ? ` — DOIT être différente de "${proteineActuelle}"` : ''}
 - INTERDICTION ABSOLUE (rappel final) : ${intolerances.length > 0 ? `les ingrédients suivants ne doivent apparaître nulle part dans ta réponse : ${intolerances.join(', ')}` : 'aucune intolérance déclarée'}
 - Le JSON doit être strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles
 - Pour "apports" : calcule les besoins énergétiques avec NRC 2006 (130 × PM^0.75 × facteur activité : sédentaire 1.0, modéré 1.4, actif 1.8) divisés par 2. Estime les valeurs réelles depuis les ingrédients. "pct" = arrondi entier. "valeur" et "cible" sont des nombres (pas des chaînes)`;

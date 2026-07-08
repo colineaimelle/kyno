@@ -88,7 +88,7 @@ async function generateMenuInBackground(email) {
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
       max_tokens: 8000,
-      system: buildMenuPrompt(profile, saison, pm),
+      system: buildMenuPrompt(profile, saison, pm, profile.proteine_principale || null),
       messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
     })
   });
@@ -152,7 +152,28 @@ async function generateMenuInBackground(email) {
     console.log(`Supabase menu core sauvegardé pour ${prenomChien} (${email})`);
   }
 
-  // PATCH 2 — apports (colonne optionnelle, PATCH séparé pour ne pas bloquer le core)
+  // PATCH 2 — proteine_principale (colonne optionnelle, PATCH séparé)
+  if (menuData.proteine_principale) {
+    const patchProteine = await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': process.env.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ proteine_principale: menuData.proteine_principale })
+      }
+    );
+    if (!patchProteine.ok) {
+      const errBody = await patchProteine.text().catch(() => '');
+      console.error(`Erreur PATCH proteine_principale (${patchProteine.status}):`, errBody);
+    }
+  }
+
+  // PATCH 4 — apports (colonne optionnelle, PATCH séparé pour ne pas bloquer le core)
   if (menuData.apports && Array.isArray(menuData.apports) && menuData.apports.length > 0) {
     const patchApports = await fetch(
       `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
@@ -175,7 +196,7 @@ async function generateMenuInBackground(email) {
     }
   }
 
-  // PATCH 3 — batch_special (colonne optionnelle, PATCH séparé pour ne pas bloquer le core)
+  // PATCH 5 — batch_special (colonne optionnelle, PATCH séparé pour ne pas bloquer le core)
   if (menuData.batch_special) {
     const patchSpecial = await fetch(
       `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
@@ -202,7 +223,7 @@ async function generateMenuInBackground(email) {
 }
 
 // ── PROMPT MENU ────────────────────────────────────────────
-function buildMenuPrompt(profile, saison, pm) {
+function buildMenuPrompt(profile, saison, pm, proteineActuelle = null) {
   const nom = profile.prenom_chien || profile.prenom || 'ton chien';
   const intolerances = Array.isArray(profile.allergies) ? profile.allergies : [];
   const equipement = Array.isArray(profile.equipement) ? profile.equipement : [];
@@ -221,7 +242,14 @@ Si tu n'as aucun autre choix pour une catégorie d'ingrédient, choisis une alte
 `
     : '';
 
-  return `${interdictionBlock}Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown \`\`\`.
+  const rotationBlock = proteineActuelle
+    ? `⚠️ ROTATION DES PROTÉINES — OBLIGATOIRE :
+Le menu précédent contenait : ${proteineActuelle}. Utilise OBLIGATOIREMENT une protéine principale différente cette semaine. Ne répète jamais la même protéine deux semaines de suite.
+
+`
+    : '';
+
+  return `${interdictionBlock}${rotationBlock}Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown \`\`\`.
 
 ## PROFIL
 - Prénom : ${nom}
@@ -280,6 +308,7 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
     { "nom": "Calcium", "unite": "g", "valeur": <g calcium par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#3E8FC4" },
     { "nom": "Oméga-3", "unite": "g", "valeur": <g oméga-3 par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#FFCE2E" }
   ],
+  "proteine_principale": "nom court de la protéine principale (ex: dinde, bœuf, saumon, agneau, poulet, cabillaud)",
   "email_html": "Texte complet du menu en Markdown. Utilise \\n pour les retours à la ligne et ** pour le gras. Commence par 'Voici le menu de la semaine de ${nom} !'. Présente la recette unique servie matin et soir, le batch cooking, la liste de courses et le coût."
 }
 
@@ -290,6 +319,7 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
 - "batch_special" : compléments ajoutés au moment du repas uniquement (huile, CMV, levure, etc.) — jamais cuits
 - "cout_indus" est une estimation du prix d'un service de livraison industrielle équivalent (Butternut Box, Pet's Deli) pour comparaison
 - "economie" = cout_indus - cout_semaine
+- "proteine_principale" : une seule protéine en minuscules, sans article (ex: "dinde" pas "de la dinde")${proteineActuelle ? ` — DOIT être différente de "${proteineActuelle}"` : ''}
 - INTERDICTION ABSOLUE (rappel final) : ${intolerances.length > 0 ? `les ingrédients suivants ne doivent apparaître nulle part dans ta réponse : ${intolerances.join(', ')}` : 'aucune intolérance déclarée'}
 - Le JSON doit être strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles
 - Pour "apports" : calcule les besoins énergétiques avec la formule NRC 2006 (130 × PM^0.75 × facteur d'activité : sédentaire 1.0, modéré 1.4, actif 1.8) divisés par 2 (= cible par repas). Estime les valeurs réelles à partir des ingrédients de la recette (protéines : viande ~20%, poisson ~18% ; lipides : viande ~8%, huile ~100% ; calcium : os crus ~8%, légumes vert ~0.1% ; oméga-3 : huile saumon ~22%, maquereau ~2%). "pct" = arrondi entier de valeur/cible×100. Les valeurs "valeur" et "cible" sont des nombres (pas de chaînes)`;
