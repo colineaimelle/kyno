@@ -1,0 +1,24 @@
+name: Weekly Menu Generation
+
+on:
+  schedule:
+    # Chaque lundi à 7h00 UTC = 8h00 heure de Paris (heure d'été)
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+jobs:
+  generate-menus:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Générer les menus hebdomadaires
+        run: |
+          response=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -X POST "${{ secrets.VERCEL_URL }}/api/cron-menu" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+          echo "HTTP status: $response"
+          cat /tmp/response.json
+          if [ "$response" != "200" ]; then
+            echo "Erreur : statut HTTP $response"
+            exit 1
+          fi
