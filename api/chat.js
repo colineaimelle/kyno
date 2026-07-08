@@ -147,6 +147,12 @@ CAPACITÉS : Tu ES capable de générer et mettre à jour le menu de ${nom} dire
         const merged = [...new Set([...allergies, ...updates.allergies])];
         patch.allergies = merged;
       }
+      // Mise à jour poids_historique seulement si le poids a réellement changé
+      if (updates.poids != null && updates.poids !== profile.poids) {
+        const existingPoids = Array.isArray(profile.poids_historique) ? profile.poids_historique : [];
+        const today = new Date().toISOString().split('T')[0];
+        patch.poids_historique = [...existingPoids, { label: today, poids: updates.poids }].slice(-6);
+      }
       await patchSupabase(email, patch);
       Object.assign(profile, patch);
     }

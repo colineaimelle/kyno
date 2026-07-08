@@ -32,7 +32,23 @@ module.exports = async function handler(req, res) {
     const saison = getSaison();
     const results = [];
 
+    const relanceResults = [];
+    const cutoff14j = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+
     for (const profile of users) {
+      // Email de relance si inactif depuis 14 jours
+      const derniereConnexion = profile.derniere_connexion ? new Date(profile.derniere_connexion) : null;
+      if (!derniereConnexion || derniereConnexion < cutoff14j) {
+        try {
+          await sendEmailRelance(profile.email, profile.prenom_chien || profile.prenom || 'ton chien');
+          relanceResults.push({ email: profile.email, relance: true });
+          console.log(`Email relance envoyé pour ${profile.prenom_chien || profile.email}`);
+        } catch (relErr) {
+          console.error(`Erreur relance pour ${profile.email}:`, relErr.message);
+        }
+      }
+
+      // Génération du menu
       try {
         await generateMenuForUser(profile, saison);
         results.push({ email: profile.email, status: 'ok' });
@@ -43,7 +59,7 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    return res.status(200).json({ success: true, processed: users.length, results });
+    return res.status(200).json({ success: true, processed: users.length, results, relances: relanceResults });
 
   } catch (error) {
     console.error('Erreur cron-menu.js:', error);
@@ -125,7 +141,32 @@ async function generateMenuForUser(profile, saison) {
     menu_envoye:  true
   });
 
-  // ── 5. proteine_principale (colonne optionnelle — PATCH séparé) ──
+  // ── 5. score_sante + score_bullets (PATCH séparé) ────────────
+  if (menuData.score_sante != null) {
+    const scorePatch = { score_sante: menuData.score_sante };
+    if (Array.isArray(menuData.score_bullets) && menuData.score_bullets.length > 0) {
+      scorePatch.score_bullets = menuData.score_bullets.slice(0, 3);
+    }
+    const patchScore = await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': process.env.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(scorePatch)
+      }
+    );
+    if (!patchScore.ok) {
+      const errBody = await patchScore.text().catch(() => '');
+      console.error(`Erreur PATCH score_sante pour ${email} (${patchScore.status}):`, errBody);
+    }
+  }
+
+  // ── 6. proteine_principale (colonne optionnelle — PATCH séparé) ──
   if (menuData.proteine_principale) {
     const patchProteine = await fetch(
       `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
@@ -314,6 +355,11 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
     { "nom": "Oméga-3", "unite": "g", "valeur": <g oméga-3 par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#FFCE2E" }
   ],
   "proteine_principale": "nom court de la protéine principale (ex: dinde, bœuf, saumon, agneau, poulet, cabillaud)",
+  "score_sante": <nombre entier entre 0 et 100 évaluant l'état de santé global de ${nom} d'après son profil>,
+  "score_bullets": [
+    { "ok": true, "text": "point positif court (ex: Poids stable et idéal pour sa race)" },
+    { "ok": false, "text": "point à surveiller (ex: Digestion à consolider)" }
+  ],
   "email_html": "Texte complet du menu en Markdown. Utilise \\n pour les retours à la ligne et ** pour le gras. Commence par 'Voici le menu de la semaine de ${nom} !'."
 }
 
@@ -323,9 +369,53 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
 - "qty" dans courses > items = quantité TOTALE pour 7 jours (×14 repas)
 - "batch_special" : compléments ajoutés au moment du repas uniquement (huile, CMV, levure, etc.) — jamais cuits
 - "proteine_principale" : une seule protéine en minuscules, sans article (ex: "dinde" pas "de la dinde")${proteineActuelle ? ` — DOIT être différente de "${proteineActuelle}"` : ''}
+- "score_sante" : évalue objectivement d'après poids, activité, antécédents, allergies, objectifs (85-100 = excellent, 70-84 = bonne forme, 55-69 = à surveiller, <55 = vigilance)
+- "score_bullets" : 2 à 3 points max ({ok: true/false, text: phrase courte}) — mix points positifs et points à surveiller selon le profil
 - INTERDICTION ABSOLUE (rappel final) : ${intolerances.length > 0 ? `les ingrédients suivants ne doivent apparaître nulle part dans ta réponse : ${intolerances.join(', ')}` : 'aucune intolérance déclarée'}
 - Le JSON doit être strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles
 - Pour "apports" : calcule les besoins énergétiques avec NRC 2006 (130 × PM^0.75 × facteur activité : sédentaire 1.0, modéré 1.4, actif 1.8) divisés par 2. Estime les valeurs réelles depuis les ingrédients. "pct" = arrondi entier. "valeur" et "cible" sont des nombres (pas des chaînes)`;
+}
+
+async function sendEmailRelance(email, prenom) {
+  const emailRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': process.env.BREVO_API_KEY
+    },
+    body: JSON.stringify({
+      sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
+      to: [{ email, name: prenom }],
+      subject: `Des nouvelles de ${prenom} ? 🐾`,
+      htmlContent: `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#E4F4E8;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#E4F4E8;padding:40px 20px;">
+    <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#FBFDF7;border:2.5px solid #F2843C;border-radius:20px;box-shadow:8px 8px 0 #FFF1BF;overflow:hidden;">
+      <tr><td style="background:#2B3A2E;padding:28px 40px;text-align:center;">
+        <p style="margin:0;font-size:22px;font-weight:700;color:#FBFDF7;letter-spacing:.06em;">kyno</p>
+      </td></tr>
+      <tr><td style="padding:36px 40px;">
+        <p style="font-size:17px;font-weight:700;color:#2B3A2E;margin:0 0 14px;">On n'a pas eu de nouvelles de <span style="color:#2FA35E;">${prenom}</span> depuis 2 semaines 🐾</p>
+        <p style="font-size:14px;color:#7E8C80;line-height:1.8;margin:0 0 28px;">Tout va bien ? Connecte-toi pour faire le point avec Kyno — ton nouveau menu de la semaine est prêt !</p>
+        <div style="text-align:center;">
+          <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#2FA35E;color:white;padding:14px 32px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:700;border:2px solid #F2843C;">Voir l'espace de ${prenom} →</a>
+        </div>
+      </td></tr>
+      <tr><td style="background:#233028;padding:18px 40px;text-align:right;">
+        <a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:rgba(245,240,232,.35);text-decoration:none;">colinemngl@gmail.com</a>
+      </td></tr>
+    </table>
+    </td></tr>
+  </table>
+</body></html>`
+    })
+  });
+  if (!emailRes.ok) {
+    const errBody = await emailRes.text().catch(() => '');
+    console.error(`Erreur email relance pour ${email}:`, errBody);
+  }
 }
 
 async function sendEmailMenu(email, prenom, menu) {
