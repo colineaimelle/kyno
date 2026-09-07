@@ -1,0 +1,23 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Tous les jours à 6h00 UTC = 7h/8h heure de Paris
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping-db:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase pour éviter la pause automatique
+        run: |
+          response=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -X GET "${{ secrets.VERCEL_URL }}/api/ping-db" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}")
+          echo "HTTP status: $response"
+          cat /tmp/response.json
+          if [ "$response" != "200" ]; then
+            echo "Erreur : statut HTTP $response"
+            exit 1
+          fi
