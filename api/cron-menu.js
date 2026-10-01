@@ -230,7 +230,7 @@ async function generateMenuForUser(profile, saison) {
   }
 
   // ── 7. Envoyer l'email ─────────────────────────────────────
-  await sendEmailMenu(email, nom, menuData.email_html || '');
+  await sendEmailMenu(email, nom, menuData, profile, saison);
 }
 
 async function patchSupabase(email, fields) {
@@ -388,24 +388,46 @@ async function sendEmailRelance(email, prenom) {
       to: [{ email, name: prenom }],
       subject: `Des nouvelles de ${prenom} ? 🐾`,
       htmlContent: `<!DOCTYPE html>
-<html lang="fr"><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#E4F4E8;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#E4F4E8;padding:40px 20px;">
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F3F7F1;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F3F7F1;padding:48px 20px;">
     <tr><td align="center">
-    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#FBFDF7;border:2.5px solid #F2843C;border-radius:20px;box-shadow:8px 8px 0 #FFF1BF;overflow:hidden;">
-      <tr><td style="background:#2B3A2E;padding:28px 40px;text-align:center;">
-        <p style="margin:0;font-size:22px;font-weight:700;color:#FBFDF7;letter-spacing:.06em;">kyno</p>
-      </td></tr>
-      <tr><td style="padding:36px 40px;">
-        <p style="font-size:17px;font-weight:700;color:#2B3A2E;margin:0 0 14px;">On n'a pas eu de nouvelles de <span style="color:#2FA35E;">${prenom}</span> depuis 2 semaines 🐾</p>
-        <p style="font-size:14px;color:#7E8C80;line-height:1.8;margin:0 0 28px;">Tout va bien ? Connecte-toi pour faire le point avec Kyno — ton nouveau menu de la semaine est prêt !</p>
-        <div style="text-align:center;">
-          <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#2FA35E;color:white;padding:14px 32px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:700;border:2px solid #F2843C;">Voir l'espace de ${prenom} →</a>
-        </div>
-      </td></tr>
-      <tr><td style="background:#233028;padding:18px 40px;text-align:right;">
-        <a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:rgba(245,240,232,.35);text-decoration:none;">colinemngl@gmail.com</a>
-      </td></tr>
+    <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+
+      <tr>
+        <td style="padding:0 8px 28px;text-align:center;">
+          <div style="display:inline-flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;border:1.5px solid #2FA35E;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2FA35E;font-family:Arial,sans-serif;">K</div>
+            <span style="font-size:15px;font-weight:700;color:#2B3A2E;letter-spacing:0.04em;">kyno</span>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="background:#FFFFFF;border-radius:20px;padding:40px 36px;border:1px solid #E3EDE1;text-align:center;">
+          <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:16px;">
+            <circle cx="26" cy="26" r="26" fill="#FBE4D8"/>
+            <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#2B3A2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#2B3A2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#F2843C"/>
+            <circle cx="22" cy="27" r="1.4" fill="#2B3A2E"/>
+            <circle cx="30" cy="27" r="1.4" fill="#2B3A2E"/>
+            <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#2B3A2E" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+            <ellipse cx="26" cy="30.5" rx="1.4" ry="1" fill="#2B3A2E"/>
+          </svg>
+          <p style="margin:0 0 10px;font-size:19px;font-weight:700;color:#2B3A2E;line-height:1.4;">Des nouvelles de <span style="color:#2FA35E;">${prenom}</span> ?</p>
+          <p style="margin:0 0 28px;font-size:14px;color:#8A978A;line-height:1.8;max-width:380px;margin-left:auto;margin-right:auto;">Ça fait deux semaines qu'on ne t'a pas vue par ici. Son nouveau menu de la semaine est prêt quand tu veux faire le point.</p>
+          <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#2FA35E;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Voir l'espace de ${prenom} →</a>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:24px 32px 0;text-align:center;">
+          <a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:#9AA69B;text-decoration:none;">kyno · colinemngl@gmail.com</a>
+        </td>
+      </tr>
+
     </table>
     </td></tr>
   </table>
@@ -418,14 +440,7 @@ async function sendEmailRelance(email, prenom) {
   }
 }
 
-async function sendEmailMenu(email, prenom, menu) {
-  const htmlMenu = menu
-    .replace(/\n\n/g, '</p><p style="margin:0 0 16px;">')
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#2B3A2E;font-weight:600;">$1</strong>')
-    .replace(/^/, '<p style="margin:0 0 16px;">')
-    .replace(/$/, '</p>');
-
+async function sendEmailMenu(email, prenom, menuData, profile, saison) {
   const emailRes = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
@@ -436,7 +451,7 @@ async function sendEmailMenu(email, prenom, menu) {
       sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
       to: [{ email, name: prenom }],
       subject: `Le menu de la semaine de ${prenom} ✦`,
-      htmlContent: buildEmailMenuHtml(prenom, htmlMenu)
+      htmlContent: buildEmailMenuHtml(prenom, menuData, profile, saison)
     })
   });
 
@@ -446,68 +461,132 @@ async function sendEmailMenu(email, prenom, menu) {
   }
 }
 
-function buildEmailMenuHtml(prenom, htmlContent) {
+function buildEmailMenuHtml(prenom, menuData, profile = {}, saison = '') {
+  const recette = menuData.recette || {};
+  const race = profile.race || 'non renseigné';
+  const poids = profile.poids ? profile.poids + ' kg' : '';
+  const sousTitre = [race, poids].filter(Boolean).join(' · ');
+  const weekLabel = getLabelSemaine();
+
+  const stepsHtml = (menuData.batch_steps || [])
+    .map(s => `${s.n}. ${s.text}`)
+    .join('<br>');
+
+  const coursesHtml = (menuData.courses || [])
+    .map(cat => `${cat.cat} : ` + (cat.items || []).map(i => `${i.name} ${i.qty}`).join(', '))
+    .join('<br>');
+
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#E4F4E8;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#E4F4E8;padding:40px 20px;">
+<body style="margin:0;padding:0;background:#F3F7F1;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F3F7F1;padding:48px 20px;">
     <tr><td align="center">
     <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+
       <tr>
-        <td style="background:#2B3A2E;border-radius:16px 16px 0 0;padding:36px 48px;text-align:center;border-bottom:3px solid #EC6592;">
-          <div style="display:inline-block;width:44px;height:44px;border-radius:50%;border:2px solid #2FA35E;text-align:center;line-height:40px;margin-bottom:12px;">
-            <span style="font-size:22px;font-weight:700;color:#2FA35E;">K</span>
-          </div>
-          <p style="margin:0;font-size:24px;font-weight:700;color:#FBFDF7;letter-spacing:0.06em;">kyno</p>
-          <p style="margin:6px 0 0;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);">Nutrition Canine Individualisée</p>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#2FA35E;padding:20px 48px;border-bottom:3px solid #F2843C;">
-          <p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Menu de la semaine</p>
-          <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FBFDF7;">Le menu de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em></p>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FBFDF7;padding:40px 48px 0;">
-          <p style="margin:0 0 8px;font-size:15px;color:#2B3A2E;">Bonjour !</p>
-          <p style="margin:0 0 32px;font-size:14px;color:#7E8C80;line-height:1.8;">Voici le menu de cette semaine pour <strong style="color:#2B3A2E;">${prenom}</strong>. Quantités précises, batch cooking et liste de courses inclus.</p>
-          <div style="height:3px;background:linear-gradient(to right,#2FA35E,#EC6592,#FFCE2E);margin-bottom:32px;border-radius:2px;"></div>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FBFDF7;padding:0 48px;">
-          <div style="background:white;border-radius:12px;padding:36px;border:1px solid #DDE8DA;border-left:4px solid #EC6592;font-size:14px;line-height:1.85;color:#2B3A2E;">
-            ${htmlContent}
+        <td style="padding:0 8px 28px;text-align:center;">
+          <div style="display:inline-flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;border:1.5px solid #2FA35E;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2FA35E;font-family:Arial,sans-serif;">K</div>
+            <span style="font-size:15px;font-weight:700;color:#2B3A2E;letter-spacing:0.04em;">kyno</span>
           </div>
         </td>
       </tr>
+
       <tr>
-        <td style="background:#FBFDF7;padding:32px 48px 40px;">
-          <div style="background:#2B3A2E;border-radius:14px;padding:36px;text-align:center;border:3px solid #F2843C;">
-            <p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#FBFDF7;line-height:1.3;">Retrouve ce menu dans<br><span style="font-size:14px;font-weight:400;color:rgba(245,240,232,0.5);">ton espace Kyno</span></p>
-            <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#2FA35E;color:white;padding:16px 32px;border-radius:4px;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.04em;border:2px solid #F2843C;">Accéder à mon espace →</a>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FBFDF7;padding:0 48px 32px;">
-          <div style="border-top:1px solid #DDE8DA;padding-top:24px;">
-            <p style="margin:0;font-size:11px;color:#7E8C80;line-height:1.7;">⚠ Ce menu est éducatif et ne remplace pas un avis vétérinaire.</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#233028;border-radius:0 0 16px 16px;padding:28px 48px;border-top:3px solid #EC6592;">
+        <td style="background:#FFFFFF;border-radius:20px 20px 0 0;padding:28px 32px;border:1px solid #E3EDE1;border-bottom:none;">
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
-              <td><p style="margin:0;font-size:13px;font-weight:700;color:#FBFDF7;">kyno</p></td>
-              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:rgba(245,240,232,0.35);text-decoration:none;">colinemngl@gmail.com</a></td>
+              <td width="56" valign="top">
+                <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="26" cy="26" r="26" fill="#FBE4D8"/>
+                  <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#2B3A2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                  <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#2B3A2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                  <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#F2843C"/>
+                  <circle cx="22" cy="27" r="1.4" fill="#2B3A2E"/>
+                  <circle cx="30" cy="27" r="1.4" fill="#2B3A2E"/>
+                  <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#2B3A2E" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                  <ellipse cx="26" cy="30.5" rx="1.4" ry="1" fill="#2B3A2E"/>
+                </svg>
+              </td>
+              <td valign="middle" style="padding-left:12px;">
+                <p style="margin:0;font-size:17px;font-weight:700;color:#2B3A2E;">${prenom}</p>
+                <p style="margin:2px 0 0;font-size:12px;color:#8A978A;">${sousTitre}</p>
+              </td>
+              <td align="right" valign="middle">
+                <span style="display:inline-block;background:#E3EDE1;color:#2FA35E;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:20px;">${weekLabel}</span>
+              </td>
             </tr>
           </table>
         </td>
       </tr>
+
+      <tr>
+        <td style="background:#2B3A2E;padding:24px 32px;">
+          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#7FBE98;font-weight:700;">Menu de la semaine</p>
+          <p style="margin:0;font-size:22px;font-weight:700;color:#FBFDF7;line-height:1.3;">${recette.titre || 'Le menu de ' + prenom}</p>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="background:#FFFFFF;padding:32px 32px 4px;border:1px solid #E3EDE1;border-top:none;">
+
+          <p style="margin:0 0 24px;font-size:14.5px;color:#3C473D;line-height:1.9;">${recette.note || `Une seule recette, cuisinée en une fois, pour toute la semaine de ${prenom} — matin et soir.`}</p>
+
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
+            <tr>
+              <td width="50%" style="background:#F3F7F1;border-radius:10px;padding:16px 20px;">
+                <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Par repas</p>
+                <p style="margin:0;font-size:20px;font-weight:700;color:#2B3A2E;">${recette.ration || '—'}</p>
+              </td>
+              <td width="12"></td>
+              <td width="50%" style="background:#F3F7F1;border-radius:10px;padding:16px 20px;">
+                <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Temps de prépa</p>
+                <p style="margin:0;font-size:20px;font-weight:700;color:#2B3A2E;">${menuData.batch_time || '—'}</p>
+              </td>
+            </tr>
+          </table>
+
+          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#2B3A2E;border-top:1px solid #EDF2EA;padding-top:22px;">Les étapes</h2>
+          <p style="margin:0 0 24px;font-size:14.5px;color:#3C473D;line-height:1.9;">${stepsHtml}</p>
+
+          ${menuData.batch_special ? `
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
+            <tr>
+              <td style="background:#FBE4D8;border-radius:10px;padding:16px 18px;">
+                <p style="margin:0;font-size:13px;color:#8A4420;line-height:1.7;"><strong>Au moment du repas seulement :</strong> ${menuData.batch_special}</p>
+              </td>
+            </tr>
+          </table>` : ''}
+
+          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#2B3A2E;">Liste de courses (7 jours)</h2>
+          <p style="margin:0 0 28px;font-size:14.5px;color:#3C473D;line-height:1.9;">${coursesHtml}</p>
+
+        </td>
+      </tr>
+
+      <tr>
+        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #E3EDE1;border-top:none;border-radius:0 0 20px 20px;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td style="text-align:center;padding-top:8px;">
+              <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#2FA35E;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Voir le menu complet →</a>
+            </td></tr>
+          </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:24px 32px 0;">
+          <p style="margin:0 0 12px;font-size:11px;color:#9AA69B;line-height:1.7;">⚠ Ce menu est éducatif et ne remplace pas un avis vétérinaire.</p>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td><span style="font-size:12px;font-weight:700;color:#5B6B5D;">kyno</span> <span style="font-size:11px;color:#9AA69B;">· Lyon, France</span></td>
+              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:#9AA69B;text-decoration:none;">colinemngl@gmail.com</a></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
     </table>
     </td></tr>
   </table>

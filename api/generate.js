@@ -280,11 +280,14 @@ module.exports = async function handler(req, res) {
 
 // ── EMAIL RAPPORT ──────────────────────────────────────────
 async function sendEmailRapport(email, prenom, rapport, data) {
+  const saison = getSaison();
+  const pm = data.poids ? Math.pow(parseFloat(data.poids), 0.75).toFixed(2) : null;
+
   const htmlRapport = rapport
-    .replace(/\n\n/g, '</p><p style="margin:0 0 16px;">')
+    .replace(/\n\n/g, '</p><p style="margin:0 0 18px;">')
     .replace(/\n/g, '<br>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#2B3A2E;font-weight:600;">$1</strong>')
-    .replace(/^/, '<p style="margin:0 0 16px;">')
+    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#2B3A2E;">$1</strong>')
+    .replace(/^/, '<p style="margin:0 0 18px;">')
     .replace(/$/, '</p>');
 
   const accessUrl = `https://project-jlc6z.vercel.app/acces.html?email=${encodeURIComponent(email)}`;
@@ -299,88 +302,95 @@ async function sendEmailRapport(email, prenom, rapport, data) {
       sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
       to: [{ email, name: prenom }],
       subject: `Le rapport nutritionnel de ${prenom} est prêt ✦`,
-      htmlContent: buildEmailHtml(prenom, htmlRapport, accessUrl)
+      htmlContent: buildEmailHtml(prenom, htmlRapport, accessUrl, data, saison)
     })
   });
 }
 
 // ── TEMPLATE EMAIL ─────────────────────────────────────────
-function buildEmailHtml(prenom, htmlContent, accessUrl) {
+function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}, saison = '') {
+  const race = data.race || 'non renseigné';
+  const age = data.age || '';
+  const poids = data.poids ? data.poids + ' kg' : '';
+  const sousTitre = [race, age, poids].filter(Boolean).join(' · ');
+
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#E4F4E8;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#E4F4E8;padding:40px 20px;">
+<body style="margin:0;padding:0;background:#F3F7F1;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F3F7F1;padding:48px 20px;">
     <tr><td align="center">
     <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
 
       <tr>
-        <td style="background:#2B3A2E;border-radius:16px 16px 0 0;padding:36px 48px;text-align:center;border-bottom:3px solid #EC6592;">
-          <div style="display:inline-block;width:44px;height:44px;border-radius:50%;border:2px solid #2FA35E;text-align:center;line-height:40px;margin-bottom:12px;">
-            <span style="font-size:22px;font-weight:700;color:#2FA35E;">K</span>
+        <td style="padding:0 8px 28px;text-align:center;">
+          <div style="display:inline-flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;border:1.5px solid #2FA35E;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2FA35E;font-family:Arial,sans-serif;">K</div>
+            <span style="font-size:15px;font-weight:700;color:#2B3A2E;letter-spacing:0.04em;">kyno</span>
           </div>
-          <p style="margin:0;font-size:24px;font-weight:700;color:#FBFDF7;letter-spacing:0.06em;">kyno</p>
-          <p style="margin:6px 0 0;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);">Nutrition Canine Individualisée</p>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#2FA35E;padding:20px 48px;border-bottom:3px solid #F2843C;">
-          <p style="margin:0 0 8px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Rapport personnalisé</p>
-          <p style="margin:0;font-size:26px;font-weight:700;color:#FBFDF7;">Le rapport nutritionnel de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em> est prêt</p>
+        <td style="background:#FFFFFF;border-radius:20px 20px 0 0;padding:28px 32px;border:1px solid #E3EDE1;border-bottom:none;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td width="56" valign="top">
+                <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="26" cy="26" r="26" fill="#FBE4D8"/>
+                  <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#2B3A2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                  <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#2B3A2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                  <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#F2843C"/>
+                  <circle cx="22" cy="27" r="1.4" fill="#2B3A2E"/>
+                  <circle cx="30" cy="27" r="1.4" fill="#2B3A2E"/>
+                  <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#2B3A2E" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                  <ellipse cx="26" cy="30.5" rx="1.4" ry="1" fill="#2B3A2E"/>
+                </svg>
+              </td>
+              <td valign="middle" style="padding-left:12px;">
+                <p style="margin:0;font-size:17px;font-weight:700;color:#2B3A2E;">${prenom}</p>
+                <p style="margin:2px 0 0;font-size:12px;color:#8A978A;">${sousTitre}</p>
+              </td>
+              <td align="right" valign="middle">
+                <span style="display:inline-block;background:#FBE4D8;color:#C85A2C;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:20px;">${saison}</span>
+              </td>
+            </tr>
+          </table>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FBFDF7;padding:40px 48px 0;">
-          <p style="margin:0 0 8px;font-size:15px;color:#2B3A2E;">Bonjour !</p>
-          <p style="margin:0 0 32px;font-size:14px;color:#7E8C80;line-height:1.8;">Voici le rapport nutritionnel ultra-personnalisé que Kyno a généré pour <strong style="color:#2B3A2E;">${prenom}</strong>. Basé sur les références NRC 2006 et FEDIAF 2023.</p>
-          <div style="height:3px;background:linear-gradient(to right,#2FA35E,#EC6592,#FFCE2E);margin-bottom:32px;border-radius:2px;"></div>
+        <td style="background:#2B3A2E;padding:24px 32px;">
+          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#7FBE98;font-weight:700;">Rapport nutritionnel</p>
+          <p style="margin:0;font-size:21px;font-weight:700;color:#FBFDF7;line-height:1.3;">Le profil complet de ${prenom} est prêt</p>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FBFDF7;padding:0 48px;">
-          <div style="background:white;border-radius:12px;padding:36px;border:1px solid #DDE8DA;border-left:4px solid #2FA35E;font-size:14px;line-height:1.85;color:#2B3A2E;">
+        <td style="background:#FFFFFF;padding:32px 32px 8px;border:1px solid #E3EDE1;border-top:none;">
+          <div style="font-size:14.5px;color:#3C473D;line-height:1.9;">
             ${htmlContent}
           </div>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FBFDF7;padding:32px 48px;">
-          <div style="background:#2B3A2E;border-radius:14px;padding:36px;text-align:center;border:3px solid #F2843C;">
-            <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.4);">Prochaine étape</p>
-            <p style="margin:0 0 8px;font-size:22px;font-weight:700;color:#FBFDF7;line-height:1.3;">Accède à ton espace<br>et découvre le menu de <span style="color:#2FA35E;">${prenom}</span></p>
-            <p style="margin:0 0 20px;font-size:13px;color:rgba(245,240,232,0.5);">Ton menu de la semaine t'attend — recettes, quantités et liste de courses.</p>
-            <a href="${accessUrl}" style="display:inline-block;background:#2FA35E;color:white;padding:18px 36px;border-radius:4px;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.04em;border:2px solid #F2843C;">
-              Accéder à mon espace et mon menu →
-            </a>
-            <p style="margin:14px 0 0;font-size:11px;color:rgba(245,240,232,0.3);">Un lien de connexion sécurisé te sera envoyé automatiquement.</p>
-          </div>
+        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #E3EDE1;border-top:none;border-radius:0 0 20px 20px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #EDF2EA;">
+            <tr><td style="padding-top:28px;text-align:center;">
+              <a href="${accessUrl}" style="display:inline-block;background:#2FA35E;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Accéder à l'espace de ${prenom} →</a>
+            </td></tr>
+          </table>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FBFDF7;padding:0 48px 32px;">
-          <div style="border-top:1px solid #DDE8DA;padding-top:24px;">
-            <p style="margin:0;font-size:11px;color:#7E8C80;line-height:1.7;">⚠ Ce rapport est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consulte ton vétérinaire avant tout changement alimentaire.</p>
-          </div>
-        </td>
-      </tr>
-
-      <tr>
-        <td style="background:#233028;border-radius:0 0 16px 16px;padding:28px 48px;border-top:3px solid #EC6592;">
+        <td style="padding:24px 32px 0;">
+          <p style="margin:0 0 12px;font-size:11px;color:#9AA69B;line-height:1.7;">⚠ Ce rapport est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consulte ton vétérinaire avant tout changement alimentaire.</p>
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
-              <td>
-                <p style="margin:0;font-size:13px;font-weight:700;color:#FBFDF7;letter-spacing:0.04em;">kyno</p>
-                <p style="margin:4px 0 0;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(245,240,232,0.25);">Lyon, France</p>
-              </td>
-              <td align="right">
-                <a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:rgba(245,240,232,0.35);text-decoration:none;">colinemngl@gmail.com</a>
-                <p style="margin:4px 0 0;font-size:10px;color:rgba(245,240,232,0.2);">© 2026 Kyno</p>
-              </td>
+              <td><span style="font-size:12px;font-weight:700;color:#5B6B5D;">kyno</span> <span style="font-size:11px;color:#9AA69B;">· Lyon, France</span></td>
+              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:#9AA69B;text-decoration:none;">colinemngl@gmail.com</a></td>
             </tr>
           </table>
         </td>
