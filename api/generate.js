@@ -299,7 +299,7 @@ async function sendEmailRapport(email, prenom, rapport, data) {
 
   const accessUrl = `https://project-jlc6z.vercel.app/acces.html?email=${encodeURIComponent(email)}`;
 
-  await fetch('https://api.brevo.com/v3/smtp/email', {
+  const emailRes = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -312,6 +312,10 @@ async function sendEmailRapport(email, prenom, rapport, data) {
       htmlContent: buildEmailHtml(prenom, htmlRapport, accessUrl, data, saison)
     })
   });
+  if (!emailRes.ok) {
+    const errBody = await emailRes.text().catch(() => '');
+    throw new Error(`Brevo rapport ${emailRes.status}: ${errBody}`);
+  }
 }
 
 // ── TEMPLATE EMAIL ─────────────────────────────────────────

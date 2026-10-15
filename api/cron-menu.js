@@ -136,7 +136,8 @@ module.exports = async function handler(req, res) {
     }
 
     console.log(`[cron-menu] Récap : ${recap.envoyes} envoyés, ${recap.ignores} ignorés, ${recap.echecs} échecs, ${recap.relances} relances`);
-    return res.status(200).json({ success: true, jourCible, todayParis, ...recap });
+    const hasErrors = recap.echecs > 0;
+    return res.status(hasErrors ? 500 : 200).json({ success: !hasErrors, jourCible, todayParis, ...recap });
 
   } catch (error) {
     console.error('Erreur cron-menu.js:', error);
@@ -521,7 +522,7 @@ async function sendEmailRelance(email, prenom) {
   });
   if (!emailRes.ok) {
     const errBody = await emailRes.text().catch(() => '');
-    console.error(`Erreur email relance pour ${email}:`, errBody);
+    throw new Error(`Brevo relance ${emailRes.status}: ${errBody}`);
   }
 }
 
@@ -542,7 +543,7 @@ async function sendEmailMenu(email, prenom, menuData, profile, saison) {
 
   if (!emailRes.ok) {
     const errBody = await emailRes.text().catch(() => '');
-    console.error(`Erreur envoi email Brevo pour ${email}:`, errBody);
+    throw new Error(`Brevo menu ${emailRes.status}: ${errBody}`);
   }
 }
 
