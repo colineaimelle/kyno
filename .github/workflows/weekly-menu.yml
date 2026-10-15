@@ -1,21 +1,38 @@
-name: Weekly Menu Generation
+name: Daily Menu Generation
 
 on:
   schedule:
-    # Chaque lundi à 7h00 UTC = 8h00 heure de Paris (heure d'été)
-    - cron: '0 7 * * 1'
+    # Chaque jour à 5h00 UTC = 6h00 heure de Paris (hiver) / 7h00 (été)
+    - cron: '0 5 * * *'
   workflow_dispatch:
+    inputs:
+      jour:
+        description: 'Jour cible (1=Lundi … 7=Dimanche). Vide = jour courant Paris.'
+        required: false
+        type: string
+      email_test:
+        description: 'Email de test. Si renseigné, traite UNIQUEMENT cet utilisateur (quel que soit son jour_envoi).'
+        required: false
+        type: string
 
 jobs:
   generate-menus:
     runs-on: ubuntu-latest
     steps:
-      - name: Générer les menus hebdomadaires
+      - name: Générer les menus du jour
         run: |
+          BODY='{}'
+          if [ -n "${{ github.event.inputs.jour }}" ]; then
+            BODY=$(echo "$BODY" | jq --argjson j '${{ github.event.inputs.jour }}' '. + {jour: $j}')
+          fi
+          if [ -n "${{ github.event.inputs.email_test }}" ]; then
+            BODY=$(echo "$BODY" | jq --arg e '${{ github.event.inputs.email_test }}' '. + {email_test: $e}')
+          fi
           response=$(curl -s -o /tmp/response.json -w "%{http_code}" \
             -X POST "${{ secrets.VERCEL_URL }}/api/cron-menu" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json")
+            -H "Content-Type: application/json" \
+            -d "$BODY")
           echo "HTTP status: $response"
           cat /tmp/response.json
           if [ "$response" != "200" ]; then

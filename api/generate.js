@@ -1,5 +1,5 @@
-// api/generate.js — v3
-// Aligné avec le nouveau quiz 21 questions (juin 2026)
+// api/generate.js — v4
+// Aligné avec le nouveau quiz 22 questions (jour d'envoi ajouté)
 // Champs quiz → Supabase → espace client
 
 // ── HELPER : fusionner tableau + champ "autre" ─────────────
@@ -97,6 +97,13 @@ async function saveToSupabase(data, statut) {
 
     // Données contextuelles
     alimentation_actuelle:   alimentation,
+
+    // Préférences d'envoi (Q21 — entier 1-7, 1=lundi par défaut)
+    jour_envoi: (Number.isInteger(data.jourEnvoi) && data.jourEnvoi >= 1 && data.jourEnvoi <= 7)
+      ? data.jourEnvoi
+      : (Number.isInteger(parseInt(data.jourEnvoi)) && parseInt(data.jourEnvoi) >= 1 && parseInt(data.jourEnvoi) <= 7)
+        ? parseInt(data.jourEnvoi)
+        : 1,
   };
 
   const response = await fetch(url, {

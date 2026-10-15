@@ -1,6 +1,35 @@
-// api/cron-menu.js
-// Appelé chaque lundi à 8h (Paris) par GitHub Actions
-// Génère et envoie le menu hebdomadaire pour tous les abonnés actifs
+// api/cron-menu.js — v2
+// Cron quotidien (5h UTC via GitHub Actions).
+// Ne traite que les utilisateurs dont le jour_envoi correspond au jour courant
+// en heure Europe/Paris. Anti-doublon via dernier_menu_envoye_le.
+
+// ── HELPERS TIMEZONE ──────────────────────────────────────────
+function getDayParis() {
+  // Retourne 1=lundi … 7=dimanche (ISO) en heure Europe/Paris
+  const parisDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+  const d = parisDate.getDay(); // 0=dim … 6=sam
+  return d === 0 ? 7 : d;
+}
+
+function getTodayParis() {
+  // Retourne YYYY-MM-DD en heure Europe/Paris
+  return new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
+}
+
+// ── SLEEP & RETRY ─────────────────────────────────────────────
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function withRetry(fn, label, maxAttempts = 3) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const result = await fn();
+    if (result.ok) return result;
+    const retryable = result.status === 429 || result.status >= 500;
+    if (!retryable || attempt === maxAttempts) return result;
+    const delay = Math.pow(2, attempt) * 1000;
+    console.warn(`[retry ${attempt}/${maxAttempts}] ${label} — statut ${result.status}, attente ${delay}ms`);
+    await sleep(delay);
+  }
+}
 
 module.exports = async function handler(req, res) {
 
@@ -14,52 +43,100 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const usersRes = await fetch(
-      `${process.env.SUPABASE_URL}/rest/v1/user?statut=in.("beta","actif")&menu_envoye=eq.true&select=*`,
-      {
+    // ── Mode test : email_test isole un seul utilisateur ────────
+    const emailTest = req.body?.email_test ? String(req.body.email_test).trim() : null;
+
+    // ── Jour cible : paramètre manuel (workflow_dispatch) OU jour Paris ──
+    const jourParam = req.body?.jour ? parseInt(req.body.jour) : null;
+    const jourCible = (jourParam >= 1 && jourParam <= 7) ? jourParam : getDayParis();
+    const todayParis = getTodayParis();
+    const cutoff5j = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const cutoff14j = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+
+    if (emailTest) {
+      console.log(`[cron-menu] MODE TEST — email_test=${emailTest}`);
+    } else {
+      console.log(`[cron-menu] jour_cible=${jourCible}, today_paris=${todayParis}`);
+    }
+
+    // ── Récupérer les utilisateurs ────────────────────────────
+    // Mode test : 1 seul utilisateur par email, quel que soit son jour_envoi
+    // Mode normal : filtre par jour_envoi + statut
+    const supabaseQuery = emailTest
+      ? `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(emailTest)}&select=*`
+      : `${process.env.SUPABASE_URL}/rest/v1/user?statut=in.("beta","actif")&menu_envoye=eq.true&jour_envoi=eq.${jourCible}&select=*`;
+
+    const usersRes = await fetch(supabaseQuery, {
         headers: {
           'apikey': process.env.SUPABASE_SERVICE_KEY,
           'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`
         }
-      }
-    );
+      });
 
     const users = await usersRes.json();
     if (!Array.isArray(users) || !users.length) {
-      return res.status(200).json({ success: true, processed: 0, message: 'Aucun abonné actif' });
+      console.log('[cron-menu] Aucun abonné pour ce jour.');
+      return res.status(200).json({ success: true, processed: 0, envoyes: 0, ignores: 0, echecs: 0 });
     }
 
     const saison = getSaison();
-    const results = [];
+    const recap = { envoyes: 0, ignores: 0, echecs: 0, relances: 0, details: [] };
 
-    const relanceResults = [];
-    const cutoff14j = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+    // ── Traitement par lots de 3 ──────────────────────────────
+    const BATCH_SIZE = 3;
+    const BATCH_PAUSE = 2000;
 
-    for (const profile of users) {
-      // Email de relance si inactif depuis 14 jours
-      const derniereConnexion = profile.derniere_connexion ? new Date(profile.derniere_connexion) : null;
-      if (!derniereConnexion || derniereConnexion < cutoff14j) {
-        try {
-          await sendEmailRelance(profile.email, profile.prenom_chien || profile.prenom || 'ton chien');
-          relanceResults.push({ email: profile.email, relance: true });
-          console.log(`Email relance envoyé pour ${profile.prenom_chien || profile.email}`);
-        } catch (relErr) {
-          console.error(`Erreur relance pour ${profile.email}:`, relErr.message);
+    for (let i = 0; i < users.length; i += BATCH_SIZE) {
+      const lot = users.slice(i, i + BATCH_SIZE);
+
+      await Promise.all(lot.map(async profile => {
+        const nom = profile.prenom_chien || profile.email;
+
+        // Anti-doublon : skip si déjà envoyé dans les 5 derniers jours
+        if (profile.dernier_menu_envoye_le && profile.dernier_menu_envoye_le >= cutoff5j) {
+          console.log(`[skip doublon] ${nom} — dernier envoi ${profile.dernier_menu_envoye_le}`);
+          recap.ignores++;
+          recap.details.push({ email: profile.email, status: 'ignore', reason: 'doublon' });
+          return;
         }
-      }
 
-      // Génération du menu
-      try {
-        await generateMenuForUser(profile, saison);
-        results.push({ email: profile.email, status: 'ok' });
-        console.log(`Menu généré pour ${profile.prenom_chien || profile.email}`);
-      } catch (err) {
-        console.error(`Erreur menu pour ${profile.email}:`, err.message);
-        results.push({ email: profile.email, status: 'error', error: err.message });
-      }
+        // Email de relance : seulement si c'est le jour d'envoi ET inactif > 14j
+        const derniereConnexion = profile.derniere_connexion ? new Date(profile.derniere_connexion) : null;
+        const relanceEligible = !derniereConnexion || derniereConnexion < cutoff14j;
+        if (relanceEligible) {
+          // Vérifier qu'on n'a pas déjà relancé cette semaine (dernier_menu_envoye_le comme proxy)
+          const derniereRelanceDateISO = profile.derniere_relance || null;
+          const cutoff7j = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+          if (!derniereRelanceDateISO || derniereRelanceDateISO < cutoff7j) {
+            try {
+              await sendEmailRelance(profile.email, profile.prenom_chien || profile.prenom || 'ton chien');
+              await patchSupabase(profile.email, { derniere_relance: todayParis });
+              recap.relances++;
+              console.log(`[relance] ${nom}`);
+            } catch (relErr) {
+              console.error(`[relance erreur] ${nom}:`, relErr.message);
+            }
+          }
+        }
+
+        // Génération du menu
+        try {
+          await generateMenuForUser(profile, saison, todayParis);
+          recap.envoyes++;
+          recap.details.push({ email: profile.email, status: 'ok' });
+          console.log(`[ok] Menu envoyé pour ${nom}`);
+        } catch (err) {
+          recap.echecs++;
+          recap.details.push({ email: profile.email, status: 'error', error: err.message });
+          console.error(`[erreur] ${nom}:`, err.message);
+        }
+      }));
+
+      if (i + BATCH_SIZE < users.length) await sleep(BATCH_PAUSE);
     }
 
-    return res.status(200).json({ success: true, processed: users.length, results, relances: relanceResults });
+    console.log(`[cron-menu] Récap : ${recap.envoyes} envoyés, ${recap.ignores} ignorés, ${recap.echecs} échecs, ${recap.relances} relances`);
+    return res.status(200).json({ success: true, jourCible, todayParis, ...recap });
 
   } catch (error) {
     console.error('Erreur cron-menu.js:', error);
@@ -67,7 +144,7 @@ module.exports = async function handler(req, res) {
   }
 };
 
-async function generateMenuForUser(profile, saison) {
+async function generateMenuForUser(profile, saison, todayParis) {
   const email = profile.email;
   const nom = profile.prenom_chien || profile.prenom || 'ton chien';
   const pm = profile.poids ? Math.pow(profile.poids, 0.75).toFixed(2) : 'à calculer';
@@ -93,25 +170,28 @@ async function generateMenuForUser(profile, saison) {
     await patchSupabase(email, { poids_historique: poidsUpdated });
   }
 
-  // ── 3. Générer le nouveau menu via Claude ──────────────────
-  const menuRes = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 8000,
-      system: buildMenuPrompt(profile, saison, pm, profile.proteine_principale || null),
-      messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
-    })
-  });
+  // ── 3. Générer le nouveau menu via Claude (retry 429/5xx) ────
+  const menuRes = await withRetry(
+    () => fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 8000,
+        system: buildMenuPrompt(profile, saison, pm, profile.proteine_principale || null),
+        messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
+      })
+    }),
+    `Claude menu pour ${nom}`
+  );
 
   if (!menuRes.ok) {
     const err = await menuRes.json().catch(() => ({}));
-    throw new Error(err.error?.message || 'Erreur API Anthropic');
+    throw new Error(err.error?.message || `Erreur API Anthropic (${menuRes.status})`);
   }
 
   const menuResult = await menuRes.json();
@@ -231,6 +311,11 @@ async function generateMenuForUser(profile, saison) {
 
   // ── 7. Envoyer l'email ─────────────────────────────────────
   await sendEmailMenu(email, nom, menuData, profile, saison);
+
+  // ── 8. Marquer l'envoi (seulement après succès) ────────────
+  if (todayParis) {
+    await patchSupabase(email, { dernier_menu_envoye_le: todayParis });
+  }
 }
 
 async function patchSupabase(email, fields) {
