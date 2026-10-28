@@ -3,6 +3,7 @@
 // Charge les chiens actifs par foyer et génère un menu par foyer.
 
 const { getSaison, buildMultiDogMenuPrompt, buildEmailMenuHtml } = require('./lib/menuGen');
+const { getTermesExclus, detecterTermeInterdit } = require('./lib/allergenes');
 
 // ── HELPERS TIMEZONE ──────────────────────────────────────────
 function getDayParis() {
@@ -86,6 +87,33 @@ async function loadChiensForFoyer(email) {
     return [];
   }
   return await res.json().catch(() => []);
+}
+
+// ── VÉRIFICATION ALLERGIES POST-GÉNÉRATION ────────────────────
+// Retourne la liste des violations (terme interdit trouvé dans la recette d'un chien).
+function verifierAllergiesMenu(menuData, chiens) {
+  const chienMap = {};
+  chiens.forEach(c => { chienMap[c.id] = c; });
+
+  const violations = [];
+  for (const mc of (menuData.chiens || [])) {
+    const chien = chienMap[mc.chien_id];
+    if (!chien) continue;
+    const termesExclus = getTermesExclus(chien.allergies);
+    if (!termesExclus.length) continue;
+
+    for (const ing of (mc.recette?.ingredients || [])) {
+      const found = detecterTermeInterdit(ing.name, termesExclus);
+      if (found) violations.push({ chien: chien.prenom_chien, champ: `ingrédient "${ing.name}"`, terme: found });
+    }
+    for (const champ of ['titre', 'note']) {
+      const found = detecterTermeInterdit(mc.recette?.[champ], termesExclus);
+      if (found) violations.push({ chien: chien.prenom_chien, champ, terme: found });
+    }
+    const found = detecterTermeInterdit(mc.batch_special, termesExclus);
+    if (found) violations.push({ chien: chien.prenom_chien, champ: 'batch_special', terme: found });
+  }
+  return violations;
 }
 
 // ── HANDLER PRINCIPAL ─────────────────────────────────────────
@@ -229,46 +257,64 @@ async function generateMenuForFoyer(foyer, chiens, saison, todayParis) {
     await patchSupabase(email, { poids_historique: [...existingPoids, poidsEntry].slice(-6) });
   }
 
-  // ── 3. Générer le menu via Claude ──────────────────────────────────────────
-  const menuRes = await withRetry(
-    () => fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 8000,
-        system: buildMultiDogMenuPrompt(chiensToProcess, foyer, saison),
-        messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
-      })
-    }),
-    `Claude menu pour ${nomsFoyer}`
-  );
-
-  if (!menuRes.ok) {
-    const err = await menuRes.json().catch(() => ({}));
-    throw new Error(err.error?.message || `Erreur API Anthropic (${menuRes.status})`);
-  }
-
-  const menuResult = await menuRes.json();
-  let rawText = menuResult.content[0].text.trim();
-  rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
-  const first = rawText.indexOf('{');
-  const last  = rawText.lastIndexOf('}');
-  if (first > 0 || last < rawText.length - 1) rawText = rawText.slice(first, last + 1);
-
+  // ── 3. Générer le menu via Claude (max 2 tentatives si violation allergie) ──
+  const systemPrompt = buildMultiDogMenuPrompt(chiensToProcess, foyer, saison);
   let menuData;
-  try {
-    menuData = JSON.parse(rawText);
-  } catch (parseErr) {
-    throw new Error(`Parsing JSON menu échoué: ${parseErr.message}`);
-  }
 
-  if (!Array.isArray(menuData.chiens) || !menuData.chiens.length) {
-    throw new Error('Réponse Claude invalide : champ "chiens" manquant ou vide');
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const menuRes = await withRetry(
+      () => fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 8000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
+        })
+      }),
+      `Claude menu pour ${nomsFoyer} (tentative ${attempt})`
+    );
+
+    if (!menuRes.ok) {
+      const err = await menuRes.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Erreur API Anthropic (${menuRes.status})`);
+    }
+
+    const menuResult = await menuRes.json();
+    let rawText = menuResult.content[0].text.trim();
+    rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
+    const first = rawText.indexOf('{');
+    const last  = rawText.lastIndexOf('}');
+    if (first > 0 || last < rawText.length - 1) rawText = rawText.slice(first, last + 1);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(rawText);
+    } catch (parseErr) {
+      throw new Error(`Parsing JSON menu échoué: ${parseErr.message}`);
+    }
+
+    if (!Array.isArray(parsed.chiens) || !parsed.chiens.length) {
+      throw new Error('Réponse Claude invalide : champ "chiens" manquant ou vide');
+    }
+
+    // Vérification allergies post-génération
+    const violations = verifierAllergiesMenu(parsed, chiensToProcess);
+    if (!violations.length) {
+      menuData = parsed;
+      break;
+    }
+
+    const violationsStr = violations.map(v => `${v.chien} — ${v.champ} contient "${v.terme}"`).join('; ');
+    if (attempt === 2) {
+      throw new Error(`Violations allergie après régénération : ${violationsStr}`);
+    }
+    console.warn(`[allergie][tentative ${attempt}] violations détectées, régénération : ${violationsStr}`);
   }
 
   // ── 4. Sauvegarder les données par chien dans la table `chien` ─────────────

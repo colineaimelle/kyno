@@ -2,6 +2,8 @@
 // Shared helpers : prompt multi-chiens, email HTML, utilitaires.
 // Importé par cron-menu.js et chat.js.
 
+const { getTermesExclus, getAlimentsProches, detecterTermeInterdit } = require('./allergenes');
+
 function getSaison() {
   const m = new Date().getMonth() + 1;
   if (m >= 3 && m <= 5) return 'Printemps';
@@ -28,9 +30,15 @@ function buildMultiDogMenuPrompt(chiens, foyer, saison) {
     const nom = chien.prenom_chien || 'ce chien';
     const intolerances = Array.isArray(chien.allergies) ? chien.allergies : [];
     if (intolerances.length > 0) {
+      const termesExclus = getTermesExclus(intolerances);
+      const alimentsProches = getAlimentsProches(intolerances);
       topBlocks += `⚠️ INTERDICTION ABSOLUE pour ${nom} — LIS EN PREMIER :\n`;
-      topBlocks += `Ces ingrédients sont STRICTEMENT INTERDITS dans la recette de ${nom} : ${intolerances.join(', ')}.\n`;
-      topBlocks += `NE LES UTILISE JAMAIS dans la recette de ${nom}, même en traces. La vie de ${nom} est en jeu.\n\n`;
+      topBlocks += `Ces ingrédients ET TOUS LEURS DÉRIVÉS sont STRICTEMENT INTERDITS dans la recette de ${nom} :\n`;
+      topBlocks += termesExclus.map(t => `  • ${t}`).join('\n') + '\n';
+      topBlocks += `NE LES UTILISE JAMAIS dans la recette de ${nom}, même en traces. Inclure foie, abats, bouillon, graisse, hydrolysat ou arôme d'une protéine interdite est une violation.\n\n`;
+      if (alimentsProches.length > 0) {
+        topBlocks += `ℹ️ Aliments proches autorisés mais à éviter si possible pour ${nom} : ${alimentsProches.join(', ')}. Si tu en utilises, ils seront signalés au propriétaire.\n\n`;
+      }
     }
     if (chien.proteine_principale) {
       topBlocks += `⚠️ ROTATION PROTÉINES pour ${nom} : menu précédent = ${chien.proteine_principale}. Choisis OBLIGATOIREMENT une protéine différente pour ${nom} cette semaine.\n\n`;
@@ -81,7 +89,7 @@ function buildMultiDogMenuPrompt(chiens, foyer, saison) {
         "titre": "nom court de la recette de ${nom}",
         "ration": <grammes par repas pour ${nom}>,
         "ingredients": [
-          {"name": "ingrédient", "qty": "quantité par repas pour ${nom}, ex: 80 g"}
+          {"name": "ingrédient", "qty": "quantité CRU par repas pour ${nom}, ex: 40 g (≈ 120 g cuit)"}
         ],
         "note": "1 phrase pourquoi cette recette est bonne pour ${nom}"
       },
@@ -133,8 +141,8 @@ Les compléments sensibles (huile, CMV, etc.) sont ajoutés AU MOMENT DU REPAS, 
 ${chiensJsonExample}
   ],
   "courses_commune": [
-    {"cat": "Viandes & poissons", "items": [{"name": "ingrédient", "qty": "quantité TOTALE pour tous les chiens × 7 jours × 2 repas"}]},
-    {"cat": "Légumes & féculents", "items": [{"name": "ingrédient", "qty": "quantité totale foyer"}]},
+    {"cat": "Viandes & poissons", "items": [{"name": "ingrédient", "qty": "quantité CRU TOTALE pour tous les chiens × 14 repas"}]},
+    {"cat": "Légumes & féculents", "items": [{"name": "ingrédient", "qty": "quantité CRU TOTALE foyer (pour les féculents : poids cru avant cuisson × 14 repas)"}]},
     {"cat": "Compléments",         "items": [{"name": "ingrédient", "qty": "quantité totale foyer"}]}
   ],
   "batch_cooking_commun": [
@@ -151,8 +159,8 @@ ${chiensJsonExample}
 
 ## RÈGLES IMPORTANTES
 - "ration" = grammes PAR REPAS pour ce chien (matin = soir)
-- "qty" dans recette.ingredients = quantité par repas pour CE chien uniquement
-- "qty" dans courses_commune = quantité TOTALE foyer (somme tous chiens × 14 repas = 7 jours × 2 repas)
+- "qty" dans recette.ingredients = quantité CRU par repas pour CE chien uniquement
+- "qty" dans courses_commune = quantité CRU TOTALE foyer = (poids cru par repas × nb chiens concernés) × 14 repas. Pour les féculents qui absorbent l'eau (riz × 3, lentilles × 2,5, pâtes × 2,5) : utilise le poids CRU, jamais le poids cuit. Exemple : 40 g riz cru/repas × 14 = 560 g cru (non : 120 g cuit × 14 = 1680 g, non : 350 g)
 - "batch_special" : compléments ajoutés au bol — jamais cuits (huile, CMV, levure…)
 - "proteine_principale" : une seule protéine en minuscules sans article
 - "score_sante" : 85-100 excellent, 70-84 bonne forme, 55-69 à surveiller, <55 vigilance
@@ -216,6 +224,8 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
     const sousTitre = [race, poids].filter(Boolean).join(' · ');
     const recette = mc.recette || {};
 
+    const prochesAlert = buildProchesAlert(chien, recette);
+
     return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -272,6 +282,7 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
               </td>
             </tr>
           </table>` : ''}
+          ${prochesAlert}
           <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#2B3A2E;">Liste de courses (7 jours)</h2>
           <p style="margin:0 0 28px;font-size:14.5px;color:#3C473D;line-height:1.9;">${coursesHtml}</p>
         </td>
@@ -313,6 +324,7 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
     const poids = chien.poids ? chien.poids + ' kg' : '';
     const sousTitre = [race, poids].filter(Boolean).join(' · ');
     const recette = mc.recette || {};
+    const prochesAlertDog = buildProchesAlert(chien, recette);
 
     return `
       <tr>
@@ -341,13 +353,14 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
             </tr>
           </table>
           ${mc.batch_special ? `
-          <table width="100%" cellpadding="0" cellspacing="0">
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 10px;">
             <tr>
               <td style="background:#FBE4D8;border-radius:8px;padding:12px 16px;">
                 <p style="margin:0;font-size:13px;color:#8A4420;line-height:1.7;"><strong>Au moment du repas :</strong> ${mc.batch_special}</p>
               </td>
             </tr>
           </table>` : ''}
+          ${prochesAlertDog}
         </td>
       </tr>`;
   }).join('');
@@ -409,6 +422,37 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
   </table>
 </body>
 </html>`;
+}
+
+// ── ALERTE ALIMENTS PROCHES ────────────────────────────────────────────────────
+// Détecte si des aliments proches d'un allergène sont présents dans la recette.
+// Retourne un bloc HTML d'avertissement, ou '' si rien à signaler.
+function buildProchesAlert(chien, recette) {
+  const allergies = Array.isArray(chien.allergies) ? chien.allergies : [];
+  if (!allergies.length) return '';
+  const alimentsProches = getAlimentsProches(allergies);
+  if (!alimentsProches.length) return '';
+
+  const detected = new Set();
+  for (const proche of alimentsProches) {
+    for (const ing of (recette.ingredients || [])) {
+      if (detecterTermeInterdit(ing.name, [proche])) {
+        detected.add(proche);
+        break;
+      }
+    }
+  }
+  if (!detected.size) return '';
+
+  const liste = [...detected].join(', ');
+  return `
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin:10px 0 0;">
+    <tr>
+      <td style="background:#FFF8E1;border-radius:8px;padding:12px 16px;border-left:3px solid #F59E0B;">
+        <p style="margin:0;font-size:12px;color:#78350F;line-height:1.7;">⚠️ <strong>${liste}</strong> est proche des allergènes de ${chien.prenom_chien || 'ton chien'}. À introduire progressivement et à mentionner à ton vétérinaire.</p>
+      </td>
+    </tr>
+  </table>`;
 }
 
 module.exports = { getSaison, getLabelSemaine, buildMultiDogMenuPrompt, buildEmailMenuHtml };
