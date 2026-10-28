@@ -1,26 +1,58 @@
-// api/chat.js — v3
-// 1 seule recette par menu (donnée matin et soir)
+// api/chat.js — v4 multi-chiens
+// chien_id obligatoire (fallback auto si absent jusqu'à la Phase 3 espace-client).
+// chat_history et observations lus/écrits sur la table `chien`.
+// Vérification d'appartenance par JWT (ou email body en fallback).
+
+const { getSaison, buildMultiDogMenuPrompt, buildEmailMenuHtml } = require('./lib/menuGen');
 
 module.exports = async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
 
   try {
-    const { messages, profile, email } = req.body;
+    const { messages, profile, email, chien_id } = req.body;
     if (!messages || !profile) return res.status(400).json({ error: 'Données incomplètes' });
 
+    // ── Vérification d'identité JWT ──────────────────────────────────────────
+    const jwtEmail = getEmailFromJwt(req.headers['authorization']);
+    const authedEmail = jwtEmail || email;
+    if (!authedEmail) return res.status(401).json({ error: 'Authentification requise' });
+
+    // ── Résolution du chien_id ───────────────────────────────────────────────
+    let chienId = chien_id;
+    if (!chienId && authedEmail) {
+      // Fallback Phase 2 → 3 : premier chien actif du foyer
+      const fallback = await fetch(
+        `${process.env.SUPABASE_URL}/rest/v1/chien?user_email=eq.${encodeURIComponent(authedEmail)}&actif=eq.true&order=ordre.asc&limit=1&select=id`,
+        { headers: supabaseHeaders() }
+      );
+      if (fallback.ok) {
+        const rows = await fallback.json().catch(() => []);
+        if (rows.length) chienId = rows[0].id;
+      }
+    }
+    if (!chienId) return res.status(400).json({ error: 'chien_id manquant' });
+
+    // ── Vérification d'appartenance du chien ────────────────────────────────
+    const owned = await verifyChienOwnership(chienId, authedEmail);
+    if (!owned) return res.status(403).json({ error: 'Accès interdit à ce chien' });
+
+    // ── Contexte chat ────────────────────────────────────────────────────────
     const saison = getSaison();
-    const pm = profile.poids ? Math.pow(profile.poids, 0.75).toFixed(2) : 'inconnu';
+    const pm  = profile.poids ? Math.pow(profile.poids, 0.75).toFixed(2) : 'inconnu';
     const nom = profile.prenom_chien || profile.prenom || 'ton chien';
 
-    const sexe = (profile.sexe || '').toLowerCase();
+    const sexe      = (profile.sexe || '').toLowerCase();
     const estFemelle = sexe.includes('femelle');
-    const allergies = Array.isArray(profile.allergies) ? profile.allergies : [];
+    const allergies  = Array.isArray(profile.allergies) ? profile.allergies : [];
+    const objectifsStr = Array.isArray(profile.objectifs)
+      ? profile.objectifs.join(', ')
+      : (typeof profile.objectifs === 'string' ? profile.objectifs : 'non renseignés');
 
     const recettesActuelles = Array.isArray(profile.recettes) && profile.recettes.length > 0
       ? profile.recettes.map(r => `- ${r.moment} : ${r.titre} (${r.ration}g/repas)`).join('\n')
@@ -48,7 +80,7 @@ PROFIL COMPLET :
 - Activité : ${profile.activite || 'non renseignée'}
 - Environnement : ${profile.environnement || 'non renseigné'}
 - Antécédents : ${profile.antecedents || 'aucun'}
-- Objectifs : ${Array.isArray(profile.objectifs) ? profile.objectifs.join(', ') : 'non renseignés'}
+- Objectifs : ${objectifsStr}
 - Saison actuelle : ${saison}
 
 ─────────────────────────────────────────────────
@@ -109,7 +141,7 @@ CAPACITÉS : Tu ES capable de générer et mettre à jour le menu de ${nom} dire
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1200,
         system: systemPrompt,
         messages: formattedMessages
@@ -125,7 +157,7 @@ CAPACITÉS : Tu ES capable de générer et mettre à jour le menu de ${nom} dire
     let rawText = claudeResult.content[0].text.trim();
     rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
     const first = rawText.indexOf('{');
-    const last = rawText.lastIndexOf('}');
+    const last  = rawText.lastIndexOf('}');
     if (first > 0 || last < rawText.length - 1) rawText = rawText.slice(first, last + 1);
 
     let parsed;
@@ -136,41 +168,59 @@ CAPACITÉS : Tu ES capable de générer et mettre à jour le menu de ${nom} dire
       return res.status(200).json({ success: true, reply: rawText, menuGenere: false });
     }
 
-    const reply = parsed.reply || '';
-    const updates = parsed.updates || {};
-    const genererMenu = parsed.generer_menu === true;
+    const reply          = parsed.reply || '';
+    const updates        = parsed.updates || {};
+    const genererMenu    = parsed.generer_menu === true;
     const newObservations = Array.isArray(parsed.observations) ? parsed.observations : [];
 
-    if (email && Object.keys(updates).length > 0) {
+    // ── Mises à jour du profil chien ────────────────────────────────────────
+    if (authedEmail && Object.keys(updates).length > 0) {
       const patch = { ...updates };
+
       if (Array.isArray(updates.allergies) && updates.allergies.length > 0) {
-        const merged = [...new Set([...allergies, ...updates.allergies])];
-        patch.allergies = merged;
+        patch.allergies = [...new Set([...allergies, ...updates.allergies])];
       }
-      // Mise à jour poids_historique seulement si le poids a réellement changé
+
+      // poids_historique → reste sur user (backward compat)
+      let userPatch = {};
       if (updates.poids != null && updates.poids !== profile.poids) {
         const existingPoids = Array.isArray(profile.poids_historique) ? profile.poids_historique : [];
         const today = new Date().toISOString().split('T')[0];
-        patch.poids_historique = [...existingPoids, { label: today, poids: updates.poids }].slice(-6);
+        userPatch.poids_historique = [...existingPoids, { label: today, poids: updates.poids }].slice(-6);
       }
-      await patchSupabase(email, patch);
+
+      // Champs chien → table chien
+      const CHIEN_FIELDS = new Set(['poids', 'allergies', 'sensibilites', 'objectifs', 'activite', 'comportement',
+        'race', 'age', 'sexe', 'maladies', 'traitements', 'reactions_allergiques', 'reaction_statut',
+        'mode_alimentaire', 'alimentation_actuelle', 'observations', 'proteine_principale', 'apports', 'batch_special']);
+      const chienPatch = {};
+      Object.entries(patch).forEach(([k, v]) => {
+        if (CHIEN_FIELDS.has(k)) chienPatch[k] = v;
+        else userPatch[k] = v;
+      });
+
+      if (Object.keys(chienPatch).length > 0) await patchChien(chienId, chienPatch);
+      if (Object.keys(userPatch).length > 0)  await patchSupabase(authedEmail, userPatch);
       Object.assign(profile, patch);
     }
 
-    if (email) {
+    // ── Historique du chat → chien ───────────────────────────────────────────
+    if (authedEmail) {
       const updatedHistory = [...messages, { role: 'assistant', content: reply }];
-      await saveChatHistory(email, updatedHistory);
+      await saveChatHistory(chienId, updatedHistory);
     }
 
-    if (email && newObservations.length > 0) {
-      await saveObservations(email, newObservations);
+    // ── Observations → chien ─────────────────────────────────────────────────
+    if (authedEmail && newObservations.length > 0) {
+      await saveObservations(chienId, newObservations);
     }
 
+    // ── Génération du menu du foyer entier ───────────────────────────────────
     let menuGenere = false;
-    if (genererMenu && email) {
+    if (genererMenu && authedEmail) {
       try {
         const updatedPm = profile.poids ? Math.pow(profile.poids, 0.75).toFixed(2) : pm;
-        menuGenere = await generateAndSaveMenu(email, profile, saison, updatedPm);
+        menuGenere = await generateAndSaveMenu(authedEmail, chienId, profile, saison, updatedPm);
       } catch (menuErr) {
         console.error('Erreur génération menu depuis chat:', menuErr);
       }
@@ -184,61 +234,81 @@ CAPACITÉS : Tu ES capable de générer et mettre à jour le menu de ${nom} dire
   }
 };
 
+// ── HELPERS AUTH ──────────────────────────────────────────────
+function getEmailFromJwt(authHeader) {
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  const token = authHeader.slice(7);
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf8'));
+    return payload.email || null;
+  } catch {
+    return null;
+  }
+}
+
+async function verifyChienOwnership(chienId, email) {
+  const res = await fetch(
+    `${process.env.SUPABASE_URL}/rest/v1/chien?id=eq.${encodeURIComponent(chienId)}&user_email=eq.${encodeURIComponent(email)}&select=id&limit=1`,
+    { headers: supabaseHeaders() }
+  );
+  if (!res.ok) return false;
+  const rows = await res.json().catch(() => []);
+  return rows.length > 0;
+}
+
+// ── HELPERS SUPABASE ──────────────────────────────────────────
+function supabaseHeaders() {
+  return {
+    'apikey': process.env.SUPABASE_SERVICE_KEY,
+    'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`
+  };
+}
+
 async function patchSupabase(email, fields) {
   const res = await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
     {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': process.env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-        'Prefer': 'return=minimal'
-      },
+      headers: { 'Content-Type': 'application/json', ...supabaseHeaders(), 'Prefer': 'return=minimal' },
       body: JSON.stringify(fields)
     }
   );
   if (!res.ok) {
     const errBody = await res.text().catch(() => '');
-    console.error('Erreur PATCH Supabase profil:', res.status, errBody);
+    console.error('Erreur PATCH user:', res.status, errBody);
   }
 }
 
-async function saveChatHistory(email, messages) {
+async function patchChien(chienId, fields) {
   const res = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
+    `${process.env.SUPABASE_URL}/rest/v1/chien?id=eq.${encodeURIComponent(chienId)}`,
     {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': process.env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({ chat_history: messages })
+      headers: { 'Content-Type': 'application/json', ...supabaseHeaders(), 'Prefer': 'return=minimal' },
+      body: JSON.stringify(fields)
     }
   );
   if (!res.ok) {
     const errBody = await res.text().catch(() => '');
-    console.error('Erreur PATCH chat_history:', res.status, errBody);
+    console.error(`Erreur PATCH chien ${chienId}:`, res.status, errBody);
   }
 }
 
-async function saveObservations(email, newObs) {
+async function saveChatHistory(chienId, messages) {
+  await patchChien(chienId, { chat_history: messages });
+}
+
+async function saveObservations(chienId, newObs) {
   const getRes = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}&select=observations`,
-    {
-      headers: {
-        'apikey': process.env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`
-      }
-    }
+    `${process.env.SUPABASE_URL}/rest/v1/chien?id=eq.${encodeURIComponent(chienId)}&select=observations`,
+    { headers: supabaseHeaders() }
   );
 
   let existing = [];
   if (getRes.ok) {
     const data = await getRes.json().catch(() => []);
-    if (data && data[0] && Array.isArray(data[0].observations)) {
+    if (data?.[0] && Array.isArray(data[0].observations)) {
       existing = data[0].observations;
     }
   }
@@ -248,30 +318,33 @@ async function saveObservations(email, newObs) {
     .filter(o => o && typeof o.texte === 'string' && o.texte.trim())
     .map(o => ({ date: today, texte: o.texte.trim(), source: 'chat' }));
 
-  const merged = [...existing, ...toAdd];
-  const res = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
-    {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': process.env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({ observations: merged })
-    }
-  );
-  if (!res.ok) {
-    const errBody = await res.text().catch(() => '');
-    console.error('Erreur PATCH observations:', res.status, errBody);
-  } else {
-    console.log(`${toAdd.length} observation(s) sauvegardée(s) pour ${email}`);
-  }
+  await patchChien(chienId, { observations: [...existing, ...toAdd] });
+  console.log(`${toAdd.length} observation(s) sauvegardée(s) sur chien ${chienId}`);
 }
 
-async function generateAndSaveMenu(email, profile, saison, pm) {
-  const nom = profile.prenom_chien || profile.prenom || 'ton chien';
+// ── GÉNÉRATION DU MENU DU FOYER ENTIER ───────────────────────
+async function generateAndSaveMenu(email, chienId, profile, saison, pm) {
+  // Charger tous les chiens actifs du foyer
+  const chiensRes = await fetch(
+    `${process.env.SUPABASE_URL}/rest/v1/chien?user_email=eq.${encodeURIComponent(email)}&actif=eq.true&order=ordre.asc&select=*`,
+    { headers: supabaseHeaders() }
+  );
+  let chiens = chiensRes.ok ? await chiensRes.json().catch(() => []) : [];
+
+  // Mettre à jour le chien courant avec les données fraîches du profil en mémoire
+  chiens = chiens.map(c => c.id === chienId ? { ...c, ...profile, id: c.id } : c);
+  if (!chiens.length) chiens = [{ id: chienId, user_email: email, ...profile }];
+
+  const chiensToProcess = chiens.slice(0, 4);
+
+  // Charger les données foyer
+  const foyerRes = await fetch(
+    `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}&select=*`,
+    { headers: supabaseHeaders() }
+  );
+  const foyer = foyerRes.ok
+    ? ((await foyerRes.json().catch(() => []))[0] || {})
+    : {};
 
   const menuRes = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -281,9 +354,9 @@ async function generateAndSaveMenu(email, profile, saison, pm) {
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-5',
+      model: 'claude-sonnet-4-6',
       max_tokens: 6000,
-      system: buildMenuPrompt(profile, saison, pm),
+      system: buildMultiDogMenuPrompt(chiensToProcess, foyer, saison),
       messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
     })
   });
@@ -297,7 +370,7 @@ async function generateAndSaveMenu(email, profile, saison, pm) {
   let rawText = menuResult.content[0].text.trim();
   rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
   const first = rawText.indexOf('{');
-  const last = rawText.lastIndexOf('}');
+  const last  = rawText.lastIndexOf('}');
   if (first > 0 || last < rawText.length - 1) rawText = rawText.slice(first, last + 1);
 
   let menuData;
@@ -308,107 +381,46 @@ async function generateAndSaveMenu(email, profile, saison, pm) {
     throw parseErr;
   }
 
-  // ── 1 SEULE RECETTE sauvegardée ──
-  await patchSupabase(email, {
-    menu_texte:   menuData.email_html || '',
-    recettes:     menuData.recette ? [menuData.recette] : [],
-    batch_steps:  menuData.batch_steps || [],
-    batch_time:   menuData.batch_time || null,
-    batch_special: menuData.batch_special || null,
-    courses:      menuData.courses || [],
+  if (!Array.isArray(menuData.chiens) || !menuData.chiens.length) {
+    throw new Error('Réponse Claude invalide: champ chiens manquant');
+  }
+
+  // Sauvegarder par chien
+  await Promise.all(menuData.chiens.map(async mc => {
+    const patch = {};
+    if (mc.proteine_principale) patch.proteine_principale = mc.proteine_principale;
+    if (Array.isArray(mc.apports) && mc.apports.length) patch.apports = mc.apports;
+    if (mc.batch_special) patch.batch_special = mc.batch_special;
+    if (Object.keys(patch).length) await patchChien(mc.chien_id, patch);
+  }));
+
+  // Sauvegarder au niveau foyer (backward compat)
+  const premierMenu = menuData.chiens[0];
+  const foyerPatch = {
+    menu_texte:   '',
+    recettes:     menuData.chiens.map(mc => mc.recette).filter(Boolean),
+    batch_steps:  menuData.batch_cooking_commun || [],
+    courses:      menuData.courses_commune || [],
     cout_semaine: menuData.cout_semaine || null,
     cout_indus:   menuData.cout_indus || null,
     economie:     menuData.economie || null,
-    menu_envoye:  true
-  });
+    batch_time:   menuData.batch_time || null,
+    menu_envoye:  true,
+  };
+  if (premierMenu.proteine_principale) foyerPatch.proteine_principale = premierMenu.proteine_principale;
+  if (Array.isArray(premierMenu.apports) && premierMenu.apports.length) foyerPatch.apports = premierMenu.apports;
+  if (premierMenu.batch_special) foyerPatch.batch_special = premierMenu.batch_special;
+  await patchSupabase(email, foyerPatch);
 
-  await sendEmailMenu(email, nom, menuData.email_html || '');
-  console.log(`Menu chat généré et sauvegardé pour ${nom} (${email})`);
+  // Envoyer l'email
+  const nomLog = chiensToProcess.map(c => c.prenom_chien || 'Chien').join(' & ');
+  await sendEmailMenu(email, nomLog, buildEmailMenuHtml(foyer, chiensToProcess, menuData, saison));
+
+  console.log(`Menu chat généré pour ${nomLog} (${email})`);
   return true;
 }
 
-function buildMenuPrompt(profile, saison, pm) {
-  const nom = profile.prenom_chien || profile.prenom || 'ton chien';
-  const intolerances = Array.isArray(profile.allergies) ? profile.allergies : [];
-  const equipement = Array.isArray(profile.equipement) ? profile.equipement : [];
-
-  const interdictionBlock = intolerances.length > 0
-    ? `⚠️ INTERDICTION ABSOLUE — LIS CECI EN PREMIER :
-Les ingrédients suivants sont STRICTEMENT INTERDITS dans ce menu : ${intolerances.join(', ')}.
-NE LES UTILISE JAMAIS, ni dans les recettes, ni dans la liste de courses, ni dans le email_html.
-
-`
-    : '';
-
-  return `${interdictionBlock}Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown.
-
-## PROFIL
-- Prénom : ${nom}
-- Race : ${profile.race || 'non renseigné'}
-- Poids : ${profile.poids ? profile.poids + ' kg' : 'non renseigné'} — Poids métabolique : ${pm} kg PM
-- Activité : ${profile.activite || 'non renseigné'}
-- Saison : ${saison}
-- Mode alimentaire : ${profile.modeAlimentaire || profile.mode_alimentaire || 'ration ménagère'}
-- Budget : ${profile.budget || 'moyen'}
-- Équipement : ${equipement.join(', ') || 'standard'}
-- Temps préparation : ${profile.tempsPrep || profile.temps_prep || 'non renseigné'}
-- Intolérances INTERDITES : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
-
-## CONCEPT DU MENU
-Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
-- 1 SEULE RECETTE pour toute la semaine, servie matin et soir
-- Cuisinée en grande quantité pour 7 jours (×14 repas)
-- Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur
-- Adapte les légumes et protéines à la saison : ${saison}
-
-## STRUCTURE JSON EXACTE
-
-{
-  "recette": {
-    "moment": "Menu du jour",
-    "color": "#2B3A2E",
-    "titre": "nom de la recette, court et appétissant",
-    "ration": nombre en grammes par repas (matin = soir = même quantité),
-    "ingredients": [
-      { "name": "nom de l'ingrédient", "qty": "quantité par repas, ex: 80 g" }
-    ],
-    "note": "note nutritionnelle courte, 1 phrase, pourquoi cette recette est bonne pour ${nom}"
-  },
-  "batch_time": "≈ XX min de prépa",
-  "batch_steps": [
-    { "n": 1, "text": "étape détaillée avec temps de cuisson" },
-    { "n": 2, "text": "..." },
-    { "n": 3, "text": "..." }
-  ],
-  "batch_special": "instruction spéciale au moment du repas (huile, CMV, etc.) — à ajouter JAMAIS à la cuisson",
-  "courses": [
-    { "cat": "Viandes & poissons", "items": [{ "name": "ingrédient", "qty": "quantité totale 7 jours" }] },
-    { "cat": "Légumes & féculents", "items": [{ "name": "ingrédient", "qty": "quantité totale 7 jours" }] },
-    { "cat": "Compléments", "items": [{ "name": "ingrédient", "qty": "quantité totale 7 jours" }] }
-  ],
-  "cout_semaine": "XX €",
-  "cout_indus": "XX €",
-  "economie": "XX €",
-  "email_html": "Texte complet du menu en Markdown. Commence par 'Voici le menu de la semaine de ${nom} !'"
-}
-
-## RÈGLES
-- "ration" dans recette = quantité PAR REPAS (matin et soir identiques)
-- "qty" dans ingredients = quantité par repas
-- "qty" dans courses = quantité TOTALE pour 7 jours (×14 repas)
-- batch_special : toujours mentionner huile + CMV à ajouter au bol au moment du repas
-- INTERDICTION ABSOLUE (rappel) : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune intolérance'}
-- JSON strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles`;
-}
-
-async function sendEmailMenu(email, prenom, menu) {
-  const htmlMenu = menu
-    .replace(/\n\n/g, '</p><p style="margin:0 0 16px;">')
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#2B3A2E;font-weight:600;">$1</strong>')
-    .replace(/^/, '<p style="margin:0 0 16px;">')
-    .replace(/$/, '</p>');
-
+async function sendEmailMenu(email, prenom, htmlContent) {
   await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
@@ -419,84 +431,7 @@ async function sendEmailMenu(email, prenom, menu) {
       sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
       to: [{ email, name: prenom }],
       subject: `Le nouveau menu de ${prenom} est prêt ✦`,
-      htmlContent: buildEmailMenuHtml(prenom, htmlMenu)
+      htmlContent
     })
   });
-}
-
-function buildEmailMenuHtml(prenom, htmlContent) {
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#E4F4E8;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#E4F4E8;padding:40px 20px;">
-    <tr><td align="center">
-    <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
-      <tr>
-        <td style="background:#2B3A2E;border-radius:16px 16px 0 0;padding:36px 48px;text-align:center;border-bottom:3px solid #EC6592;">
-          <div style="display:inline-block;width:44px;height:44px;border-radius:50%;border:2px solid #2FA35E;text-align:center;line-height:40px;margin-bottom:12px;">
-            <span style="font-size:22px;font-weight:700;color:#2FA35E;">K</span>
-          </div>
-          <p style="margin:0;font-size:24px;font-weight:700;color:#FBFDF7;letter-spacing:0.06em;">kyno</p>
-          <p style="margin:6px 0 0;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);">Nutrition Canine Individualisée</p>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#2FA35E;padding:20px 48px;border-bottom:3px solid #F2843C;">
-          <p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Menu mis à jour</p>
-          <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FBFDF7;">Le nouveau menu de <em style="font-style:normal;color:#FFCE2E;">${prenom}</em></p>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FBFDF7;padding:40px 48px 0;">
-          <p style="margin:0 0 8px;font-size:15px;color:#2B3A2E;">Bonjour !</p>
-          <p style="margin:0 0 32px;font-size:14px;color:#7E8C80;line-height:1.8;">Suite à tes échanges avec Kyno, voici le menu adapté aux changements récents de <strong style="color:#2B3A2E;">${prenom}</strong>.</p>
-          <div style="height:3px;background:linear-gradient(to right,#2FA35E,#EC6592,#FFCE2E);margin-bottom:32px;border-radius:2px;"></div>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FBFDF7;padding:0 48px;">
-          <div style="background:white;border-radius:12px;padding:36px;border:1px solid #DDE8DA;border-left:4px solid #EC6592;font-size:14px;line-height:1.85;color:#2B3A2E;">
-            ${htmlContent}
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FBFDF7;padding:32px 48px 40px;">
-          <div style="background:#2B3A2E;border-radius:14px;padding:36px;text-align:center;border:3px solid #F2843C;">
-            <p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#FBFDF7;line-height:1.3;">Retrouve ce menu dans<br><span style="font-size:14px;font-weight:400;color:rgba(245,240,232,0.5);">ton espace Kyno</span></p>
-            <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#2FA35E;color:white;padding:16px 32px;border-radius:4px;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.04em;border:2px solid #F2843C;">Accéder à mon espace →</a>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FBFDF7;padding:0 48px 32px;">
-          <div style="border-top:1px solid #DDE8DA;padding-top:24px;">
-            <p style="margin:0;font-size:11px;color:#7E8C80;line-height:1.7;">⚠ Ce menu est éducatif et ne remplace pas un avis vétérinaire.</p>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#233028;border-radius:0 0 16px 16px;padding:28px 48px;border-top:3px solid #EC6592;">
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td><p style="margin:0;font-size:13px;font-weight:700;color:#FBFDF7;">kyno</p></td>
-              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:rgba(245,240,232,0.35);text-decoration:none;">colinemngl@gmail.com</a></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
-}
-
-function getSaison() {
-  const m = new Date().getMonth() + 1;
-  if (m >= 3 && m <= 5) return 'Printemps';
-  if (m >= 6 && m <= 8) return 'Été';
-  if (m >= 9 && m <= 11) return 'Automne';
-  return 'Hiver';
 }

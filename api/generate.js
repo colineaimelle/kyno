@@ -20,93 +20,32 @@ function getSaison() {
   return 'Hiver';
 }
 
-// ── SUPABASE ───────────────────────────────────────────────
-async function saveToSupabase(data, statut) {
-  const url = `${process.env.SUPABASE_URL}/rest/v1/user?on_conflict=email`;
+// ── SUPABASE — FOYER (table "user") ───────────────────────
+function parseJourEnvoi(v) {
+  if (Number.isInteger(v) && v >= 1 && v <= 7) return v;
+  const n = parseInt(v);
+  if (Number.isInteger(n) && n >= 1 && n <= 7) return n;
+  return 1;
+}
 
-  // ── Mapping nouveau quiz → colonnes Supabase ──────────────
-
-  // Intolérances alimentaires (Q12)
-  const intolerances = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
-
-  // Sensibilités / tracas quotidiens (Q10)
-  const sensibilites = mergeAutre(data.tracasQuotidiens, null, ['aucun']);
-
-  // Comportement (Q13)
-  const comportement = Array.isArray(data.comportement)
-    ? data.comportement.filter(v => v && v !== 'aucun')
-    : [];
-
-  // Maladies diagnostiquées (Q8)
-  const maladies = data.maladiesDiagnostiquees && Array.isArray(data.maladiesDiagnostiquees)
-    ? data.maladiesDiagnostiquees
-    : [];
-
-  // Objectifs (Q19)
-  const objectifs = mergeAutre(data.objectif, data.objectifAutre);
-
-  // Alimentation actuelle (Q7)
-  const alimentation = mergeAutre(data.alimentation, data.alimentationAutre);
-
-  // Lieux de courses (Q18)
+async function saveFoyerToSupabase(data, statut) {
   const coursesOu = mergeAutre(data.coursesOu, null);
-
-  // Réactions allergiques (Q11)
-  const reactionsAllergiques = data.reactionsAllergiques || null;
-  const reactionStatut = data.reactionStatut || null;
-
-  // Attentes libres (Q20)
   const attentes = data.attentes && data.attentes.trim() ? data.attentes.trim() : null;
 
-  // Traitements (Q9)
-  const traitements = data.traitements && data.traitements.trim() ? data.traitements.trim() : null;
-
-  // Comportement texte agrégé pour affichage
-  const comportementTexte = comportement.length > 0 ? comportement.join(', ') : null;
-
   const body = {
-    email:                   data.email,
-    prenom_chien:            data.prenom || null,
-    race:                    data.race || null,
-    poids:                   data.poids ? parseFloat(data.poids) : null,
-    age:                     data.age || null,
-    sexe:                    data.sexe || null,
-    activite:                data.activite || null,
-    plan:                    data.plan || 'beta',
-    statut:                  statut,
-    rapport_envoye:          true,
-    menu_envoye:             false,
-
-    // Santé
-    allergies:               intolerances,          // Q12
-    sensibilites:            sensibilites,          // Q10 (tracas quotidiens)
-    comportement:            comportementTexte,     // Q13
-    maladies:                maladies,              // Q8
-    traitements:             traitements,           // Q9
-    reactions_allergiques:   reactionsAllergiques,  // Q11
-    reaction_statut:         reactionStatut,        // Q11 statut
-
-    // Projet
-    mode_alimentaire:        data.modeAlimentaire || null,   // Q14
-    // budget omis — colonne absente du schéma Supabase (PGRST204)
-    equipement:              Array.isArray(data.equipement) ? data.equipement : [], // Q16
-    temps_prep:              data.tempsPrep || null,         // Q17
-    courses_ou:              coursesOu,                      // Q18
-    objectifs:               objectifs,                      // Q19
-    attentes:                attentes,                       // Q20
-
-    // Données contextuelles
-    alimentation_actuelle:   alimentation,
-
-    // Préférences d'envoi (Q21 — entier 1-7, 1=lundi par défaut)
-    jour_envoi: (Number.isInteger(data.jourEnvoi) && data.jourEnvoi >= 1 && data.jourEnvoi <= 7)
-      ? data.jourEnvoi
-      : (Number.isInteger(parseInt(data.jourEnvoi)) && parseInt(data.jourEnvoi) >= 1 && parseInt(data.jourEnvoi) <= 7)
-        ? parseInt(data.jourEnvoi)
-        : 1,
+    email:          data.email,
+    plan:           data.plan || 'beta',
+    statut,
+    rapport_envoye: true,
+    menu_envoye:    false,
+    equipement:     Array.isArray(data.equipement) ? data.equipement : [],
+    temps_prep:     data.tempsPrep || null,
+    courses_ou:     coursesOu,
+    attentes,
+    jour_envoi:     parseJourEnvoi(data.jourEnvoi),
   };
 
-  const response = await fetch(url, {
+  const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/user?on_conflict=email`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -119,9 +58,76 @@ async function saveToSupabase(data, statut) {
 
   if (!response.ok) {
     const errBody = await response.text().catch(() => '');
-    console.error('Erreur saveToSupabase:', response.status, errBody);
+    console.error('Erreur saveFoyerToSupabase:', response.status, errBody);
   }
+  return response;
+}
 
+// ── SUPABASE — CHIEN (table "chien") ───────────────────────
+async function getNextOrdreForEmail(email) {
+  const res = await fetch(
+    `${process.env.SUPABASE_URL}/rest/v1/chien?user_email=eq.${encodeURIComponent(email)}&select=ordre&order=ordre.desc&limit=1`,
+    {
+      headers: {
+        'apikey': process.env.SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`
+      }
+    }
+  );
+  if (!res.ok) return 1;
+  const rows = await res.json().catch(() => []);
+  return rows.length ? (rows[0].ordre || 0) + 1 : 1;
+}
+
+async function saveChienToSupabase(email, data, ordre) {
+  const intolerances      = mergeAutre(data.intolerances, data.intolerancesAutre, ['aucune']);
+  const sensibilites      = mergeAutre(data.tracasQuotidiens, null, ['aucun']);
+  const comportementArr   = Array.isArray(data.comportement)
+    ? data.comportement.filter(v => v && v !== 'aucun')
+    : [];
+  const maladies          = Array.isArray(data.maladiesDiagnostiquees) ? data.maladiesDiagnostiquees : [];
+  const objectifs         = mergeAutre(data.objectif, data.objectifAutre);
+  const alimentation      = mergeAutre(data.alimentation, data.alimentationAutre);
+  const traitements       = data.traitements && data.traitements.trim() ? data.traitements.trim() : null;
+  const comportementTexte = comportementArr.length > 0 ? comportementArr.join(', ') : null;
+
+  const body = {
+    user_email:            email,
+    prenom_chien:          data.prenom || null,
+    race:                  data.race || null,
+    poids:                 data.poids ? parseFloat(data.poids) : null,
+    age:                   data.age || null,
+    sexe:                  data.sexe || null,
+    activite:              data.activite || null,
+    allergies:             intolerances,
+    sensibilites:          sensibilites,
+    comportement:          comportementTexte,
+    maladies,
+    traitements,
+    reactions_allergiques: data.reactionsAllergiques || null,
+    reaction_statut:       data.reactionStatut || null,
+    mode_alimentaire:      data.modeAlimentaire || null,
+    alimentation_actuelle: alimentation,
+    objectifs,
+    ordre,
+    actif: true,
+  };
+
+  const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/chien`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': process.env.SUPABASE_SERVICE_KEY,
+      'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    const errBody = await response.text().catch(() => '');
+    console.error('Erreur saveChienToSupabase:', response.status, errBody);
+  }
   return response;
 }
 
@@ -270,11 +276,15 @@ module.exports = async function handler(req, res) {
 
     const prenomChien = data.prenom;
     const statut = data.plan === 'beta' ? 'beta' : 'waitlist';
+    const ajoutChien = data.ajoutChien === true;
 
-    // ── Sauvegarde + email en parallèle ───────────────────
+    // ── Ordre du nouveau chien + sauvegarde en parallèle ──
+    const ordre = data.email ? await getNextOrdreForEmail(data.email) : 1;
+
     await Promise.all([
       data.email ? sendEmailRapport(data.email, prenomChien, rapport, data) : Promise.resolve(),
-      data.email ? saveToSupabase(data, statut) : Promise.resolve()
+      data.email ? saveChienToSupabase(data.email, data, ordre) : Promise.resolve(),
+      (!ajoutChien && data.email) ? saveFoyerToSupabase(data, statut) : Promise.resolve(),
     ]);
 
     return res.status(200).json({ success: true, prenom: prenomChien });
