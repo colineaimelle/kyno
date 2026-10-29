@@ -188,6 +188,7 @@ function getAlimentsProches(allergies) {
 }
 
 // Retourne le premier terme interdit trouvé dans un texte (mot entier), ou null.
+// Utiliser pour les champs structurés (ingrédients, batch_special) : zéro tolérance.
 function detecterTermeInterdit(texte, termesExclus) {
   if (!texte || !termesExclus.length) return null;
   const norm = normalise(texte);
@@ -199,4 +200,25 @@ function detecterTermeInterdit(texte, termesExclus) {
   return null;
 }
 
-module.exports = { ALLERGENES, ALIAS, getTermesExclus, getAlimentsProches, detecterTermeInterdit };
+// Mots qui annulent la mention d'un terme (contexte des 40 caractères précédents).
+const NEGATIFS = ['sans', 'pas de', 'aucun', 'exclu', 'exclus', 'exclure', 'exclut', 'evite', 'eviter', 'interdit', 'interdits', 'allergene', 'allergie'];
+
+// Retourne le premier terme interdit trouvé dans un texte libre, en ignorant
+// les mentions niées (ex : « sans poulet »). Utiliser pour note et titre.
+function detecterTermeNonNie(texte, termesExclus) {
+  if (!texte || !termesExclus.length) return null;
+  const norm = normalise(texte);
+  for (const terme of termesExclus) {
+    const termeNorm = normalise(terme);
+    const regex = new RegExp('\\b' + escapeRegex(termeNorm) + '\\b', 'g');
+    let match;
+    while ((match = regex.exec(norm)) !== null) {
+      const contextBefore = norm.slice(Math.max(0, match.index - 20), match.index);
+      const estNie = NEGATIFS.some(neg => contextBefore.includes(neg));
+      if (!estNie) return terme;
+    }
+  }
+  return null;
+}
+
+module.exports = { ALLERGENES, ALIAS, getTermesExclus, getAlimentsProches, detecterTermeInterdit, detecterTermeNonNie };

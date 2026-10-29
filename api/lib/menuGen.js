@@ -35,7 +35,8 @@ function buildMultiDogMenuPrompt(chiens, foyer, saison) {
       topBlocks += `⚠️ INTERDICTION ABSOLUE pour ${nom} — LIS EN PREMIER :\n`;
       topBlocks += `Ces ingrédients ET TOUS LEURS DÉRIVÉS sont STRICTEMENT INTERDITS dans la recette de ${nom} :\n`;
       topBlocks += termesExclus.map(t => `  • ${t}`).join('\n') + '\n';
-      topBlocks += `NE LES UTILISE JAMAIS dans la recette de ${nom}, même en traces. Inclure foie, abats, bouillon, graisse, hydrolysat ou arôme d'une protéine interdite est une violation.\n\n`;
+      topBlocks += `NE LES UTILISE JAMAIS dans la recette de ${nom}, même en traces. Inclure foie, abats, bouillon, graisse, hydrolysat ou arôme d'une protéine interdite est une violation.\n`;
+      topBlocks += `Dans les textes libres (note, titre) : NE JAMAIS nommer un ingrédient interdit, même pour dire qu'il est absent. Écris à la place « adapté aux allergies de ${nom} » ou « sans ses allergènes ».\n\n`;
       if (alimentsProches.length > 0) {
         topBlocks += `ℹ️ Aliments proches autorisés mais à éviter si possible pour ${nom} : ${alimentsProches.join(', ')}. Si tu en utilises, ils seront signalés au propriétaire.\n\n`;
       }

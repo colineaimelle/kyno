@@ -21,13 +21,16 @@ jobs:
     steps:
       - name: Générer les menus du jour
         run: |
+          JOUR="${{ github.event.inputs.jour }}"
+          EMAIL="${{ github.event.inputs.email_test }}"
           BODY='{}'
-          if [ -n "${{ github.event.inputs.jour }}" ]; then
-            BODY=$(echo "$BODY" | jq --argjson j '${{ github.event.inputs.jour }}' '. + {jour: $j}')
+          if [ -n "$JOUR" ]; then
+            BODY=$(echo "$BODY" | jq --argjson j "$JOUR" '. + {jour: $j}')
           fi
-          if [ -n "${{ github.event.inputs.email_test }}" ]; then
-            BODY=$(echo "$BODY" | jq --arg e '${{ github.event.inputs.email_test }}' '. + {email_test: $e}')
+          if [ -n "$EMAIL" ]; then
+            BODY=$(echo "$BODY" | jq --arg e "$EMAIL" '. + {email_test: $e}')
           fi
+          echo "Requête : BODY=$BODY"
           response=$(curl -s -o /tmp/response.json -w "%{http_code}" \
             -X POST "${{ secrets.VERCEL_URL }}/api/cron-menu" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \

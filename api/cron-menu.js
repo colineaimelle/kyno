@@ -3,7 +3,7 @@
 // Charge les chiens actifs par foyer et génère un menu par foyer.
 
 const { getSaison, buildMultiDogMenuPrompt, buildEmailMenuHtml } = require('./lib/menuGen');
-const { getTermesExclus, detecterTermeInterdit } = require('./lib/allergenes');
+const { getTermesExclus, detecterTermeInterdit, detecterTermeNonNie } = require('./lib/allergenes');
 
 // ── HELPERS TIMEZONE ──────────────────────────────────────────
 function getDayParis() {
@@ -102,16 +102,18 @@ function verifierAllergiesMenu(menuData, chiens) {
     const termesExclus = getTermesExclus(chien.allergies);
     if (!termesExclus.length) continue;
 
+    // Champs structurés : détection stricte (ingrédient présent = violation)
     for (const ing of (mc.recette?.ingredients || [])) {
       const found = detecterTermeInterdit(ing.name, termesExclus);
       if (found) violations.push({ chien: chien.prenom_chien, champ: `ingrédient "${ing.name}"`, terme: found });
     }
+    const foundBatch = detecterTermeInterdit(mc.batch_special, termesExclus);
+    if (foundBatch) violations.push({ chien: chien.prenom_chien, champ: 'batch_special', terme: foundBatch });
+    // Textes libres : ignorer les mentions niées (« sans poulet », « exclu »…)
     for (const champ of ['titre', 'note']) {
-      const found = detecterTermeInterdit(mc.recette?.[champ], termesExclus);
+      const found = detecterTermeNonNie(mc.recette?.[champ], termesExclus);
       if (found) violations.push({ chien: chien.prenom_chien, champ, terme: found });
     }
-    const found = detecterTermeInterdit(mc.batch_special, termesExclus);
-    if (found) violations.push({ chien: chien.prenom_chien, champ: 'batch_special', terme: found });
   }
   return violations;
 }

@@ -1,7 +1,7 @@
 // api/lib/allergenes.test.js
 // Usage : node api/lib/allergenes.test.js
 
-const { getTermesExclus, getAlimentsProches, detecterTermeInterdit } = require('./allergenes');
+const { getTermesExclus, getAlimentsProches, detecterTermeInterdit, detecterTermeNonNie } = require('./allergenes');
 
 let passed = 0;
 let failed = 0;
@@ -94,6 +94,34 @@ console.log('\n-- Alias quiz --');
   const termes = getTermesExclus(['gluten']);
   assert(termes.includes('epeautre'), 'alias gluten → épeautre interdit');
 }
+
+// ── detecterTermeNonNie (textes libres avec contexte de négation) ───────────────
+console.log('\n-- Textes libres avec négation --');
+
+function checkFree(label, texte, allergies, shouldBeNull) {
+  const termes = getTermesExclus(allergies);
+  const result = detecterTermeNonNie(texte, termes);
+  if (shouldBeNull) {
+    assert(result === null, label + ` → ignoré (résultat: ${JSON.stringify(result)})`);
+  } else {
+    assert(result !== null, label + ` → détecté (résultat: ${JSON.stringify(result)})`);
+  }
+}
+
+checkFree('"lot sans poulet" — mention niée, pas de violation',
+  'lot sans poulet', ['poulet'], true);
+checkFree('"recette sans ses allergènes" — mention niée',
+  'recette sans ses allergènes', ['poulet'], true);
+checkFree('"exclu : poulet" — mention niée',
+  'exclu : poulet', ['poulet'], true);
+checkFree('"adapté aux allergies de Pistache" — pas de terme interdit',
+  'adapté aux allergies de Pistache', ['poulet'], true);
+checkFree('"200 g de foie de volaille" — terme interdit non nié',
+  '200 g de foie de volaille', ['poulet'], false);
+checkFree('"riche en protéines de poulet" — terme interdit non nié',
+  'riche en protéines de poulet', ['poulet'], false);
+checkFree('"sans gluten, avec de la semoule" — "semoule" non niée (allergie gluten)',
+  'sans gluten, avec de la semoule', ['gluten'], false);
 
 // ── Résumé ─────────────────────────────────────────────────────────────────────
 console.log(`\n${passed + failed} tests : ${passed} passés, ${failed} échoués\n`);
