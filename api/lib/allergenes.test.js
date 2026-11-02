@@ -78,6 +78,22 @@ console.log('\n-- Aliments proches --');
   assert(result === null, '"foie de boeuf" ne déclenche pas "oie" (mot entier)');
 }
 
+// ── Réaction croisée volaille-poisson ─────────────────────────────────────────
+console.log('\n-- Réaction croisée volaille-poisson --');
+const POISSONS_PROCHES = ['saumon', 'thon', 'cabillaud', 'sardine', 'maquereau', 'truite', 'merlan', 'hareng', 'poisson'];
+for (const volaille of ['poulet', 'dinde', 'canard']) {
+  const proches = getAlimentsProches([volaille]);
+  for (const poisson of POISSONS_PROCHES) {
+    assert(proches.includes(poisson), `allergie ${volaille} → "${poisson}" dans les proches`);
+  }
+  // Les poissons doivent rester AUTORISÉS (pas dans termes exclus)
+  const termes = getTermesExclus([volaille]);
+  for (const poisson of ['saumon', 'thon', 'sardine']) {
+    const result = detecterTermeInterdit(poisson, termes);
+    assert(result === null, `allergie ${volaille} → "${poisson}" autorisé (pas interdit, juste proche)`);
+  }
+}
+
 // ── Alias quiz ─────────────────────────────────────────────────────────────────
 console.log('\n-- Alias quiz --');
 {

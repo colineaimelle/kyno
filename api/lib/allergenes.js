@@ -19,7 +19,9 @@ const ALLERGENES = {
       'proteine de poulet', 'hydrolysat de poulet', 'arome poulet',
       'gelatine de poulet', 'bouillon de poulet', 'collagene de poulet',
     ],
-    proches: ['dinde', 'canard', 'oie', 'pintade', 'caille', 'oeuf'],
+    // Réaction croisée volaille-poisson documentée chez le chien
+    proches: ['dinde', 'canard', 'oie', 'pintade', 'caille', 'oeuf',
+              'saumon', 'thon', 'cabillaud', 'sardine', 'maquereau', 'truite', 'merlan', 'hareng', 'poisson'],
   },
   dinde: {
     termes: [
@@ -31,7 +33,9 @@ const ALLERGENES = {
       'proteine de dinde', 'hydrolysat de dinde', 'arome dinde',
       'bouillon de dinde',
     ],
-    proches: ['poulet', 'canard', 'oie', 'pintade', 'caille', 'oeuf'],
+    // Réaction croisée volaille-poisson documentée chez le chien
+    proches: ['poulet', 'canard', 'oie', 'pintade', 'caille', 'oeuf',
+              'saumon', 'thon', 'cabillaud', 'sardine', 'maquereau', 'truite', 'merlan', 'hareng', 'poisson'],
   },
   canard: {
     termes: [
@@ -43,7 +47,9 @@ const ALLERGENES = {
       'proteine de canard', 'hydrolysat de canard', 'arome canard',
       'bouillon de canard',
     ],
-    proches: ['poulet', 'dinde', 'oie', 'pintade', 'caille', 'oeuf'],
+    // Réaction croisée volaille-poisson documentée chez le chien
+    proches: ['poulet', 'dinde', 'oie', 'pintade', 'caille', 'oeuf',
+              'saumon', 'thon', 'cabillaud', 'sardine', 'maquereau', 'truite', 'merlan', 'hareng', 'poisson'],
   },
   boeuf: {
     termes: [

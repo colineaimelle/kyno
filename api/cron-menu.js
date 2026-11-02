@@ -174,8 +174,8 @@ module.exports = async function handler(req, res) {
       await Promise.all(lot.map(async foyer => {
         const nom = foyer.prenom_chien || foyer.email;
 
-        // Anti-doublon
-        if (foyer.dernier_menu_envoye_le && foyer.dernier_menu_envoye_le >= cutoff5j) {
+        // Anti-doublon (ignoré en mode email_test)
+        if (!emailTest && foyer.dernier_menu_envoye_le && foyer.dernier_menu_envoye_le >= cutoff5j) {
           console.log(`[skip doublon] ${nom} — dernier envoi ${foyer.dernier_menu_envoye_le}`);
           recap.ignores++;
           recap.details.push({ email: foyer.email, status: 'ignore', reason: 'doublon' });
