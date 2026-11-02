@@ -150,10 +150,33 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande session de ba
 ${pluriel
   ? `Génère une recette adaptée à chaque chien. Quand les profils sont compatibles, partage la même protéine principale et les mêmes légumes. Si les allergies sont incompatibles, sépare les lots dans batch_cooking_commun en précisant quel lot est pour quel chien.
 Ne jamais utiliser dans la recette d'un chien un ingrédient qui figure dans ses INTOLÉRANCES INTERDITES.
-Un ingrédient interdit pour un chien peut figurer dans la recette d'un autre chien si ce dernier ne l'a pas dans ses intolérances.
-Quand les chiens partagent la même recette, NE PAS indiquer de réserver les portions séparément par chien : chaque portion est prélevée au moment du repas selon le poids cru de chaque chien.`
-  : `1 SEULE recette, servie matin ET soir (×14 portions : 7 jours × 2 repas).`}
+Un ingrédient interdit pour un chien peut figurer dans la recette d'un autre chien si ce dernier ne l'a pas dans ses intolérances.`
+  : `1 SEULE recette, servie matin ET soir (14 repas sur 7 jours).`}
 Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur.
+
+## PORTIONNAGE (étape OBLIGATOIRE dans batch_cooking_commun)
+${(() => {
+    if (!pluriel) {
+      return `La DERNIÈRE étape de batch_cooking_commun doit être exactement :
+"Divise la préparation cuite en 14 boîtes égales (matin et soir, 7 jours)."
+Ne parle JAMAIS de portions journalières ni de grammes dans cette étape.`;
+    }
+    const total = Object.values(ciblesKcal).reduce((s, v) => s + (v || 0), 0);
+    const parts = chiens.map(c => {
+      const pct = total > 0 ? Math.round((ciblesKcal[c.id] || 0) / total * 100) : Math.round(100 / chiens.length);
+      return { nom: c.prenom_chien || 'Chien', pct };
+    });
+    // Ajuster arrondi pour sommer à 100
+    const diff = 100 - parts.reduce((s, p) => s + p.pct, 0);
+    if (diff !== 0) parts[0].pct += diff;
+    const pctStr = parts.map(p => `${p.pct} % à ${p.nom}`).join(' et ');
+    return `La DERNIÈRE étape de batch_cooking_commun doit reprendre EXACTEMENT l'une des deux formulations suivantes (au choix selon ta décision sur les lots) :
+— Si tu prépares UNE SEULE préparation commune pour tous les chiens :
+  "Pèse la préparation cuite, donne ${pctStr}, puis divise chaque part en 14 boîtes égales (matin et soir, 7 jours)."
+— Si les lots sont SÉPARÉS (allergies incompatibles) :
+${chiens.map(c => `  "Divise le lot de ${c.prenom_chien || 'Chien'} en 14 boîtes égales (matin et soir, 7 jours)."`).join('\n')}
+Ne parle JAMAIS de portions journalières ni de grammes dans cette étape.`;
+  })()}
 Les compléments sensibles (huile, CMV, etc.) sont ajoutés AU MOMENT DU REPAS, jamais à la cuisson.
 Le canard est toujours utilisé SANS PEAU (viande seule) pour maîtriser l'apport en graisses.
 
@@ -387,9 +410,6 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
 
     const prochesAlert = buildProchesAlert(chien, recette);
 
-    const portions14Label = recette.ration
-      ? `14 portions (≈ ${recette.ration} g crus)`
-      : '14 portions égales';
 
     return `<!DOCTYPE html>
 <html lang="fr">
@@ -437,7 +457,7 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
               </td>
             </tr>
           </table>
-          <p style="margin:0 0 24px;font-size:12px;color:#8A978A;">Ce menu représente <strong>${portions14Label}</strong> — poids indiqués en cru (la cuisson modifie le poids final).</p>
+          <p style="margin:0 0 24px;font-size:12px;color:#8A978A;"><strong>Portionnage :</strong> divise la préparation cuite en 14 boîtes égales (matin et soir, 7 jours).${recette.ration ? ` Ration crue totale : ≈ ${recette.ration} g/j.` : ''}</p>
           <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#2B3A2E;border-top:1px solid #EDF2EA;padding-top:22px;">Les étapes</h2>
           <p style="margin:0 0 24px;font-size:14.5px;color:#3C473D;line-height:1.9;">${stepsHtml}</p>
           ${mc.batch_special ? `
@@ -519,7 +539,7 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
               </td>
             </tr>
           </table>
-          <p style="margin:0 0 10px;font-size:11px;color:#8A978A;">14 portions${recette.ration ? ' (≈ ' + recette.ration + ' g crus chacune)' : ' égales'}</p>
+          ${recette.ration ? `<p style="margin:0 0 10px;font-size:11px;color:#8A978A;">Ration crue : ≈ ${recette.ration} g/j</p>` : ''}
           ${mc.batch_special ? `
           <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 10px;">
             <tr>

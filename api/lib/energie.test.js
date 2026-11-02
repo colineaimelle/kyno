@@ -121,6 +121,17 @@ console.log('\n=== Tests energie.js ===\n');
   assert(kcal === null, 'poids manquant → null');
 }
 
+// Warning activité inconnue — ne doit pas planter, retourne 1,6
+{
+  const warns = [];
+  const origWarn = console.warn;
+  console.warn = (...args) => warns.push(args.join(' '));
+  const kcal = besoinKcalJour({ poids: 10, age: '3 à 7 ans', sexe: 'mâle entier', activite: 'turbo-actif', objectifs: [] });
+  console.warn = origWarn;
+  assert(warns.length >= 1 && warns[0].includes('turbo-actif'), 'activité inconnue → console.warn émis');
+  assert(typeof kcal === 'number' && kcal > 0, 'activité inconnue → fallback 1,6, résultat numérique');
+}
+
 // ── calories.js ────────────────────────────────────────────────────────────────
 console.log('\n=== Tests calories.js ===\n');
 
@@ -128,6 +139,7 @@ console.log('\n=== Tests calories.js ===\n');
 assert(kcalPour100g('bœuf maigre') === 125,           '"bœuf maigre" → 125');
 assert(kcalPour100g('bœuf haché') === 150,            '"bœuf haché" → 150 (générique)');
 assert(kcalPour100g('bœuf haché 5% MG') === 121,      '"bœuf haché 5%" → 121 (Ciqual 2013)');
+assert(kcalPour100g('bœuf haché 10% MG') === 169,     '"bœuf haché 10%" → 169 (Ciqual 2013)');
 assert(kcalPour100g('bœuf haché 15% MG') === 199,     '"bœuf haché 15%" → 199 (Ciqual 2013)');
 assert(kcalPour100g('bœuf haché 20% MG') === 285,     '"bœuf haché 20%" → 285 (Ciqual 2013)');
 assert(kcalPour100g('agneau') === 128,                '"agneau" → 128 (Ciqual 2013)');

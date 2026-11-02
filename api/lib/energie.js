@@ -20,7 +20,11 @@ const COEFFICIENTS_ACTIVITE = {
 };
 
 function coeffActivite(activite) {
-  return COEFFICIENTS_ACTIVITE[normaliser(activite)] ?? 1.60;
+  const key = normaliser(activite);
+  if (!(key in COEFFICIENTS_ACTIVITE)) {
+    console.warn(`[energie] activité non reconnue : "${activite}" — fallback 1,60`);
+  }
+  return COEFFICIENTS_ACTIVITE[key] ?? 1.60;
 }
 
 function estSterilise(sexe) {

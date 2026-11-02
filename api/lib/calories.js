@@ -16,6 +16,7 @@ function normaliser(s) {
 const TABLE_RAW = [
   // ── Viandes ────────────────────────────────────────────────────────────────────
   ['boeuf hache 5',         121],  // bœuf haché 5% MG — Ciqual 2013
+  ['boeuf hache 10',        169],  // bœuf haché 10% MG — Ciqual 2013
   ['boeuf hache 15',        199],  // bœuf haché 15% MG — Ciqual 2013
   ['boeuf hache 20',        285],  // bœuf haché 20% MG — Ciqual 2013
   ['boeuf hache',           150],  // bœuf haché générique (moyenne)
