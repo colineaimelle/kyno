@@ -2,6 +2,8 @@
 // Aligné avec le nouveau quiz 22 questions (jour d'envoi ajouté)
 // Champs quiz → Supabase → espace client
 
+const { besoinKcalJour } = require('./lib/energie');
+
 // ── HELPER : fusionner tableau + champ "autre" ─────────────
 function mergeAutre(arr, autre, excludeVals = []) {
   const base = Array.isArray(arr)
@@ -132,7 +134,7 @@ async function saveChienToSupabase(email, data, ordre) {
 }
 
 // ── PROMPT RAPPORT ─────────────────────────────────────────
-function buildRapportPrompt(data, saison, pm) {
+function buildRapportPrompt(data, saison, pm, besoin) {
 
   // Mapping champs nouveau quiz
   const alimentation    = mergeAutre(data.alimentation, data.alimentationAutre);
@@ -178,9 +180,11 @@ function buildRapportPrompt(data, saison, pm) {
 - Objectif(s) : ${objectifs.length > 0 ? objectifs.join(', ') : 'non renseigné'}
 - Attentes libres : ${attentes || 'aucune'}
 
-## CALCUL BEE
-Calcule BEE = 110 × (${data.poids || '?'})^0.75 et applique le coefficient selon l'activité (${data.activite || 'modéré'}).
-Exprime le résultat en kcal/jour de façon simple. Ne donne pas de quantités en grammes ici.
+## BESOIN ÉNERGÉTIQUE
+${besoin
+  ? `Besoin estimé de ${nom} : **${besoin} kcal/jour** (RER = 70 × ${pm}^0,75 × coefficient activité/statut).`
+  : `Calcule le BEE de ${nom} : RER = 70 × ${data.poids || '?'}^0,75, puis applique le coefficient selon l'activité (${data.activite || 'modéré'}).`}
+Explique ce chiffre simplement au propriétaire. Ne donne pas de quantités en grammes ici.
 
 ## PRÉDISPOSITIONS RACIALES
 Identifie les alertes pour "${data.race || 'cette race'}" parmi : DCM/taurine, cuivre, MDR1, obésité, EPI, brachycéphales, épagneul breton (articulations, tendons).
@@ -249,6 +253,14 @@ module.exports = async function handler(req, res) {
 
     const saison = getSaison();
     const pm = data.poids ? Math.pow(parseFloat(data.poids), 0.75).toFixed(2) : 'à calculer';
+    const besoin = besoinKcalJour({
+      poids:      data.poids,
+      age:        data.age,
+      sexe:       data.sexe,
+      activite:   data.activite,
+      objectifs:  mergeAutre(data.objectif, data.objectifAutre),
+      poids_ideal: null,
+    });
 
     // ── Génération du rapport ──────────────────────────────
     const rapportResponse = await fetch('https://api.anthropic.com/v1/messages', {
@@ -261,7 +273,7 @@ module.exports = async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 4000,
-        system: buildRapportPrompt(data, saison, pm),
+        system: buildRapportPrompt(data, saison, pm, besoin),
         messages: [{ role: 'user', content: 'Génère le rapport nutritionnel.' }]
       })
     });

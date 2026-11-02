@@ -2,8 +2,9 @@
 // Cron quotidien (5h UTC via GitHub Actions).
 // Charge les chiens actifs par foyer et génère un menu par foyer.
 
-const { getSaison, buildMultiDogMenuPrompt, buildEmailMenuHtml } = require('./lib/menuGen');
+const { getSaison, buildMultiDogMenuPrompt, ajusterRations, buildEmailMenuHtml } = require('./lib/menuGen');
 const { getTermesExclus, detecterTermeInterdit, detecterTermeNonNie } = require('./lib/allergenes');
+const { besoinKcalJour } = require('./lib/energie');
 
 // ── HELPERS TIMEZONE ──────────────────────────────────────────
 function getDayParis() {
@@ -259,8 +260,18 @@ async function generateMenuForFoyer(foyer, chiens, saison, todayParis) {
     await patchSupabase(email, { poids_historique: [...existingPoids, poidsEntry].slice(-6) });
   }
 
-  // ── 3. Générer le menu via Claude (max 2 tentatives si violation allergie) ──
-  const systemPrompt = buildMultiDogMenuPrompt(chiensToProcess, foyer, saison);
+  // ── 3. Calcul des cibles énergétiques ─────────────────────────────────────
+  const ciblesKcal = {};
+  for (const chien of chiensToProcess) {
+    const besoin = besoinKcalJour(chien);
+    if (besoin) {
+      ciblesKcal[chien.id] = besoin;
+      console.log(`[energie] ${chien.prenom_chien || chien.id} — besoin : ${besoin} kcal/jour`);
+    }
+  }
+
+  // ── 4. Générer le menu via Claude (max 2 tentatives si violation allergie) ──
+  const systemPrompt = buildMultiDogMenuPrompt(chiensToProcess, foyer, saison, ciblesKcal);
   let menuData;
 
   for (let attempt = 1; attempt <= 2; attempt++) {
@@ -319,7 +330,12 @@ async function generateMenuForFoyer(foyer, chiens, saison, todayParis) {
     console.warn(`[allergie][tentative ${attempt}] violations détectées, régénération : ${violationsStr}`);
   }
 
-  // ── 4. Sauvegarder les données par chien dans la table `chien` ─────────────
+  // ── 4bis. Ajustement des rations si l'écart dépasse 5 % ──────────────────
+  const chienMap = {};
+  chiensToProcess.forEach(c => { chienMap[c.id] = c; });
+  menuData = ajusterRations(menuData, chienMap, ciblesKcal);
+
+  // ── 5. Sauvegarder les données par chien dans la table `chien` ─────────────
   await Promise.all(menuData.chiens.map(async mc => {
     const chienPatch = {};
     if (mc.proteine_principale) chienPatch.proteine_principale = mc.proteine_principale;
@@ -362,8 +378,8 @@ async function generateMenuForFoyer(foyer, chiens, saison, todayParis) {
     await patchSupabase(email, { batch_special: premierMenu.batch_special });
   }
 
-  // ── 6. Envoyer l'email ─────────────────────────────────────────────────────
-  await sendEmailMenu(foyer, chiensToProcess, menuData, saison);
+  // ── 7. Envoyer l'email ─────────────────────────────────────────────────────
+  await sendEmailMenu(foyer, chiensToProcess, menuData, saison, ciblesKcal);
 
   // ── 7. Marquer l'envoi ─────────────────────────────────────────────────────
   if (todayParis) {
@@ -385,7 +401,7 @@ function getIsoWeek() {
 }
 
 // ── EMAIL MENU ────────────────────────────────────────────────
-async function sendEmailMenu(foyer, chiens, menuData, saison) {
+async function sendEmailMenu(foyer, chiens, menuData, saison, ciblesKcal = {}) {
   const prenom = chiens.length === 1
     ? (chiens[0].prenom_chien || 'ton chien')
     : chiens.map(c => c.prenom_chien || 'Chien').join(' & ');
@@ -400,7 +416,7 @@ async function sendEmailMenu(foyer, chiens, menuData, saison) {
       sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
       to: [{ email: foyer.email, name: prenom }],
       subject: `Le menu de la semaine de ${prenom} ✦`,
-      htmlContent: buildEmailMenuHtml(foyer, chiens, menuData, saison)
+      htmlContent: buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal)
     })
   });
 

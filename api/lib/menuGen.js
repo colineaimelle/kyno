@@ -1,8 +1,18 @@
 // api/lib/menuGen.js
-// Shared helpers : prompt multi-chiens, email HTML, utilitaires.
+// Helpers partagés : prompt multi-chiens, ajustement rations, email HTML.
 // Importé par cron-menu.js et chat.js.
 
 const { getTermesExclus, getAlimentsProches, detecterTermeInterdit } = require('./allergenes');
+const { kcalPour100g, kcalTotale } = require('./calories');
+
+function normaliser(s) {
+  return (s || '').toLowerCase()
+    .replace(/œ/g, 'oe').replace(/æ/g, 'ae')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/['']/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 function getSaison() {
   const m = new Date().getMonth() + 1;
@@ -19,9 +29,11 @@ function getLabelSemaine() {
 }
 
 // ── PROMPT MULTI-CHIENS ────────────────────────────────────────────────────────
-// chiens : lignes Supabase de la table `chien` (id, prenom_chien, race, poids…)
-// foyer  : ligne Supabase de la table `user` (equipement, temps_prep, courses_ou…)
-function buildMultiDogMenuPrompt(chiens, foyer, saison) {
+// chiens     : lignes Supabase de la table `chien`
+// foyer      : ligne Supabase de la table `user`
+// saison     : string
+// ciblesKcal : { [chien_id]: number } — kcal/jour calculées par le code
+function buildMultiDogMenuPrompt(chiens, foyer, saison, ciblesKcal = {}) {
   const pluriel = chiens.length > 1;
 
   // ── Blocs allergie + rotation par chien ──────────────────────────────────────
@@ -51,6 +63,7 @@ function buildMultiDogMenuPrompt(chiens, foyer, saison) {
   chiens.forEach((chien, i) => {
     const nom = chien.prenom_chien || `Chien ${i + 1}`;
     const pm = chien.poids ? Math.pow(chien.poids, 0.75).toFixed(2) : 'à calculer';
+    const cible = ciblesKcal[chien.id];
     const intolerances = Array.isArray(chien.allergies) ? chien.allergies : [];
     const alimentation = Array.isArray(chien.alimentation_actuelle)
       ? chien.alimentation_actuelle.join(', ')
@@ -62,6 +75,7 @@ function buildMultiDogMenuPrompt(chiens, foyer, saison) {
     profilesSection += `- Poids : ${chien.poids ? chien.poids + ' kg' : 'non renseigné'} — PM : ${pm} kg\n`;
     profilesSection += `- Âge : ${chien.age || 'non renseigné'}  |  Sexe : ${chien.sexe || 'non renseigné'}\n`;
     profilesSection += `- Activité : ${chien.activite || 'non renseigné'}\n`;
+    profilesSection += `- Cible énergétique : ${cible ? `**${cible} kcal/jour** (calculé par le code — à respecter)` : 'calculer selon NRC 2006'}\n`;
     profilesSection += `- Mode alimentaire : ${chien.mode_alimentaire || 'ration ménagère'}\n`;
     profilesSection += `- Alimentation actuelle : ${alimentation}\n`;
     if (intolerances.length > 0) {
@@ -82,21 +96,27 @@ function buildMultiDogMenuPrompt(chiens, foyer, saison) {
   // ── Exemple de structure JSON attendue ───────────────────────────────────────
   const chiensJsonExample = chiens.map(chien => {
     const nom = chien.prenom_chien || 'ce chien';
+    const cible = ciblesKcal[chien.id];
+    const cibleParRepas = cible ? Math.round(cible / 2) : '<n>';
     return `    {
       "chien_id": "${chien.id}",
       "recette": {
         "moment": "Matin et soir",
         "color": "#2FA35E",
         "titre": "nom court de la recette de ${nom}",
-        "ration": <grammes par repas pour ${nom}>,
+        "ration": <grammes CRU par repas pour ${nom} = sum(ingredients_grammes_crus) / 2>,
         "ingredients": [
           {"name": "ingrédient", "qty": "quantité CRU par repas pour ${nom}, ex: 40 g (≈ 120 g cuit)"}
         ],
         "note": "1 phrase pourquoi cette recette est bonne pour ${nom}"
       },
+      "ingredients_grammes_crus": [
+        {"name": "ingrédient A", "qty_g_jour": <grammes CRU par JOUR pour ${nom}>, "kcal_100g": <kcal pour 100 g cru, source NRC/Ciqual>},
+        {"name": "huile de colza", "qty_g_jour": <grammes CRU par JOUR, huiles comprises>, "kcal_100g": 900}
+      ],
       "batch_special": "compléments à ajouter AU MOMENT DU REPAS uniquement pour ${nom} (huile, CMV…)",
       "apports": [
-        {"nom": "Calories",  "unite": "kcal", "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#F2843C"},
+        {"nom": "Calories",  "unite": "kcal", "valeur": <n>, "cible": ${cibleParRepas}, "pct": <n>, "color": "#F2843C"},
         {"nom": "Protéines", "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#2FA35E"},
         {"nom": "Lipides",   "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#EC6592"},
         {"nom": "Calcium",   "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#3E8FC4"},
@@ -130,10 +150,12 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande session de ba
 ${pluriel
   ? `Génère une recette adaptée à chaque chien. Quand les profils sont compatibles, partage la même protéine principale et les mêmes légumes. Si les allergies sont incompatibles, sépare les lots dans batch_cooking_commun en précisant quel lot est pour quel chien.
 Ne jamais utiliser dans la recette d'un chien un ingrédient qui figure dans ses INTOLÉRANCES INTERDITES.
-Un ingrédient interdit pour un chien peut figurer dans la recette d'un autre chien si ce dernier ne l'a pas dans ses intolérances.`
+Un ingrédient interdit pour un chien peut figurer dans la recette d'un autre chien si ce dernier ne l'a pas dans ses intolérances.
+Quand les chiens partagent la même recette, NE PAS indiquer de réserver les portions séparément par chien : chaque portion est prélevée au moment du repas selon le poids cru de chaque chien.`
   : `1 SEULE recette, servie matin ET soir (×14 portions : 7 jours × 2 repas).`}
-Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur en portions.
+Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur.
 Les compléments sensibles (huile, CMV, etc.) sont ajoutés AU MOMENT DU REPAS, jamais à la cuisson.
+Le canard est toujours utilisé SANS PEAU (viande seule) pour maîtriser l'apport en graisses.
 
 ## STRUCTURE JSON EXACTE À RESPECTER
 
@@ -159,36 +181,173 @@ ${chiensJsonExample}
 }
 
 ## RÈGLES IMPORTANTES
-- "ration" = grammes PAR REPAS pour ce chien (matin = soir)
-- "qty" dans recette.ingredients = quantité CRU par repas pour CE chien uniquement
-- "qty" dans courses_commune = quantité CRU TOTALE foyer = (poids cru par repas × nb chiens concernés) × 14 repas. Pour les féculents qui absorbent l'eau (riz × 3, lentilles × 2,5, pâtes × 2,5) : utilise le poids CRU, jamais le poids cuit. Exemple : 40 g riz cru/repas × 14 = 560 g cru (non : 120 g cuit × 14 = 1680 g, non : 350 g)
+- "ration" = sum(ingredients_grammes_crus.qty_g_jour) / 2 pour ce chien (poids CRU par repas)
+- "ingredients_grammes_crus" : TOUS les ingrédients (huiles comprises) en grammes CRU par JOUR pour CE chien, avec une estimation "kcal_100g" (source NRC/Ciqual) pour chaque ingrédient. La somme de leurs kcal doit correspondre à la cible énergétique fournie dans le profil.
+- "qty" dans recette.ingredients = quantité CRU par repas pour CE chien uniquement = qty_g_jour / 2
+- "qty" dans courses_commune = quantité CRU TOTALE foyer = (poids cru par repas × nb chiens concernés) × 14 repas. Pour les féculents qui absorbent l'eau (riz × 3, lentilles × 2,5, pâtes × 2,5) : utilise le poids CRU. Exemple : 40 g riz cru/repas × 14 = 560 g cru
+- "batch_cooking_commun" et "note" dans recette : NE JAMAIS écrire de grammes ni de quantités numériques dans les étapes ou les notes — désigner les ingrédients par leur nom ("la dinde hachée", "la quantité de riz indiquée dans les ingrédients"). Les chiffres n'apparaissent QUE dans "ingredients", "ingredients_grammes_crus" et "courses_commune", que le code recalcule.
 - "batch_special" : compléments ajoutés au bol — jamais cuits (huile, CMV, levure…)
 - "proteine_principale" : une seule protéine en minuscules sans article
 - "score_sante" : 85-100 excellent, 70-84 bonne forme, 55-69 à surveiller, <55 vigilance
 - "score_bullets" : 2-3 points (mix positifs/négatifs) propres à CE chien
 - Les chien_id dans "chiens" doivent correspondre EXACTEMENT aux chien_id fournis ci-dessus
-- "apports" : NRC 2006 (130 × PM^0.75 × facteur activité sédentaire 1.0 / modéré 1.4 / actif 1.8) ÷ 2 = cible par repas. "valeur" et "cible" sont des nombres (pas des chaînes), "pct" = arrondi entier
+- "apports" Calories : cible = cible fournie ÷ 2 (par repas). Protéines, lipides, calcium, oméga-3 selon NRC 2006. "valeur" et "cible" sont des nombres (pas des chaînes), "pct" = arrondi entier
 - JSON strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles`;
 }
 
+// ── AJUSTEMENT DES RATIONS ─────────────────────────────────────────────────────
+// Résolution kcal/100g : table Ciqual en priorité, estimation IA en fallback.
+function _resolveKcal(ing, nom) {
+  const fromTable = kcalPour100g(ing.name);
+  if (fromTable !== null) return fromTable;
+  const aiVal = parseFloat(ing.kcal_100g);
+  if (!isNaN(aiVal) && aiVal > 0) {
+    console.warn(`[calories] ${nom} — "${ing.name}" : hors table, estimation IA utilisée (${aiVal} kcal/100g)`);
+    return aiVal;
+  }
+  return null;
+}
+
+// Si les kcal calculées s'écartent de plus de 5 % de la cible, ajuste
+// proportionnellement les quantités connues et reconstruit ration + courses.
+//
+// menuData   : JSON parsé retourné par Claude (format multi-chiens)
+// chienMap   : { [id]: profil chien } — pour les logs
+// ciblesKcal : { [chien_id]: number }
+// Retourne menuData muté.
+function ajusterRations(menuData, chienMap, ciblesKcal) {
+  if (!Array.isArray(menuData.chiens)) return menuData;
+
+  let unChienAjuste = false;
+
+  for (const mc of menuData.chiens) {
+    const cible = ciblesKcal[mc.chien_id];
+    if (!cible) continue;
+
+    const ingsCrus = mc.ingredients_grammes_crus;
+    if (!Array.isArray(ingsCrus) || ingsCrus.length === 0) continue;
+
+    const nom = chienMap[mc.chien_id]?.prenom_chien || mc.chien_id;
+    const totalPoidsJour = ingsCrus.reduce((s, i) => s + (i.qty_g_jour || 0), 0);
+
+    // Bloquer si un ingrédient inconnu représente >10 % du poids total
+    const blocages = [];
+    for (const ing of ingsCrus) {
+      if (_resolveKcal(ing, nom) === null) {
+        const pct = totalPoidsJour > 0 ? ing.qty_g_jour / totalPoidsJour : 0;
+        if (pct > 0.10) {
+          blocages.push(`"${ing.name}" (${Math.round(pct * 100)}% du poids)`);
+        } else {
+          console.warn(`[calories] ${nom} — "${ing.name}" : kcal inconnues, <10% du poids, ignoré dans le calcul`);
+        }
+      }
+    }
+    if (blocages.length > 0) {
+      console.error(`[calories] ${nom} — ajustement annulé, ingrédients inconnus >10% : ${blocages.join(', ')}`);
+      continue;
+    }
+
+    const kcalActuel = ingsCrus.reduce((s, ing) => {
+      const k = _resolveKcal(ing, nom);
+      return s + (k !== null ? ing.qty_g_jour * k / 100 : 0);
+    }, 0);
+
+    if (kcalActuel === 0) continue;
+
+    const ecart = Math.abs(kcalActuel - cible) / cible;
+    if (ecart <= 0.05) continue;
+
+    console.log(`[calories] ${nom} — écart ${Math.round(ecart * 100)}% (${Math.round(kcalActuel)} vs ${cible} kcal), factor=${(cible / kcalActuel).toFixed(3)}`);
+
+    const factor = cible / kcalActuel;
+
+    // Ajuste les ingrédients dont les kcal sont résolvables (table ou IA)
+    for (const ing of ingsCrus) {
+      if (_resolveKcal(ing, nom) !== null) {
+        ing.qty_g_jour = Math.round(ing.qty_g_jour * factor);
+      }
+    }
+
+    // Reconstruire recette.ingredients (qty CRU par repas = qty_g_jour / 2)
+    if (mc.recette && Array.isArray(mc.recette.ingredients)) {
+      for (const recIng of mc.recette.ingredients) {
+        const match = ingsCrus.find(ig =>
+          normaliser(ig.name).includes(normaliser(recIng.name)) ||
+          normaliser(recIng.name).includes(normaliser(ig.name))
+        );
+        if (match) {
+          const parRepas = Math.round(match.qty_g_jour / 2);
+          recIng.qty = `${parRepas} g`;
+        }
+      }
+    }
+
+    // Reconstruire ration (total cru / 2)
+    const totalJour = ingsCrus.reduce((s, i) => s + i.qty_g_jour, 0);
+    if (mc.recette) mc.recette.ration = Math.round(totalJour / 2);
+
+    unChienAjuste = true;
+  }
+
+  if (unChienAjuste) {
+    menuData.courses_commune = _rebuildCourses(menuData.chiens);
+  }
+
+  return menuData;
+}
+
+// Reconstruit courses_commune depuis les ingredients_grammes_crus de tous les chiens × 7 jours.
+function _rebuildCourses(chiens) {
+  const totals = {};
+
+  for (const mc of chiens) {
+    if (!Array.isArray(mc.ingredients_grammes_crus)) continue;
+    for (const ing of mc.ingredients_grammes_crus) {
+      const key = normaliser(ing.name);
+      if (!totals[key]) totals[key] = { name: ing.name, total: 0 };
+      totals[key].total += ing.qty_g_jour * 7;
+    }
+  }
+
+  const viandes = [], legumes = [], complements = [];
+
+  const MOTS_VIANDE = ['boeuf', 'veau', 'poulet', 'dinde', 'agneau', 'porc', 'canard', 'lapin', 'cheval', 'saumon', 'thon', 'sardine', 'cabillaud', 'merlan', 'maquereau', 'hareng', 'truite', 'foie', 'coeur', 'rognon', 'rate', 'poumon', 'estomac', 'gibier', 'bison', 'sanglier', 'cerf', 'viande', 'poisson', 'abats', 'volaille'];
+  const MOTS_COMP  = ['huile', 'cmv', 'levure', 'spiruline', 'complement', 'vitamine', 'supplement', 'oeuf', 'kelp', 'algue', 'probioti', 'kefir', 'yaourt'];
+
+  for (const { name, total } of Object.values(totals)) {
+    const n = normaliser(name);
+    const qty = total >= 1000 ? `${(total / 1000).toFixed(1)} kg` : `${Math.round(total)} g`;
+    const item = { name, qty };
+    if (MOTS_VIANDE.some(m => n.includes(m)))    viandes.push(item);
+    else if (MOTS_COMP.some(m => n.includes(m))) complements.push(item);
+    else                                          legumes.push(item);
+  }
+
+  const cats = [];
+  if (viandes.length)    cats.push({ cat: 'Viandes & poissons', items: viandes });
+  if (legumes.length)    cats.push({ cat: 'Légumes & féculents', items: legumes });
+  if (complements.length) cats.push({ cat: 'Compléments', items: complements });
+  return cats;
+}
+
 // ── EMAIL HTML (1 ou N chiens) ─────────────────────────────────────────────────
-// foyer    : ligne `user`
-// chiens   : lignes `chien` dans l'ordre du menu
-// menuData : JSON parsé retourné par Claude (format multi-chiens)
-function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
+// foyer      : ligne `user`
+// chiens     : lignes `chien` dans l'ordre du menu
+// menuData   : JSON parsé retourné par Claude (format multi-chiens)
+// saison     : string
+// ciblesKcal : { [chien_id]: number } — optionnel, pour afficher le besoin estimé
+function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
   const menuChiens = Array.isArray(menuData.chiens) ? menuData.chiens : [];
   const courses_commune = menuData.courses_commune || [];
   const batch_cooking_commun = menuData.batch_cooking_commun || [];
   const batch_time = menuData.batch_time || '—';
   const weekLabel = getLabelSemaine();
 
-  // Map chien_id → profil
   const chienMap = {};
   chiens.forEach(c => { chienMap[c.id] = c; });
 
   const pluriel = menuChiens.length > 1;
 
-  // Éléments communs au template
   const logoBar = `
       <tr>
         <td style="padding:0 8px 28px;text-align:center;">
@@ -215,7 +374,7 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
     .map(cat => `${cat.cat} : ` + (cat.items || []).map(i => `${i.name} ${i.qty}`).join(', '))
     .join('<br>');
 
-  // ── Cas 1 chien : design identique à aujourd'hui ──────────────────────────────
+  // ── Cas 1 chien ──────────────────────────────────────────────────────────────
   if (!pluriel) {
     const mc = menuChiens[0] || {};
     const chien = chienMap[mc.chien_id] || chiens[0] || {};
@@ -224,8 +383,13 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
     const poids = chien.poids ? chien.poids + ' kg' : '';
     const sousTitre = [race, poids].filter(Boolean).join(' · ');
     const recette = mc.recette || {};
+    const cible = ciblesKcal[mc.chien_id];
 
     const prochesAlert = buildProchesAlert(chien, recette);
+
+    const portions14Label = recette.ration
+      ? `14 portions (≈ ${recette.ration} g crus)`
+      : '14 portions égales';
 
     return `<!DOCTYPE html>
 <html lang="fr">
@@ -263,8 +427,8 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
           <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
             <tr>
               <td width="50%" style="background:#F3F7F1;border-radius:10px;padding:16px 20px;">
-                <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Par repas</p>
-                <p style="margin:0;font-size:20px;font-weight:700;color:#2B3A2E;">${recette.ration || '—'} g</p>
+                <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Besoin estimé</p>
+                <p style="margin:0;font-size:20px;font-weight:700;color:#2B3A2E;">${cible ? cible + ' kcal/j' : '—'}</p>
               </td>
               <td width="12"></td>
               <td width="50%" style="background:#F3F7F1;border-radius:10px;padding:16px 20px;">
@@ -273,6 +437,7 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
               </td>
             </tr>
           </table>
+          <p style="margin:0 0 24px;font-size:12px;color:#8A978A;">Ce menu représente <strong>${portions14Label}</strong> — poids indiqués en cru (la cuisson modifie le poids final).</p>
           <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#2B3A2E;border-top:1px solid #EDF2EA;padding-top:22px;">Les étapes</h2>
           <p style="margin:0 0 24px;font-size:14.5px;color:#3C473D;line-height:1.9;">${stepsHtml}</p>
           ${mc.batch_special ? `
@@ -315,7 +480,7 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
 </html>`;
   }
 
-  // ── Cas N chiens : sections par chien + liste de courses commune ──────────────
+  // ── Cas N chiens ─────────────────────────────────────────────────────────────
   const noms = menuChiens.map(mc => (chienMap[mc.chien_id]?.prenom_chien || 'Chien')).join(' & ');
 
   const dogSectionsHtml = menuChiens.map(mc => {
@@ -325,6 +490,7 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
     const poids = chien.poids ? chien.poids + ' kg' : '';
     const sousTitre = [race, poids].filter(Boolean).join(' · ');
     const recette = mc.recette || {};
+    const cible = ciblesKcal[mc.chien_id];
     const prochesAlertDog = buildProchesAlert(chien, recette);
 
     return `
@@ -345,14 +511,15 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
         <td style="background:#FFFFFF;padding:12px 32px 20px;border:1px solid #E3EDE1;border-top:none;">
           <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#2B3A2E;">${recette.titre || 'Menu de la semaine'}</p>
           <p style="margin:0 0 10px;font-size:13px;color:#5B6B5D;line-height:1.7;">${recette.note || ''}</p>
-          <table cellpadding="0" cellspacing="0" style="margin:0 0 12px;">
+          <table cellpadding="0" cellspacing="0" style="margin:0 0 8px;">
             <tr>
               <td style="background:#F3F7F1;border-radius:8px;padding:10px 16px;">
-                <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Par repas</p>
-                <p style="margin:0;font-size:18px;font-weight:700;color:#2B3A2E;">${recette.ration || '—'} g</p>
+                <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Besoin estimé</p>
+                <p style="margin:0;font-size:18px;font-weight:700;color:#2B3A2E;">${cible ? cible + ' kcal/j' : '—'}</p>
               </td>
             </tr>
           </table>
+          <p style="margin:0 0 10px;font-size:11px;color:#8A978A;">14 portions${recette.ration ? ' (≈ ' + recette.ration + ' g crus chacune)' : ' égales'}</p>
           ${mc.batch_special ? `
           <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 10px;">
             <tr>
@@ -426,8 +593,6 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison) {
 }
 
 // ── ALERTE ALIMENTS PROCHES ────────────────────────────────────────────────────
-// Détecte si des aliments proches d'un allergène sont présents dans la recette.
-// Retourne un bloc HTML d'avertissement, ou '' si rien à signaler.
 function buildProchesAlert(chien, recette) {
   const allergies = Array.isArray(chien.allergies) ? chien.allergies : [];
   if (!allergies.length) return '';
@@ -456,4 +621,4 @@ function buildProchesAlert(chien, recette) {
   </table>`;
 }
 
-module.exports = { getSaison, getLabelSemaine, buildMultiDogMenuPrompt, buildEmailMenuHtml };
+module.exports = { getSaison, getLabelSemaine, buildMultiDogMenuPrompt, ajusterRations, buildEmailMenuHtml };
