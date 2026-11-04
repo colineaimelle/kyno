@@ -3,125 +3,118 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kyno — Accède à ton espace</title>
+<title>Kyno : Accède à ton espace</title>
+<link rel="icon" href="kyno-favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="charte-kyno.css">
 <style>
-  :root{
-    --sage:#2FA35E;
-    --sage-l:#7CCB95;
-    --sage-mist:#E4F4E8;
-    --ecru:#FBFDF7;
-    --sand:#DDE8DA;
-    --honey:#7E8C80;
-    --tabac:#2B3A2E;
-    --warm:#FCFDF8;
-    --peach:#EC6592;
-    --banana:#FFCE2E;
-    --banana-soft:#FFF1BF;
-    --blue-soft:#DEEBF7;
-    --pink:#EC6592;
-    --pink-soft:#FBE2EB;
-    --orange:#F2843C;
-    --display:"Syne",system-ui,sans-serif;
-    --body:"Manrope",system-ui,sans-serif;
-  }
   *{margin:0;padding:0;box-sizing:border-box;}
+
   body{
-    font-family:var(--body);
-    background:var(--sage-mist);
-    color:var(--tabac);
     min-height:100vh;
     display:flex;
     align-items:center;
     justify-content:center;
     padding:32px 20px;
+    background:var(--mauve-pale);
     position:relative;
     overflow:hidden;
     -webkit-font-smoothing:antialiased;
   }
+
   .deco{position:fixed;border-radius:50%;z-index:0;pointer-events:none;}
-  .deco-1{width:420px;height:420px;background:var(--blue-soft);opacity:0.55;top:-150px;right:-130px;}
-  .deco-2{width:300px;height:300px;background:var(--banana-soft);opacity:0.6;bottom:-110px;left:-90px;}
-  .deco-3{width:170px;height:170px;background:var(--pink-soft);opacity:0.7;bottom:60px;right:7%;}
+  .deco-1{width:420px;height:420px;background:var(--mauve);opacity:0.45;top:-150px;right:-130px;}
+  .deco-2{width:300px;height:300px;background:var(--citron-pale);opacity:0.6;bottom:-110px;left:-90px;}
+  .deco-3{width:170px;height:170px;background:var(--corail-pale);opacity:0.5;bottom:60px;right:7%;}
 
   .card{
     position:relative;z-index:1;width:100%;max-width:452px;
-    background:#fff;border:2.5px solid var(--pink);border-radius:20px;
-    box-shadow:0 32px 72px rgba(42,31,20,0.1);
+    background:var(--blanc);border:4px solid var(--aubergine);border-radius:24px;
+    box-shadow:var(--ombre-bd);
     padding:44px 42px 40px;text-align:center;
     animation:fadeUp 0.8s cubic-bezier(.22,.61,.36,1) both;
   }
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
 
-  .nav-logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:26px;}
-  .logo-mark{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--sage);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;}
-  .logo-mark span{font-family:var(--display);font-weight:600;font-size:21px;color:var(--sage);line-height:1;margin-top:-1px;}
-  .logo-word{font-family:var(--display);font-weight:600;font-size:24px;letter-spacing:0.04em;color:var(--tabac);}
+  .nav-logo{display:inline-block;text-decoration:none;margin-bottom:26px;}
+  .nav-logo img{height:34px;width:auto;}
 
-  .eyebrow{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--peach);display:inline-flex;align-items:center;gap:14px;font-weight:600;margin-bottom:18px;}
-  .eyebrow::before,.eyebrow::after{content:'';width:28px;height:1px;background:var(--peach);flex-shrink:0;}
+  .eyebrow{font-size:13px;color:var(--aubergine-doux);display:inline-block;font-weight:700;margin-bottom:18px;}
 
-  h1{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.12;letter-spacing:-0.02em;color:var(--tabac);margin-bottom:14px;text-wrap:balance;}
-  h1 em{font-style:normal;color:var(--sage);}
-  .subtitle{font-size:15px;line-height:1.7;color:var(--honey);font-weight:300;max-width:340px;margin:0 auto 28px;}
+  h1{font-family:var(--font-titre);font-weight:400;font-size:30px;line-height:1.12;color:var(--aubergine);margin-bottom:14px;text-wrap:balance;}
+  h1 em{font-style:normal;color:var(--cassis);}
+  .subtitle{font-size:15px;line-height:1.7;color:var(--aubergine-doux);font-weight:400;max-width:340px;margin:0 auto 28px;}
 
   .email-badge{
     display:inline-flex;align-items:center;gap:9px;
-    background:var(--sage-mist);border:1.5px solid var(--sage-l);
+    background:var(--mauve-pale);border:2px solid var(--trait);
     border-radius:999px;padding:9px 18px;margin-bottom:26px;
-    font-size:13.5px;font-weight:600;color:var(--tabac);
+    font-size:13.5px;font-weight:700;color:var(--aubergine);
   }
   .email-badge svg{flex-shrink:0;}
 
   .btn-main{
-    font-family:var(--display);width:100%;background:var(--sage);color:#fff;
-    padding:17px 26px;border-radius:4px;font-size:14.5px;font-weight:600;
-    letter-spacing:0.03em;border:2px solid var(--orange);cursor:pointer;
+    font-family:var(--font-texte);width:100%;
+    background:var(--aubergine);color:var(--papier);
+    padding:16px 26px;border-radius:var(--radius-pill);
+    font-size:17px;font-weight:700;
+    border:4px solid var(--aubergine);box-shadow:var(--ombre-corail);
+    cursor:pointer;
     display:flex;align-items:center;justify-content:center;gap:9px;
-    transition:background .2s ease,transform .15s ease;
+    transition:transform .16s cubic-bezier(.22,.61,.36,1),box-shadow .16s;
   }
-  .btn-main:hover{background:var(--sage-l);transform:translateY(-1px);}
-  .btn-main:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+  .btn-main:hover{transform:translate(-2px,-2px);}
+  .btn-main:active{transform:translate(2px,2px);box-shadow:none;}
+  .btn-main:disabled{background:var(--trait);color:var(--aubergine-doux);border-color:var(--trait);box-shadow:none;cursor:not-allowed;transform:none;}
+  .btn-main:focus-visible{outline:3px solid var(--cassis);outline-offset:3px;}
   .btn-main .arrow{transition:transform .2s cubic-bezier(.22,.61,.36,1);}
   .btn-main:hover .arrow{transform:translateX(3px);}
 
   .error{
     display:none;align-items:center;gap:9px;text-align:left;
-    background:var(--pink-soft);border:1.5px solid var(--pink);border-radius:4px;
-    padding:11px 14px;margin-top:16px;font-size:13.5px;font-weight:500;color:#C44B78;
+    background:var(--corail-pale);border:2px solid var(--corail);border-radius:12px;
+    padding:11px 14px;margin-top:16px;font-size:13.5px;font-weight:500;color:var(--corail-fonce);
   }
   .error svg{flex-shrink:0;}
 
-  .footnote{margin-top:24px;font-size:11.5px;color:var(--honey);line-height:1.6;font-weight:400;}
+  .footnote{margin-top:24px;font-size:12px;color:var(--aubergine-doux);line-height:1.6;}
 
-  /* ── État 2 : confirmation 3 étapes ── */
   .confirm{display:none;text-align:center;animation:fadeUp 0.6s cubic-bezier(.22,.61,.36,1) both;}
-  .confirm h2{font-family:var(--display);font-weight:600;font-size:27px;line-height:1.15;letter-spacing:-0.02em;color:var(--tabac);margin-bottom:10px;text-wrap:balance;}
-  .confirm h2 em{font-style:normal;color:var(--sage);}
-  .confirm p.sub{font-size:14.5px;line-height:1.7;color:var(--honey);font-weight:300;max-width:330px;margin:0 auto 28px;}
+  .confirm h2{font-family:var(--font-titre);font-weight:400;font-size:27px;line-height:1.15;color:var(--aubergine);margin-bottom:10px;text-wrap:balance;}
+  .confirm h2 em{font-style:normal;color:var(--cassis);}
+  .confirm p.sub{font-size:14.5px;line-height:1.7;color:var(--aubergine-doux);font-weight:400;max-width:330px;margin:0 auto 28px;}
 
   .steps{display:flex;flex-direction:column;gap:14px;text-align:left;margin-bottom:24px;}
-  .step{display:flex;align-items:center;gap:14px;background:var(--warm);border:1.5px solid var(--sand);border-radius:12px;padding:14px 16px;}
-  .step-num{
-    flex-shrink:0;width:32px;height:32px;border-radius:50%;background:var(--sage-mist);
-    border:2px solid var(--sage);display:flex;align-items:center;justify-content:center;
-    font-family:var(--display);font-weight:700;font-size:14px;color:var(--sage);
+  .step{
+    display:flex;align-items:center;gap:14px;
+    background:var(--mauve-pale);border:2px solid var(--trait);
+    border-radius:12px;padding:14px 16px;
   }
-  .step-text{font-size:13.5px;line-height:1.5;color:var(--tabac);font-weight:500;}
+  .step-num{
+    flex-shrink:0;width:32px;height:32px;border-radius:50%;
+    background:var(--cassis);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-titre);font-weight:400;font-size:16px;color:var(--papier);
+  }
+  .step-text{font-size:13.5px;line-height:1.5;color:var(--aubergine);font-weight:500;}
   .step-text strong{font-weight:700;}
 
   .spam-note{
     display:flex;align-items:flex-start;gap:11px;text-align:left;
-    background:var(--sage-mist);border:1.5px solid var(--sage-l);border-radius:4px;
-    padding:13px 15px;margin-top:6px;font-size:13px;line-height:1.5;color:var(--tabac);font-weight:400;
+    background:var(--mauve-pale);border:2px solid var(--trait);border-radius:12px;
+    padding:13px 15px;margin-top:6px;font-size:13px;line-height:1.5;color:var(--aubergine);
   }
   .spam-note svg{flex-shrink:0;margin-top:1px;}
-  .spam-note strong{font-weight:600;}
+  .spam-note strong{font-weight:700;}
 
-  .resend{margin-top:22px;font-size:13px;color:var(--honey);font-weight:400;}
-  .resend button{font-family:var(--body);font-weight:600;font-size:13px;color:var(--sage);background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+  .resend{margin-top:22px;font-size:13px;color:var(--aubergine-doux);}
+  .resend button{
+    font-family:var(--font-texte);font-weight:700;font-size:13px;
+    color:var(--cassis);background:none;border:none;padding:0;
+    cursor:pointer;text-decoration:underline;text-underline-offset:2px;
+  }
+  .resend button:focus-visible{outline:3px solid var(--cassis);outline-offset:3px;}
 
   @media(max-width:480px){
     .card{padding:36px 26px 32px;}
@@ -137,18 +130,17 @@
 
   <main class="card">
     <a href="index.html" class="nav-logo">
-      <span class="logo-mark"><span>K</span></span>
-      <span class="logo-word">kyno</span>
+      <img src="kyno-logo.svg" alt="Kyno">
     </a>
 
-    <!-- État 1 — Accès -->
+    <!-- État 1 : Accès -->
     <div id="accessState">
       <div class="eyebrow">Dernière étape</div>
       <h1>Ton menu <em>t'attend</em></h1>
       <p class="subtitle">Un clic et on t'envoie ton lien de connexion sécurisé. Ton menu de la semaine se prépare pendant ce temps.</p>
 
       <div class="email-badge" id="emailBadge">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2FA35E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A3A7C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="4" width="20" height="16" rx="2"></rect>
           <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
         </svg>
@@ -163,16 +155,16 @@
       </button>
 
       <div class="error" id="accessError">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C44B78" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C93417" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path>
         </svg>
         <span id="accessErrorText">Une erreur est survenue. Réessaie dans quelques instants.</span>
       </div>
 
-      <p class="footnote">Aucun mot de passe à retenir — un simple lien de connexion sécurisé.</p>
+      <p class="footnote">Aucun mot de passe à retenir, juste un lien de connexion sécurisé.</p>
     </div>
 
-    <!-- État 2 — Confirmation en 3 étapes -->
+    <!-- État 2 : Confirmation en 3 étapes -->
     <div class="confirm" id="confirmState">
       <h2>C'est <em>envoyé</em> ✦</h2>
       <p class="sub">Ton menu se prépare en ce moment même. Voici comment accéder à ton espace :</p>
@@ -193,7 +185,7 @@
       </div>
 
       <div class="spam-note">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2FA35E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#451A36" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 9v4"></path><path d="M12 17h.01"></path>
           <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
         </svg>
@@ -213,7 +205,6 @@
       document.getElementById('emailText').textContent = email;
       document.getElementById('stepEmail').textContent = email;
     } else {
-      // Pas d'email dans l'URL → on ne peut rien faire, redirection douce
       document.getElementById('emailText').textContent = 'adresse manquante';
       document.getElementById('accessBtn').disabled = true;
     }
@@ -223,7 +214,7 @@
       hideError();
 
       if (!email) {
-        showError("Lien invalide — l'adresse email est manquante. Retourne dans l'email reçu et reclique sur le bouton.");
+        showError("Lien invalide : l'adresse email est manquante. Retourne dans l'email reçu et reclique sur le bouton.");
         return;
       }
 

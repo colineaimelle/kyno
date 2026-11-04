@@ -1,0 +1,110 @@
+/* Charte Kyno. Source : Kyno Design System. */
+@import url("https://fonts.googleapis.com/css2?family=Lilita+One&family=Figtree:wght@400;500;700&display=swap");
+:root{
+  --mauve:#e2bce2;
+  --mauve-pale:#f6e7f3;
+  --corail:#ff5a3c;
+  --corail-pale:#ffe1da;
+  --corail-fonce:#c93417;
+  --citron:#ffe83d;
+  --citron-pale:#fff8c2;
+  --aubergine:#451a36;
+  --aubergine-doux:#6e4a63;
+  --cassis:#8a3a7c;
+  --papier:#fff9f2;
+  --blanc:#ffffff;
+  --trait:#ebd9e6;
+  --pelage:#be6b41;
+  --trait-chien:#3a2a20;
+  --space-4:4px;
+  --space-8:8px;
+  --space-12:12px;
+  --space-16:16px;
+  --space-24:24px;
+  --space-32:32px;
+  --space-48:48px;
+  --space-80:80px;
+  --radius-12:12px;
+  --radius-16:16px;
+  --radius-24:24px;
+  --radius-pill:999px;
+  --radius-rond:50%;
+  --ombre-bd:6px 6px 0 #451a36;
+  --ombre-bd-petite:4px 4px 0 #451a36;
+  --ombre-corail:6px 6px 0 #ff5a3c;
+  --contour-fin:2px;
+  --contour-fort:4px;
+  --font-titre:"Lilita One", system-ui, sans-serif;
+  --font-texte:"Figtree", system-ui, sans-serif;
+}
+
+body{font-family:var(--font-texte);color:var(--aubergine);background:var(--papier);margin:0}
+.ky-rang{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-16);padding:var(--space-12)}
+.ky-pile{display:flex;flex-direction:column;gap:var(--space-16);padding:var(--space-12)}
+.ky-btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);min-height:48px;box-sizing:border-box;padding:14px 28px;border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:18px;line-height:1.2;font-weight:700;text-decoration:none;cursor:pointer;transition:transform .16s cubic-bezier(.22,.61,.36,1),box-shadow .16s}
+.ky-btn:hover{transform:translate(-2px,-2px)}
+.ky-btn:active{transform:translate(2px,2px);box-shadow:none}
+.ky-btn:focus-visible,.ky-champ input:focus-visible,.ky-option:focus-visible,.ky-acc summary:focus-visible{outline:3px solid var(--cassis);outline-offset:3px}
+.ky-btn-principal{background:var(--aubergine);color:var(--papier);box-shadow:var(--ombre-corail)}
+.ky-btn-action{background:var(--citron);color:var(--aubergine);box-shadow:var(--ombre-bd)}
+.ky-btn-secondaire{background:var(--blanc);color:var(--aubergine);box-shadow:var(--ombre-bd-petite)}
+.ky-btn[disabled]{background:var(--trait);color:var(--aubergine-doux);border-color:var(--trait);box-shadow:none;cursor:not-allowed;transform:none}
+.ky-sticker{display:inline-block;background:var(--corail);color:var(--aubergine);border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-16);padding:2px 16px 8px;box-shadow:var(--ombre-bd);transform:rotate(-2deg)}
+.ky-sticker-citron{background:var(--citron)}
+.ky-etoile{position:relative;width:160px;height:160px;transform:rotate(10deg)}
+.ky-etoile svg{position:absolute;inset:0}
+.ky-etoile p{position:absolute;left:0;right:0;top:50px;margin:0;text-align:center;font-family:var(--font-titre);font-size:24px;line-height:1.05;color:var(--aubergine)}
+.ky-champ{display:flex;flex-direction:column;gap:var(--space-8)}
+.ky-champ label{font-size:14px;line-height:1.3;font-weight:700}
+.ky-champ input{font-family:var(--font-texte);font-size:18px;color:var(--aubergine);background:var(--blanc);border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-16);padding:15px 18px;outline:none;box-sizing:border-box;width:100%}
+.ky-champ input::placeholder{color:var(--aubergine-doux)}
+.ky-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-12)}
+.ky-option{display:flex;flex-direction:column;align-items:center;gap:var(--space-8);padding:var(--space-16) var(--space-8);background:var(--blanc);border:var(--contour-fin) solid var(--aubergine);border-radius:var(--radius-16);font-family:var(--font-texte);font-size:15px;font-weight:700;color:var(--aubergine);cursor:pointer}
+.ky-option img{width:56px;height:56px}
+.ky-option[aria-pressed="true"]{background:var(--mauve-pale);border-width:var(--contour-fort);padding:14px 6px;box-shadow:var(--ombre-bd-petite)}
+.ky-prog{display:flex;flex-direction:column;gap:var(--space-8)}
+.ky-prog-piste{height:14px;background:var(--blanc);border:var(--contour-fin) solid var(--aubergine);border-radius:var(--radius-pill);overflow:hidden}
+.ky-prog-jauge{height:100%;background:var(--cassis)}
+.ky-pastille{display:inline-flex;align-items:center;padding:6px 14px;border-radius:var(--radius-pill);border:var(--contour-fin) solid var(--aubergine);font-size:14px;line-height:1.3;font-weight:700;color:var(--aubergine);background:var(--mauve-pale)}
+.ky-pastille-alerte{background:var(--corail-pale)}
+.ky-pastille-saison{background:var(--citron)}
+.ky-encart{display:flex;gap:var(--space-12);align-items:flex-start;padding:var(--space-16);border:var(--contour-fin) solid var(--aubergine);border-radius:var(--radius-16);font-size:15px;line-height:1.5;color:var(--aubergine);background:var(--mauve-pale)}
+.ky-encart img{width:22px;height:22px;flex:none}
+.ky-encart p{margin:0}
+.ky-encart-astuce{background:var(--citron-pale)}
+.ky-encart-alerte{background:var(--corail-pale)}
+.ky-carte{background:var(--blanc);border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-24);box-shadow:var(--ombre-bd);padding:var(--space-24)}
+.ky-fiche{display:flex;gap:var(--space-24);align-items:center}
+.ky-fiche-avatar{flex:none;width:148px;height:148px;border-radius:var(--radius-rond);border:var(--contour-fort) solid var(--aubergine);background:var(--citron);overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.ky-fiche-avatar img{width:128px;height:auto;margin-bottom:-18px}
+.ky-fiche h3{margin:0 0 4px;font-family:var(--font-titre);font-weight:400;font-size:30px;line-height:1.1}
+.ky-fiche p{margin:0 0 var(--space-12);font-size:15px;line-height:1.5;color:var(--aubergine-doux)}
+.ky-score{display:flex;align-items:center;gap:var(--space-16)}
+.ky-score-anneau{position:relative;width:118px;height:118px}
+.ky-score-anneau svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ky-score-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-titre);font-size:38px}
+.ky-score strong{display:block;font-family:var(--font-titre);font-weight:400;font-size:24px}
+.ky-score span{font-size:15px;color:var(--aubergine-doux)}
+.ky-menu{padding:0;overflow:hidden}
+.ky-menu-tete{display:flex;justify-content:space-between;align-items:center;background:var(--aubergine);color:var(--papier);padding:12px var(--space-24);font-size:14px;font-weight:700}
+.ky-menu-corps{padding:var(--space-24)}
+.ky-menu-titre{display:flex;justify-content:space-between;align-items:flex-end;gap:var(--space-16);margin-bottom:var(--space-12)}
+.ky-menu-titre h3{margin:0;font-family:var(--font-titre);font-weight:400;font-size:24px;line-height:1.15}
+.ky-menu-titre b{font-family:var(--font-titre);font-weight:400;font-size:44px;line-height:1;white-space:nowrap}
+.ky-menu ul{list-style:none;margin:0;padding:0}
+.ky-menu li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:var(--contour-fin) solid var(--trait);font-size:15px}
+.ky-menu li:last-child{border-bottom:none}
+.ky-menu li b{color:var(--corail-fonce)}
+.ky-acc{background:var(--blanc);border:var(--contour-fin) solid var(--aubergine);border-radius:var(--radius-16)}
+.ky-acc summary{display:flex;justify-content:space-between;align-items:center;gap:var(--space-16);padding:var(--space-16) var(--space-24);list-style:none;cursor:pointer;font-family:var(--font-titre);font-size:20px;line-height:1.2}
+.ky-acc summary::-webkit-details-marker{display:none}
+.ky-acc summary::after{content:"+";font-size:26px;color:var(--corail-fonce)}
+.ky-acc[open] summary::after{content:"×"}
+.ky-acc p{margin:0;padding:0 var(--space-24) var(--space-24);font-size:17px;line-height:1.6}
+.ky-offres{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-24)}
+.ky-offre{display:flex;flex-direction:column;gap:var(--space-12)}
+.ky-offre h3{margin:0;font-family:var(--font-titre);font-weight:400;font-size:30px}
+.ky-offre-prix{font-family:var(--font-titre);font-size:62px;line-height:1}
+.ky-offre-prix small{font-family:var(--font-texte);font-size:15px;font-weight:500}
+.ky-offre p{margin:0;font-size:15px;line-height:1.5}
+.ky-offre-forte{background:var(--mauve)}
