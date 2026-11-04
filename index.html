@@ -693,66 +693,70 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 <!-- OFFRES -->
 <section class="s-offers" id="offres">
   <div class="offers-wrap">
-    <div class="s-label" style="justify-content:center;">Tarifs</div>
-    <h2>Une seule offre,<br><em>deux moments.</em></h2>
-  </div>
+    <h2>Commence avec le bilan,<br>reste si ça t'aide.</h2>
 
-  <div class="eb-offres-badge">
-    <div class="early-bird-badge"><div class="eb-dot"></div>Offre de lancement</div>
-    <p class="early-bird-counter"><strong id="placesLeftOffers2">87</strong> / 100 places au tarif de lancement encore disponibles</p>
-  </div>
-  <div class="offers-grid">
-
-    <!-- LANCEMENT -->
-    <div class="offer-early early">
+    <!-- Gratuit -->
+    <div class="ky-carte" style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:24px;">
       <div>
-        <div class="eb-offer-badge"><div class="eb-dot" style="width:5px;height:5px;background:var(--citron);border-radius:50%;"></div>Tarif de lancement — 100 places</div>
-        <p class="eb-offer-counter" style="margin-top:8px;"><span id="placesLeftOffers">87</span> / 100 places encore disponibles</p>
+        <h3 style="font-family:var(--font-titre);font-weight:400;font-size:28px;margin:0 0 6px;">Bilan nutritionnel</h3>
+        <p style="margin:0;font-size:15px;line-height:1.5;color:var(--aubergine-doux);">Quiz de 21 questions et rapport nutritionnel personnalisé.</p>
       </div>
-      <div class="offer-price">
-        <div class="p-num early">9</div>
-        <div class="p-detail">
-          <span class="p-cur">€</span>
-          <span class="p-freq early">/ mois · à vie</span>
-        </div>
-        <div class="p-crossed early">15€</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0;">
+        <div style="font-family:var(--font-titre);font-weight:400;font-size:52px;line-height:1;">Gratuit</div>
+        <a href="quiz.html" class="ky-btn ky-btn-secondaire">Faire le bilan</a>
       </div>
-      <div class="offer-name early">Suivi Continu</div>
-      <p class="offer-tagline early">Le tarif fondateur, réservé aux 100 premiers membres. Ton prix ne bougera jamais. Environ <strong style="color:var(--citron);font-weight:600;">2,25 € par menu</strong>, soit 0,30 € par jour.</p>
-      <div class="offer-feats early">
-        <div class="feat early"><div class="feat-dot early"></div>Rapport nutritionnel complet + premier menu offert</div>
-        <div class="feat early"><div class="feat-dot early"></div>Nouveaux menus chaque semaine (4×/mois), à cuisiner toi-même</div>
-        <div class="feat early"><div class="feat-dot early"></div>Suivi mensuel de l'évolution de ton chien</div>
-        <div class="feat early"><div class="feat-dot early"></div>Compléments ciblés avec dosages précis</div>
-        <div class="feat early"><div class="feat-dot early"></div>Alertes liées à sa race et à sa santé</div>
-        <div class="feat early"><div class="feat-dot early"></div>Prix garanti à vie, même après le lancement public</div>
-      </div>
-      <a href="quiz.html" class="offer-btn early">Créer le profil de mon chien — 9 € / mois →</a>
-      <p class="offer-fine">Sans engagement · résiliable à tout moment</p>
     </div>
 
-    <!-- TARIF PUBLIC (après lancement) -->
-    <div class="offer-standard normal">
-      <div class="offer-badge-standard">Tarif public — après le lancement</div>
-      <div class="offer-price">
-        <div class="p-num normal">15</div>
-        <div class="p-detail">
-          <span class="p-cur">€</span>
-          <span class="p-freq normal">/ mois</span>
+    <!-- Kyno + Kyno+ -->
+    <div class="ky-offres">
+
+      <!-- Kyno -->
+      <div class="ky-offre ky-carte">
+        <h3>Kyno</h3>
+        <div class="ky-offre-prix">12 <small>€/mois</small></div>
+        <p>Résiliable à tout moment.</p>
+        <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.5;">
+          <li>Menus hebdomadaires personnalisés</li>
+          <li>Liste de courses et batch-cooking</li>
+          <li>Profil modifiable à tout moment</li>
+          <li>Chat IA pour les adaptations au quotidien<br><small style="font-size:13px;color:var(--aubergine-doux);">Usage raisonnable, sans limite pour un usage personnel normal.</small></li>
+        </ul>
+        <p>Chien supplémentaire : +6 €/mois.<br><small style="font-size:13px;color:var(--aubergine-doux);">Menus distincts par chien, ingrédients partagés quand c'est possible, une seule liste de courses.</small></p>
+        <a href="quiz.html" class="ky-btn ky-btn-principal" style="margin-top:auto;">Commencer</a>
+      </div>
+
+      <!-- Kyno+ -->
+      <div class="ky-offre ky-carte ky-offre-forte">
+        <h3>Kyno+</h3>
+
+        <div>
+          <div class="ky-offre-prix">21 <small>€/mois</small></div>
+          <p><strong>Au mois : 21 €/mois.</strong> Résiliable à tout moment.</p>
         </div>
+
+        <div style="border-top:2px solid var(--aubergine);padding-top:12px;">
+          <div class="ky-offre-prix">180 <small>€/an</small></div>
+          <p><strong>À l'année : 180 €/an, soit 15 €/mois.</strong> Engagement de 12 mois, payé en une fois et renouvelé automatiquement. Tu peux désactiver le renouvellement à tout moment, et l'année en cours n'est pas remboursée.</p>
+        </div>
+
+        <div>
+          <p style="font-weight:700;margin-bottom:8px;">Tout Kyno, plus :</p>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:15px;line-height:1.5;">
+            <li>IA avancée : menus avec ce qu'on a dans le frigo, anti-gaspillage <span class="ky-pastille">Bientôt disponible</span></li>
+            <li>Guides numériques inclus <span class="ky-pastille">Bientôt disponible</span></li>
+            <li>Suivi santé renforcé : courbe de poids, rapport pour le vétérinaire <span class="ky-pastille">Bientôt disponible</span></li>
+          </ul>
+        </div>
+
+        <p>Chien supplémentaire : +10,50 €/mois ou +90 €/an.</p>
+        <a href="quiz.html" class="ky-btn ky-btn-principal" style="margin-top:auto;">Commencer</a>
       </div>
-      <div class="offer-name normal">Suivi Continu</div>
-      <p class="offer-tagline normal">Le même service au tarif public, dès l'ouverture officielle de Kyno. Environ <strong style="color:var(--cassis);font-weight:600;">3,75 € par menu</strong>, soit 0,50 € par jour.</p>
-      <div class="offer-feats normal">
-        <div class="feat normal"><div class="feat-dot normal"></div>Rapport nutritionnel complet personnalisé</div>
-        <div class="feat normal"><div class="feat-dot normal"></div>Nouveaux menus chaque semaine, à cuisiner toi-même</div>
-        <div class="feat normal"><div class="feat-dot normal"></div>Adaptation saisonnière automatique</div>
-        <div class="feat normal"><div class="feat-dot normal"></div>Compléments ciblés avec dosages</div>
-        <div class="feat normal"><div class="feat-dot normal"></div>Alertes liées à sa race et à sa santé</div>
-        <div class="feat normal"><div class="feat-dot normal"></div>Suivi mensuel adaptatif</div>
-      </div>
-      <a href="#waitlist-full" class="offer-btn normal" id="btnWaitlistOffers">Être averti à l'ouverture →</a>
-      <p class="offer-fine">Sans engagement · résiliable à tout moment</p>
+
+    </div>
+
+    <!-- Places fondatrices -->
+    <div class="ky-encart" style="margin-top:24px;">
+      <p><strong>100 places fondatrices :</strong> les 100 premiers abonnés, bêta-testeurs compris, ont Kyno+ à 12 €/mois et le chien supplémentaire à 6 €/mois. Tarif garanti tant que ton abonnement reste actif, perdu en cas de résiliation.</p>
     </div>
 
   </div>
