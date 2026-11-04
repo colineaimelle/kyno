@@ -335,7 +335,7 @@ async function sendEmailRapport(email, prenom, rapport, data) {
   const htmlRapport = rapport
     .replace(/\n\n/g, '</p><p style="margin:0 0 18px;">')
     .replace(/\n/g, '<br>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#2B3A2E;">$1</strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#451A36;">$1</strong>')
     .replace(/^/, '<p style="margin:0 0 18px;">')
     .replace(/$/, '</p>');
 
@@ -377,31 +377,28 @@ function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}, saison = '') 
 
       <tr>
         <td style="padding:0 8px 28px;text-align:center;">
-          <div style="display:inline-flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:50%;border:1.5px solid #2FA35E;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2FA35E;font-family:Arial,sans-serif;">K</div>
-            <span style="font-size:15px;font-weight:700;color:#2B3A2E;letter-spacing:0.04em;">kyno</span>
-          </div>
+          <img src="https://kyno.fr/kyno-logo.png" alt="Kyno" height="40" style="display:block;margin:0 auto;">
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FFFFFF;border-radius:20px 20px 0 0;padding:28px 32px;border:1px solid #E3EDE1;border-bottom:none;">
+        <td style="background:#FFFFFF;border-radius:20px 20px 0 0;padding:28px 32px;border:1px solid #F6E7F3;border-bottom:none;">
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td width="56" valign="top">
                 <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="26" cy="26" r="26" fill="#FBE4D8"/>
-                  <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#2B3A2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-                  <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#2B3A2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-                  <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#F2843C"/>
-                  <circle cx="22" cy="27" r="1.4" fill="#2B3A2E"/>
-                  <circle cx="30" cy="27" r="1.4" fill="#2B3A2E"/>
-                  <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#2B3A2E" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-                  <ellipse cx="26" cy="30.5" rx="1.4" ry="1" fill="#2B3A2E"/>
+                  <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                  <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                  <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#FF5A3C"/>
+                  <circle cx="22" cy="27" r="1.4" fill="#451A36"/>
+                  <circle cx="30" cy="27" r="1.4" fill="#451A36"/>
+                  <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#451A36" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                  <ellipse cx="26" cy="30.5" rx="1.4" ry="1" fill="#451A36"/>
                 </svg>
               </td>
               <td valign="middle" style="padding-left:12px;">
-                <p style="margin:0;font-size:17px;font-weight:700;color:#2B3A2E;">${prenom}</p>
+                <p style="margin:0;font-size:17px;font-weight:700;color:#451A36;">${prenom}</p>
                 <p style="margin:2px 0 0;font-size:12px;color:#8A978A;">${sousTitre}</p>
               </td>
               <td align="right" valign="middle">
@@ -413,14 +410,14 @@ function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}, saison = '') 
       </tr>
 
       <tr>
-        <td style="background:#2B3A2E;padding:24px 32px;">
+        <td style="background:#451A36;padding:24px 32px;">
           <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#7FBE98;font-weight:700;">Rapport nutritionnel</p>
-          <p style="margin:0;font-size:21px;font-weight:700;color:#FBFDF7;line-height:1.3;">Le profil complet de ${prenom} est prêt</p>
+          <p style="margin:0;font-size:21px;font-weight:700;color:#FFF9F2;line-height:1.3;">Le profil complet de ${prenom} est prêt</p>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FFFFFF;padding:32px 32px 8px;border:1px solid #E3EDE1;border-top:none;">
+        <td style="background:#FFFFFF;padding:32px 32px 8px;border:1px solid #F6E7F3;border-top:none;">
           <div style="font-size:14.5px;color:#3C473D;line-height:1.9;">
             ${htmlContent}
           </div>
@@ -428,10 +425,10 @@ function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}, saison = '') 
       </tr>
 
       <tr>
-        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #E3EDE1;border-top:none;border-radius:0 0 20px 20px;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #EDF2EA;">
+        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #F6E7F3;border-top:none;border-radius:0 0 20px 20px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #EBD9E6;">
             <tr><td style="padding-top:28px;text-align:center;">
-              <a href="${accessUrl}" style="display:inline-block;background:#2FA35E;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Accéder à l'espace de ${prenom} →</a>
+              <a href="${accessUrl}" style="display:inline-block;background:#451A36;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Accéder à l'espace de ${prenom} →</a>
             </td></tr>
           </table>
         </td>

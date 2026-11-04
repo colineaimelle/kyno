@@ -271,7 +271,7 @@ textarea{resize:vertical;min-height:100px;}
 <div class="wrap" id="quizWrap">
   <!-- Q1 — PRÉNOM -->
   <div class="step active" data-step="1">
-    <div class="beta-badge"><div class="beta-dot"></div>Bêta gratuite — 100 places</div>
+    <div class="beta-badge"><div class="beta-dot"></div>Bêta gratuite, 100 places</div>
     <div class="step-num">Profil · 1 / 6</div>
     <h2 class="step-question">Comment s'appelle<br><em>ton chien ?</em></h2>
     <p class="step-hint">Son prénom apparaîtra dans tout son rapport nutritionnel personnalisé.</p>
@@ -347,7 +347,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="5">
     <div class="step-num">Profil · 5 / 6</div>
     <h2 class="step-question" id="q5Title">C'est un garçon<br><em>ou une fille ?</em></h2>
-    <p class="step-hint">La stérilisation réduit les besoins énergétiques de 20 à 30 % — un ajustement crucial.</p>
+    <p class="step-hint">La stérilisation réduit les besoins énergétiques de 20 à 30 %, un ajustement crucial.</p>
     <div class="options cards cols-2" id="q5">
       <div class="opt" onclick="radio('q5',this,'male'); showSexeSub('male')"><span class="opt-illo" data-illo="dog-male"></span><span class="opt-cap">Un garçon</span></div>
       <div class="opt" onclick="radio('q5',this,'femelle'); showSexeSub('femelle')"><span class="opt-illo" data-illo="dog-female"></span><span class="opt-cap">Une fille</span></div>
@@ -442,8 +442,8 @@ textarea{resize:vertical;min-height:100px;}
         <div class="opt" onclick="multi('q8maladies',this,'épilepsie')">Épilepsie</div>
         <div class="opt" onclick="multi('q8maladies',this,'maladie cardiaque')">Maladie cardiaque</div>
         <div class="opt" onclick="multi('q8maladies',this,'maladie rénale')">Maladie rénale</div>
-        <div class="opt" onclick="multi('q8maladies',this,'calculs urinaires struvite')">Calculs urinaires — struvite</div>
-        <div class="opt" onclick="multi('q8maladies',this,'calculs urinaires oxalate')">Calculs urinaires — oxalate</div>
+        <div class="opt" onclick="multi('q8maladies',this,'calculs urinaires struvite')">Calculs urinaires (struvite)</div>
+        <div class="opt" onclick="multi('q8maladies',this,'calculs urinaires oxalate')">Calculs urinaires (oxalate)</div>
         <div class="opt" onclick="multi('q8maladies',this,'diabète')">Diabète</div>
         <div class="opt" onclick="multi('q8maladies',this,'malabsorption intestinale')">Malabsorption intestinale</div>
         <div class="opt" onclick="multi('q8maladies',this,'MICI')">MICI (maladie inflammatoire)</div>
@@ -493,7 +493,7 @@ textarea{resize:vertical;min-height:100px;}
     <h2 class="step-question">Des petits tracas<br><em>au quotidien ?</em></h2>
     <p class="step-hint">Plusieurs choix. Ces signaux nous permettent d'adapter les recettes et les compléments.</p>
     <div class="options" id="q10">
-      <div class="opt" onclick="multi('q10',this,'aucun')">Aucun — tout va bien</div>
+      <div class="opt" onclick="multi('q10',this,'aucun')">Aucun, tout va bien</div>
       <div class="opt" onclick="multi('q10',this,'peau irritée')">Peau irritée / rougeurs</div>
       <div class="opt" onclick="multi('q10',this,'démangeaisons')">Démangeaisons fréquentes</div>
       <div class="opt" onclick="multi('q10',this,'pelage terne')">Pelage terne ou cassant</div>
@@ -664,7 +664,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="17">
     <div class="step-num">Projet · 4 / 6</div>
     <h2 class="step-question">Combien de temps<br><em>pour cuisiner par semaine ?</em></h2>
-    <p class="step-hint">Honnêtement — les menus seront adaptés à ta réalité.</p>
+    <p class="step-hint">Honnêtement, les menus seront adaptés à ta réalité.</p>
     <div class="options" id="q17">
       <div class="opt" onclick="radio('q17',this,'moins de 30 min')">Moins de 30 min</div>
       <div class="opt" onclick="radio('q17',this,'30 min à 1h')">30 min – 1h</div>
@@ -913,7 +913,7 @@ const total = 22;
 const IS_AJOUT = new URLSearchParams(window.location.search).has('ajout');
 const FOYER_STEPS = new Set([16, 17, 18, 20, 21, 22]);
 if (IS_AJOUT) {
-  document.title = 'Kyno — Ajouter un chien';
+  document.title = 'Kyno : Ajouter un chien';
   const visible = [];
   for (let i = 1; i <= total; i++) if (!FOYER_STEPS.has(i)) visible.push(i);
   document.getElementById('navStep').textContent = 'Question 1 / ' + visible.length;

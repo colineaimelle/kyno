@@ -102,7 +102,7 @@ function buildMultiDogMenuPrompt(chiens, foyer, saison, ciblesKcal = {}) {
       "chien_id": "${chien.id}",
       "recette": {
         "moment": "Matin et soir",
-        "color": "#2FA35E",
+        "color": "#8A3A7C",
         "titre": "nom court de la recette de ${nom}",
         "ration": <grammes CRU par repas pour ${nom} = sum(ingredients_grammes_crus) / 2>,
         "ingredients": [
@@ -116,11 +116,11 @@ function buildMultiDogMenuPrompt(chiens, foyer, saison, ciblesKcal = {}) {
       ],
       "batch_special": "compléments à ajouter AU MOMENT DU REPAS uniquement pour ${nom} (huile, CMV…)",
       "apports": [
-        {"nom": "Calories",  "unite": "kcal", "valeur": <n>, "cible": ${cibleParRepas}, "pct": <n>, "color": "#F2843C"},
-        {"nom": "Protéines", "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#2FA35E"},
-        {"nom": "Lipides",   "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#EC6592"},
+        {"nom": "Calories",  "unite": "kcal", "valeur": <n>, "cible": ${cibleParRepas}, "pct": <n>, "color": "#FF5A3C"},
+        {"nom": "Protéines", "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#8A3A7C"},
+        {"nom": "Lipides",   "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#C93417"},
         {"nom": "Calcium",   "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#3E8FC4"},
-        {"nom": "Oméga-3",   "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#FFCE2E"}
+        {"nom": "Oméga-3",   "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#FFE83D"}
       ],
       "proteine_principale": "protéine en minuscules sans article (ex: dinde)",
       "score_sante": <0-100>,
@@ -374,22 +374,19 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
   const logoBar = `
       <tr>
         <td style="padding:0 8px 28px;text-align:center;">
-          <div style="display:inline-flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:50%;border:1.5px solid #2FA35E;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2FA35E;font-family:Arial,sans-serif;">K</div>
-            <span style="font-size:15px;font-weight:700;color:#2B3A2E;letter-spacing:0.04em;">kyno</span>
-          </div>
+          <img src="https://kyno.fr/kyno-logo.png" alt="Kyno" height="40" style="display:block;margin:0 auto;">
         </td>
       </tr>`;
 
   const dogSvg = `<svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="26" cy="26" r="26" fill="#FBE4D8"/>
-                  <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#2B3A2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-                  <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#2B3A2E" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-                  <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#F2843C"/>
-                  <circle cx="22" cy="27" r="1.4" fill="#2B3A2E"/>
-                  <circle cx="30" cy="27" r="1.4" fill="#2B3A2E"/>
-                  <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#2B3A2E" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-                  <ellipse cx="26" cy="30.5" rx="1.4" ry="1" fill="#2B3A2E"/>
+                  <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                  <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                  <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#FF5A3C"/>
+                  <circle cx="22" cy="27" r="1.4" fill="#451A36"/>
+                  <circle cx="30" cy="27" r="1.4" fill="#451A36"/>
+                  <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#451A36" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                  <ellipse cx="26" cy="30.5" rx="1.4" ry="1" fill="#451A36"/>
                 </svg>`;
 
   const stepsHtml = batch_cooking_commun.map(s => `${s.n}. ${s.text}`).join('<br>');
@@ -420,45 +417,45 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
     <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
       ${logoBar}
       <tr>
-        <td style="background:#FFFFFF;border-radius:20px 20px 0 0;padding:28px 32px;border:1px solid #E3EDE1;border-bottom:none;">
+        <td style="background:#FFFFFF;border-radius:20px 20px 0 0;padding:28px 32px;border:1px solid #F6E7F3;border-bottom:none;">
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td width="56" valign="top">${dogSvg}</td>
               <td valign="middle" style="padding-left:12px;">
-                <p style="margin:0;font-size:17px;font-weight:700;color:#2B3A2E;">${prenom}</p>
+                <p style="margin:0;font-size:17px;font-weight:700;color:#451A36;">${prenom}</p>
                 <p style="margin:2px 0 0;font-size:12px;color:#8A978A;">${sousTitre}</p>
               </td>
               <td align="right" valign="middle">
-                <span style="display:inline-block;background:#E3EDE1;color:#2FA35E;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:20px;">${weekLabel}</span>
+                <span style="display:inline-block;background:#F6E7F3;color:#8A3A7C;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:20px;">${weekLabel}</span>
               </td>
             </tr>
           </table>
         </td>
       </tr>
       <tr>
-        <td style="background:#2B3A2E;padding:24px 32px;">
+        <td style="background:#451A36;padding:24px 32px;">
           <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#7FBE98;font-weight:700;">Menu de la semaine</p>
-          <p style="margin:0;font-size:22px;font-weight:700;color:#FBFDF7;line-height:1.3;">${recette.titre || 'Le menu de ' + prenom}</p>
+          <p style="margin:0;font-size:22px;font-weight:700;color:#FFF9F2;line-height:1.3;">${recette.titre || 'Le menu de ' + prenom}</p>
         </td>
       </tr>
       <tr>
-        <td style="background:#FFFFFF;padding:32px 32px 4px;border:1px solid #E3EDE1;border-top:none;">
+        <td style="background:#FFFFFF;padding:32px 32px 4px;border:1px solid #F6E7F3;border-top:none;">
           <p style="margin:0 0 24px;font-size:14.5px;color:#3C473D;line-height:1.9;">${recette.note || ''}</p>
           <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
             <tr>
               <td width="50%" style="background:#F3F7F1;border-radius:10px;padding:16px 20px;">
                 <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Besoin estimé</p>
-                <p style="margin:0;font-size:20px;font-weight:700;color:#2B3A2E;">${cible ? cible + ' kcal/j' : '—'}</p>
+                <p style="margin:0;font-size:20px;font-weight:700;color:#451A36;">${cible ? cible + ' kcal/j' : '—'}</p>
               </td>
               <td width="12"></td>
               <td width="50%" style="background:#F3F7F1;border-radius:10px;padding:16px 20px;">
                 <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Temps de prépa</p>
-                <p style="margin:0;font-size:20px;font-weight:700;color:#2B3A2E;">${batch_time}</p>
+                <p style="margin:0;font-size:20px;font-weight:700;color:#451A36;">${batch_time}</p>
               </td>
             </tr>
           </table>
           <p style="margin:0 0 24px;font-size:12px;color:#8A978A;"><strong>Portionnage :</strong> divise la préparation cuite en 14 boîtes égales (matin et soir, 7 jours).${recette.ration ? ` Ration crue totale : ≈ ${recette.ration} g/j.` : ''}</p>
-          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#2B3A2E;border-top:1px solid #EDF2EA;padding-top:22px;">Les étapes</h2>
+          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#451A36;border-top:1px solid #EBD9E6;padding-top:22px;">Les étapes</h2>
           <p style="margin:0 0 24px;font-size:14.5px;color:#3C473D;line-height:1.9;">${stepsHtml}</p>
           ${mc.batch_special ? `
           <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
@@ -469,15 +466,15 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
             </tr>
           </table>` : ''}
           ${prochesAlert}
-          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#2B3A2E;">Liste de courses (7 jours)</h2>
+          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#451A36;">Liste de courses (7 jours)</h2>
           <p style="margin:0 0 28px;font-size:14.5px;color:#3C473D;line-height:1.9;">${coursesHtml}</p>
         </td>
       </tr>
       <tr>
-        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #E3EDE1;border-top:none;border-radius:0 0 20px 20px;">
+        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #F6E7F3;border-top:none;border-radius:0 0 20px 20px;">
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr><td style="text-align:center;padding-top:8px;">
-              <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#2FA35E;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Voir le menu complet →</a>
+              <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Voir le menu complet →</a>
             </td></tr>
           </table>
         </td>
@@ -515,12 +512,12 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
 
     return `
       <tr>
-        <td style="background:#FFFFFF;padding:24px 32px 0;border:1px solid #E3EDE1;border-top:none;">
+        <td style="background:#FFFFFF;padding:24px 32px 0;border:1px solid #F6E7F3;border-top:none;">
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td width="44" valign="top">${dogSvg}</td>
               <td valign="middle" style="padding-left:10px;">
-                <p style="margin:0;font-size:16px;font-weight:700;color:#2B3A2E;">${nom}</p>
+                <p style="margin:0;font-size:16px;font-weight:700;color:#451A36;">${nom}</p>
                 <p style="margin:2px 0 0;font-size:11px;color:#8A978A;">${sousTitre}</p>
               </td>
             </tr>
@@ -528,14 +525,14 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
         </td>
       </tr>
       <tr>
-        <td style="background:#FFFFFF;padding:12px 32px 20px;border:1px solid #E3EDE1;border-top:none;">
-          <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#2B3A2E;">${recette.titre || 'Menu de la semaine'}</p>
+        <td style="background:#FFFFFF;padding:12px 32px 20px;border:1px solid #F6E7F3;border-top:none;">
+          <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#451A36;">${recette.titre || 'Menu de la semaine'}</p>
           <p style="margin:0 0 10px;font-size:13px;color:#5B6B5D;line-height:1.7;">${recette.note || ''}</p>
           <table cellpadding="0" cellspacing="0" style="margin:0 0 8px;">
             <tr>
               <td style="background:#F3F7F1;border-radius:8px;padding:10px 16px;">
                 <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Besoin estimé</p>
-                <p style="margin:0;font-size:18px;font-weight:700;color:#2B3A2E;">${cible ? cible + ' kcal/j' : '—'}</p>
+                <p style="margin:0;font-size:18px;font-weight:700;color:#451A36;">${cible ? cible + ' kcal/j' : '—'}</p>
               </td>
             </tr>
           </table>
@@ -562,34 +559,34 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
     <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
       ${logoBar}
       <tr>
-        <td style="background:#2B3A2E;border-radius:20px 20px 0 0;padding:24px 32px;">
+        <td style="background:#451A36;border-radius:20px 20px 0 0;padding:24px 32px;">
           <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#7FBE98;font-weight:700;">Menu de la semaine</p>
-          <p style="margin:0;font-size:21px;font-weight:700;color:#FBFDF7;line-height:1.3;">${noms}</p>
+          <p style="margin:0;font-size:21px;font-weight:700;color:#FFF9F2;line-height:1.3;">${noms}</p>
           <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,0.45);">${weekLabel}</p>
         </td>
       </tr>
       ${dogSectionsHtml}
       <tr>
-        <td style="background:#FFFFFF;padding:24px 32px 4px;border:1px solid #E3EDE1;border-top:none;">
-          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#2B3A2E;border-top:1px solid #EDF2EA;padding-top:22px;">Batch cooking commun</h2>
+        <td style="background:#FFFFFF;padding:24px 32px 4px;border:1px solid #F6E7F3;border-top:none;">
+          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#451A36;border-top:1px solid #EBD9E6;padding-top:22px;">Batch cooking commun</h2>
           <table cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
             <tr>
               <td style="background:#F3F7F1;border-radius:8px;padding:10px 16px;">
                 <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Temps de prépa</p>
-                <p style="margin:0;font-size:18px;font-weight:700;color:#2B3A2E;">${batch_time}</p>
+                <p style="margin:0;font-size:18px;font-weight:700;color:#451A36;">${batch_time}</p>
               </td>
             </tr>
           </table>
           <p style="margin:0 0 28px;font-size:14.5px;color:#3C473D;line-height:1.9;">${stepsHtml}</p>
-          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#2B3A2E;">Liste de courses du foyer (7 jours)</h2>
+          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#451A36;">Liste de courses du foyer (7 jours)</h2>
           <p style="margin:0 0 28px;font-size:14.5px;color:#3C473D;line-height:1.9;">${coursesHtml}</p>
         </td>
       </tr>
       <tr>
-        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #E3EDE1;border-top:none;border-radius:0 0 20px 20px;">
+        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #F6E7F3;border-top:none;border-radius:0 0 20px 20px;">
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr><td style="text-align:center;padding-top:8px;">
-              <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#2FA35E;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Voir les menus complets →</a>
+              <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Voir les menus complets →</a>
             </td></tr>
           </table>
         </td>

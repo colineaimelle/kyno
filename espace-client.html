@@ -973,7 +973,7 @@ const DEMO_PROFILE = {
         { name: 'Huile de saumon', qty: '3 ml' },
         { name: 'CMV', qty: '3 g' }
       ],
-      note: "Repas complet et équilibré — protéines maigres digestes et oméga-3 (EPA/DHA) pour le pelage de Viva. Même ration matin et soir." }
+      note: "Repas complet et équilibré : protéines maigres digestes et oméga-3 (EPA/DHA) pour le pelage de Viva. Même ration matin et soir." }
   ],
   batch_time: '≈ 35 min de prépa',
   batch_steps: [
@@ -1000,9 +1000,9 @@ const DEMO_PROFILE = {
   ],
   cout_semaine: '38 €',
   historique_menus: [
-    { score: 84, label: 'Semaine du 3 juin', note: 'Menu poulet & courge — pelage en nette amélioration' },
-    { score: 81, label: 'Semaine du 27 mai', note: 'Menu bœuf & carotte — digestion stabilisée' },
-    { score: 78, label: 'Semaine du 20 mai', note: 'Premier menu Kyno — transition réussie' }
+    { score: 84, label: 'Semaine du 3 juin', note: 'Menu poulet & courge, pelage en nette amélioration' },
+    { score: 81, label: 'Semaine du 27 mai', note: 'Menu bœuf & carotte, digestion stabilisée' },
+    { score: 78, label: 'Semaine du 20 mai', note: 'Premier menu Kyno, transition réussie' }
   ]
 };
 
@@ -1068,7 +1068,7 @@ function renderAll(p) {
 
   // message d'accueil chat (si pas d'historique)
   if (!Array.isArray(p.chat_history) || !p.chat_history.length) {
-    addMessage('ia', `Salut ! Je suis là pour suivre ${nom} avec toi. Dis-moi comment elle va cette semaine — appétit, selles, énergie, poids — et je recalibre son plan en temps réel.`, true);
+    addMessage('ia', `Salut ! Je suis là pour suivre ${nom} avec toi. Dis-moi comment elle va cette semaine : appétit, selles, énergie, poids, et je recalibre son plan en temps réel.`, true);
   }
 }
 
@@ -1403,7 +1403,7 @@ function renderBatch(p) {
   document.getElementById('batchSpecial').innerHTML = p.batch_special ? `
     <div class="batch-special">
       <span class="batch-special-num"><svg viewBox="0 0 24 24" fill="none" stroke="#FF5A3C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M5 8h14l-1 13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"></path></svg></span>
-      <span class="batch-special-text"><b>Au moment du repas — </b>${esc(p.batch_special)}</span>
+      <span class="batch-special-text"><b>Au moment du repas :</b> ${esc(p.batch_special)}</span>
     </div>` : '';
 
   const frigo = p.conserv_frigo, congelo = p.conserv_congelo;
@@ -1628,7 +1628,7 @@ function toggleAccordion(name) {
 // ═══════════════════════════════════════════════════════════
 function copyList() {
   if (!coursesData.length) return;
-  const txt = coursesData.map(c => `${c.name} — ${c.qty}`).join('\n');
+  const txt = coursesData.map(c => `${c.name} : ${c.qty}`).join('\n');
   try { navigator.clipboard && navigator.clipboard.writeText(txt); } catch (e) {}
   const lbl = document.getElementById('copyLabel');
   lbl.textContent = 'Copiée ✓';
@@ -1770,7 +1770,7 @@ function localReply(msg) {
   if (m.includes('selle') || m.includes('diarrh') || m.includes('molle')) return `Merci pour le retour. Je vais alléger un peu les fibres et privilégier des protéines très digestes sur le prochain menu de ${nom}. Si ça persiste plus de 48h, on en parle à ton vétérinaire.`;
   if (m.includes('appétit') || m.includes('mange') || m.includes('mange pas')) return `Compris. Je vais varier les protéines et ajuster les portions pour redonner de l'appétit à ${nom}. Tu as remarqué un changement de routine ou de température ces derniers jours ?`;
   if (m.includes('poids') || m.includes('kg') || m.includes('gros') || m.includes('maigr')) return `Noté pour le poids. Je recalcule la ration de ${nom} au gramme près et j'ajuste le ratio lipides/protéines sur le menu à venir.`;
-  if (m.includes('bien') || m.includes('super') || m.includes('nickel') || m.includes('top')) return `Génial ! Je garde le cap alors. Je reviens vers toi dans 15 jours pour le prochain point — mais écris-moi quand tu veux si quelque chose change pour ${nom} 🐾`;
+  if (m.includes('bien') || m.includes('super') || m.includes('nickel') || m.includes('top')) return `Génial ! Je garde le cap alors. Je reviens vers toi dans 15 jours pour le prochain point, mais écris-moi quand tu veux si quelque chose change pour ${nom} 🐾`;
   if (m.includes('énergie') || m.includes('fatigu') || m.includes('mou')) return `Merci. Je vais renforcer légèrement l'apport énergétique et les oméga-3 pour soutenir ${nom}. On surveille ça ensemble la semaine prochaine.`;
   return `Bien reçu ✦ Je prends ça en compte pour le suivi de ${nom} et j'ajusterai son plan si besoin. Y a-t-il autre chose que tu as remarqué (appétit, selles, énergie, poids) ?`;
 }
