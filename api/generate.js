@@ -235,12 +235,25 @@ Structure :
 Note légale : Ce rapport est éducatif et ne remplace pas un avis vétérinaire.`;
 }
 
+// ── JWT — email vérifié depuis le header Authorization ─────
+function getEmailFromJwt(authHeader) {
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  const token = authHeader.slice(7);
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf8'));
+    return payload.email || null;
+  } catch {
+    return null;
+  }
+}
+
 // ── HANDLER PRINCIPAL ──────────────────────────────────────
 module.exports = async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
@@ -249,6 +262,13 @@ module.exports = async function handler(req, res) {
     const data = req.body;
     if (!data.prenom || !data.race) {
       return res.status(400).json({ error: 'Données incomplètes — prénom et race requis' });
+    }
+
+    // Pour ajoutChien, l'email doit venir du JWT — jamais du corps de la requête.
+    if (data.ajoutChien === true) {
+      const jwtEmail = getEmailFromJwt(req.headers['authorization']);
+      if (!jwtEmail) return res.status(401).json({ error: 'Authentification requise pour ajouter un chien' });
+      data.email = jwtEmail;
     }
 
     const saison = getSaison();
