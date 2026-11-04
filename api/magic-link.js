@@ -13,7 +13,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
 
   try {
-    const { email } = req.body;
+    const { email, redirectTo } = req.body;
     if (!email) return res.status(400).json({ error: 'Email manquant' });
 
     // ── 1. Envoyer le lien magique via Supabase Auth ──────
@@ -28,7 +28,7 @@ module.exports = async function handler(req, res) {
         email: email,
         create_user: true,
         options: {
-          email_redirect_to: 'https://project-jlc6z.vercel.app/espace-client.html'
+          email_redirect_to: redirectTo || 'https://project-jlc6z.vercel.app/espace-client.html'
         }
       })
     });
