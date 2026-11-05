@@ -112,8 +112,9 @@ nav{
 .nav-links{display:flex;align-items:center;gap:36px;}
 .nav-links a{font-size:12px;color:var(--aubergine);text-decoration:none;opacity:0.7;transition:opacity 0.2s;font-weight:400;}
 .nav-links a:hover{opacity:1;}
-.nav-cta{font-family:var(--font-titre);background:var(--cassis);color:white;padding:10px 22px;border-radius:4px;font-size:12px;font-weight:600;text-decoration:none;transition:background 0.2s;border:2px solid var(--corail);nd 0.2s;opacity:1!important;}
-.nav-cta:hover{background:var(--mauve);}
+.nav-cta{display:inline-flex;align-items:center;justify-content:center;padding:8px 20px;min-height:36px;border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:14px;font-weight:700;background:var(--aubergine);color:var(--papier);box-shadow:var(--ombre-corail);text-decoration:none;cursor:pointer;transition:transform .16s cubic-bezier(.22,.61,.36,1),box-shadow .16s;}
+.nav-cta:hover{transform:translate(-2px,-2px);}
+.nav-cta:active{transform:translate(2px,2px);box-shadow:none;}
 .nav-espace{font-size:12px;color:var(--cassis);text-decoration:none;font-weight:600;padding:8px 16px;border-radius:4px;border:1.5px solid var(--mauve);transition:all 0.2s;font-family:var(--font-titre);}
 .nav-espace:hover{background:var(--mauve-pale);border-color:var(--cassis);}
 
@@ -477,7 +478,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   .nav-links.open{display:flex;}
   .nav-links a{font-size:14px;opacity:1;padding:8px 0;border-bottom:1px solid var(--trait);}
   .nav-links a:last-child{border-bottom:none;}
-  .nav-cta{text-align:center;padding:12px 24px!important;border-radius:4px;}
+  .nav-cta{padding:12px 24px;text-align:center;}
   .nav-espace{text-align:center;padding:8px 0!important;border:none!important;}
 }
 </style>
@@ -496,7 +497,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
     <a href="#comment">Comment ça marche</a>
     <a href="#offres">Tarifs</a>
     <a href="login.html" class="nav-espace">Mon espace</a>
-    <a href="quiz.html" class="nav-cta">Commencer →</a>
+    <a href="quiz.html" class="nav-cta">Commencer</a>
   </div>
   <button class="nav-burger" id="navBurger" onclick="toggleMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
