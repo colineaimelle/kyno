@@ -3,6 +3,8 @@
 // Charge les chiens actifs par foyer et génère un menu par foyer.
 
 const { getSaison, buildMultiDogMenuPrompt, ajusterRations, buildEmailMenuHtml } = require('./lib/menuGen');
+
+const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
 const { getTermesExclus, detecterTermeInterdit, detecterTermeNonNie } = require('./lib/allergenes');
 const { besoinKcalJour } = require('./lib/energie');
 
@@ -447,7 +449,7 @@ async function sendEmailRelance(email, prenom) {
     <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
       <tr>
         <td style="padding:0 8px 28px;text-align:center;">
-          <img src="https://kyno.fr/kyno-logo.png" alt="Kyno" height="40" style="display:block;margin:0 auto;">
+          <img src="${SITE_URL}/kyno-logo.png" alt="Kyno" height="40" style="display:block;margin:0 auto;">
         </td>
       </tr>
       <tr>

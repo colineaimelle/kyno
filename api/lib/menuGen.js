@@ -3,6 +3,8 @@
 // Importé par cron-menu.js et chat.js.
 
 const { getTermesExclus, getAlimentsProches, detecterTermeInterdit } = require('./allergenes');
+
+const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
 const { kcalPour100g, kcalTotale } = require('./calories');
 
 function normaliser(s) {
@@ -374,7 +376,7 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
   const logoBar = `
       <tr>
         <td style="padding:0 8px 28px;text-align:center;">
-          <img src="https://kyno.fr/kyno-logo.png" alt="Kyno" height="40" style="display:block;margin:0 auto;">
+          <img src="${SITE_URL}/kyno-logo.png" alt="Kyno" height="40" style="display:block;margin:0 auto;">
         </td>
       </tr>`;
 

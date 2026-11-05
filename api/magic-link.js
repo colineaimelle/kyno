@@ -3,6 +3,8 @@
 // et génère le menu (synchrone — Vercel peut tuer le process avant la fin
 // d'un traitement fire-and-forget lancé après la réponse HTTP, donc on attend).
 
+const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
+
 module.exports = async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -370,7 +372,7 @@ function buildEmailMenuHtml(prenom, htmlContent) {
 
       <tr>
         <td style="background:#451A36;border-radius:16px 16px 0 0;padding:36px 48px;text-align:center;border-bottom:3px solid #C93417;">
-          <img src="https://kyno.fr/kyno-logo-clair.png" alt="Kyno" height="40" style="display:block;margin:0 auto 8px;">
+          <img src="${SITE_URL}/kyno-logo-clair.png" alt="Kyno" height="40" style="display:block;margin:0 auto 8px;">
           <p style="margin:0;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);">Nutrition Canine Individualisée</p>
         </td>
       </tr>
