@@ -39,6 +39,9 @@
 }
 
 body{font-family:var(--font-texte);color:var(--aubergine);background:var(--papier);margin:0}
+/* Lilita One : poids forcé 400, pas de synthèse grasse */
+h1,h2,h3,h4,[class*="ky-"][class*="titre"],[class*="font-titre"]{font-synthesis:none;}
+h1,h2,h3,h4{font-weight:400;}
 .ky-rang{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-16);padding:var(--space-12)}
 .ky-pile{display:flex;flex-direction:column;gap:var(--space-16);padding:var(--space-12)}
 .ky-btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);min-height:48px;box-sizing:border-box;padding:14px 28px;border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:18px;line-height:1.2;font-weight:700;text-decoration:none;cursor:pointer;transition:transform .16s cubic-bezier(.22,.61,.36,1),box-shadow .16s}
