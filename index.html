@@ -649,6 +649,37 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   .s-faq-new{padding:56px 20px;grid-template-columns:1fr;}
   .faq-gauche h2{font-size:36px;}
 }
+
+/* ── CTA FINAL ──────────────────────────────────────── */
+.s-cta{padding:0 80px 96px;}
+.s-cta-card{position:relative;background:var(--turquoise);border:4px solid var(--aubergine);border-radius:28px;box-shadow:8px 8px 0 var(--aubergine);overflow:hidden;padding:56px 60px;min-height:300px;display:flex;flex-direction:column;justify-content:center;gap:20px;}
+.s-cta-bg{position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 80% 100%,#2BB3AE 0deg 7deg,#3FC0BB 7deg 14deg);}
+.s-cta-xpl{position:absolute;right:36px;top:22px;width:140px;height:140px;transform:rotate(12deg);}
+.s-cta-xpl svg{position:absolute;inset:0;width:100%;height:100%;}
+.s-cta-xpl p{position:absolute;left:0;right:0;top:50px;text-align:center;font-family:var(--font-titre);font-size:26px;line-height:1;color:var(--papier);}
+.s-cta-disc{position:absolute;right:40px;bottom:-90px;width:300px;height:300px;border-radius:50%;background:var(--moutarde);border:4px solid var(--aubergine);}
+.s-cta-viva{position:absolute;right:76px;bottom:0;width:220px;height:auto;}
+.s-cta-viva svg{width:100%;height:auto;}
+.s-cta-h2{position:relative;margin:0;font-family:var(--font-titre);font-weight:400;font-size:52px;line-height:1.05;max-width:640px;}
+.s-cta-desc{position:relative;margin:0;font-size:17px;line-height:1.55;max-width:520px;font-weight:500;}
+.s-cta-actions{position:relative;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.s-cta-note{font-size:15px;font-weight:500;}
+/* Pied de page */
+.ft-new{background:var(--aubergine);color:var(--papier);padding:56px 80px 40px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;}
+.ft-new-brand{display:flex;flex-direction:column;gap:14px;}
+.ft-new-tagline{margin:0;font-size:16px;line-height:1.5;}
+.ft-new-copy{margin:0;font-size:14px;color:var(--trait);}
+.ft-new-col{display:flex;flex-direction:column;gap:10px;}
+.ft-new-col-titre{margin:0 0 4px;font-size:15px;font-weight:700;color:var(--moutarde);}
+.ft-new-col a{color:var(--papier);font-size:16px;text-decoration:none;transition:opacity 0.2s;}
+.ft-new-col a:hover{opacity:0.75;}
+@media(max-width:768px){
+  .s-cta{padding:0 20px 56px;}
+  .s-cta-card{padding:40px 24px;min-height:auto;}
+  .s-cta-h2{font-size:36px;}
+  .s-cta-viva,.s-cta-disc,.s-cta-xpl{display:none;}
+  .ft-new{grid-template-columns:1fr 1fr;gap:28px;padding:48px 20px 32px;}
+}
 </style>
 </head>
 <body>
@@ -1038,41 +1069,50 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   </div>
 </section>
 
-<!-- CTA PRINCIPAL — places dispo -->
-<section class="s-waitlist" id="waitlist">
-  <h2 class="wl-title">Ton chien mérite<br>une nutrition <span class="ky-sticker ky-sticker-moutarde">qui lui ressemble.</span></h2>
-  <p class="wl-desc">Commence par le bilan nutritionnel gratuit. 100 places fondatrices pour Kyno+ à 12 €/mois. Ton avis nous aide à bâtir le meilleur service de nutrition canine en France.</p>
-  <a href="quiz.html" class="ky-btn ky-btn-action">
-    Faire le bilan gratuit
-  </a>
-  <p class="wl-note">Résiliable à tout moment.</p>
+<!-- CTA FINAL -->
+<section class="s-cta">
+  <div class="s-cta-card">
+    <div class="s-cta-bg" aria-hidden="true"></div>
+    <div class="s-cta-xpl" aria-hidden="true">
+      <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="80,2 92,40 124,14 114,52 156,48 122,74 158,98 116,100 132,140 96,116 82,158 70,116 30,142 46,102 4,100 40,76 6,48 48,52 36,12 68,40" fill="#E5432F" stroke="#451A36" stroke-width="5" stroke-linejoin="round"/></svg>
+      <p>Gratuit !</p>
+    </div>
+    <div class="s-cta-disc" aria-hidden="true"></div>
+    <div class="s-cta-viva" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 500" fill="none"><g stroke="#3A2A20" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M336 326 q56 -4 72 -50 q10 -28 -16 -36 q-26 -8 -34 22 q-8 30 -38 34 q-4 16 16 30 Z" fill="#BE6B41"/><path d="M120 470 q-26 -150 28 -208 q40 -42 132 -34 q70 8 86 78 q16 70 -10 164 Z" fill="#FFFFFF"/><path d="M250 252 q66 0 84 64 q12 44 4 96 q-44 14 -86 6 q14 -90 -22 -150 q9 -12 16 -16 Z" fill="#BE6B41"/><path d="M150 470 q-8 -64 8 -104 q24 -22 46 -2 q14 40 8 106 Z" fill="#FFFFFF"/><path d="M232 470 q-6 -62 10 -100 q24 -20 44 0 q12 40 8 100 Z" fill="#FFFFFF"/><g stroke-width="3.5"><path d="M150 470 h54" stroke="#CFC8BB"/><path d="M168 452 v18 M186 452 v18" stroke="#CFC8BB"/><path d="M236 470 h54" stroke="#CFC8BB"/><path d="M254 452 v18 M272 452 v18" stroke="#CFC8BB"/></g><path d="M118 150 q-58 8 -64 88 q-4 64 40 104 q40 18 58 -16 q16 -64 6 -132 q-6 -36 -40 -44 Z" fill="#BE6B41"/><path d="M320 150 q58 8 64 88 q4 64 -40 104 q-40 18 -58 -16 q-16 -64 -6 -132 q6 -36 40 -44 Z" fill="#BE6B41"/><path d="M220 86 q104 0 120 92 q12 74 -36 122 q-38 36 -84 36 q-46 0 -84 -36 q-48 -48 -36 -122 q16 -92 120 -92 Z" fill="#FFFFFF"/><path d="M220 86 q70 0 102 56 q-30 22 -70 18 q-44 -6 -70 8 q-22 -16 -28 -26 q22 -56 66 -56 Z" fill="#BE6B41"/><path d="M256 150 q40 -6 54 22 q10 30 -10 50 q-30 14 -50 -8 q-16 -34 6 -64 Z" fill="#BE6B41"/><path d="M220 196 q40 0 48 38 q4 34 -48 44 q-52 -10 -48 -44 q8 -38 48 -38 Z" fill="#FFFFFF"/><g stroke="none"><ellipse cx="160" cy="210" rx="13" ry="8" fill="#EFC3A6" opacity="0.7"/><ellipse cx="286" cy="210" rx="13" ry="8" fill="#EFC3A6" opacity="0.7"/></g><g stroke="none" fill="#3A2A20"><ellipse cx="178" cy="168" rx="12" ry="15"/><ellipse cx="262" cy="168" rx="12" ry="15"/></g><g stroke="none" fill="#FFFFFF"><circle cx="183" cy="162" r="4"/><circle cx="267" cy="162" r="4"/></g><path d="M163 147 q15 -9 30 -2" stroke-width="4.5"/><path d="M247 145 q15 -8 30 2" stroke-width="4.5"/><path d="M220 196 q17 0 17 13 q0 11 -17 13 q-17 -2 -17 -13 q0 -13 17 -13 Z" fill="#2E211A" stroke="none"/><path d="M220 222 v8" stroke-width="4.5"/><path d="M220 230 q-20 13 -38 4" stroke-width="4.5"/><path d="M220 230 q20 14 38 3" stroke-width="4.5"/><path d="M212 234 q8 18 18 18 q10 0 14 -13 q-16 6 -32 -5 Z" fill="#D98E80"/></g></svg>
+    </div>
+    <h2 class="s-cta-h2">Ton chien mérite une nutrition qui lui <span class="ky-sticker ky-sticker-moutarde">ressemble.</span></h2>
+    <p class="s-cta-desc">Commence par le bilan nutritionnel gratuit. 100 places fondatrices pour Kyno+ à 12 &#x20AC;/mois.</p>
+    <div class="s-cta-actions">
+      <a href="quiz.html" class="ky-btn ky-btn-rouge">Faire le bilan gratuit</a>
+      <span class="s-cta-note">Résiliable à tout moment.</span>
+    </div>
+  </div>
 </section>
 
-<!-- FOOTER -->
-<footer>
-  <div>
-    <div class="ft-logo">
-      <img src="kyno-logo-clair.svg" alt="Kyno" height="30">
-    </div>
-    <div class="ft-tagline">Nutrition Canine Individualisée</div>
-    <p class="ft-copy">© 2026 Kyno. Tous droits réservés.<br>Lyon, France.</p>
+<!-- PIED DE PAGE -->
+<footer class="ft-new">
+  <div class="ft-new-brand">
+    <img src="kyno-logo-clair.svg" alt="Kyno" height="68">
+    <p class="ft-new-tagline">Nutrition canine individualisée.</p>
+    <p class="ft-new-copy">&#x00A9; 2026 Kyno. Lyon, France.</p>
   </div>
-  <div class="ft-col">
-    <h4>Navigation</h4>
+  <div class="ft-new-col">
+    <p class="ft-new-col-titre">Navigation</p>
     <a href="#difference">Le concept</a>
     <a href="#comment">Comment ça marche</a>
     <a href="#offres">Tarifs</a>
-    <a href="quiz.html">Commencer</a>
+    <a href="login.html">Mon espace</a>
   </div>
-  <div class="ft-col">
-    <h4>Légal</h4>
+  <div class="ft-new-col">
+    <p class="ft-new-col-titre">Légal</p>
     <a href="#">Mentions légales</a>
     <a href="#">Confidentialité</a>
     <a href="#">CGV</a>
     <a href="#">Mentions Elycoop [À faire valider par Agnès]</a>
   </div>
-  <div class="ft-col">
-    <h4>Contact</h4>
+  <div class="ft-new-col">
+    <p class="ft-new-col-titre">Contact</p>
     <a href="mailto:hello@kyno.fr">hello@kyno.fr</a>
     <a href="#">Instagram</a>
   </div>
