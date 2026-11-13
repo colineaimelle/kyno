@@ -279,7 +279,7 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
 {
   "recette": {
     "moment": "Matin et soir",
-    "color": "#8A3A7C",
+    "color": "#17706C",
     "titre": "nom de la recette, court et appétissant",
     "ration": nombre en grammes par repas (matin = soir = même quantité),
     "ingredients": [
@@ -304,11 +304,11 @@ Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
   "cout_indus": "XX €",
   "economie": "XX,XX €",
   "apports": [
-    { "nom": "Calories", "unite": "kcal", "valeur": <kcal réels par repas estimés depuis les ingrédients>, "cible": <besoins journaliers / 2 selon NRC 2006 : 130 × PM^0.75 × facteur activité>, "pct": <arrondi valeur/cible×100>, "color": "#FF5A3C" },
-    { "nom": "Protéines", "unite": "g", "valeur": <g protéines par repas>, "cible": <cible par repas selon FEDIAF 2023>, "pct": <arrondi>, "color": "#8A3A7C" },
-    { "nom": "Lipides", "unite": "g", "valeur": <g lipides par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#C93417" },
-    { "nom": "Calcium", "unite": "g", "valeur": <g calcium par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#3E8FC4" },
-    { "nom": "Oméga-3", "unite": "g", "valeur": <g oméga-3 par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#FFE83D" }
+    { "nom": "Calories", "unite": "kcal", "valeur": <kcal réels par repas estimés depuis les ingrédients>, "cible": <besoins journaliers / 2 selon NRC 2006 : 130 × PM^0.75 × facteur activité>, "pct": <arrondi valeur/cible×100>, "color": "#E5432F" },
+    { "nom": "Protéines", "unite": "g", "valeur": <g protéines par repas>, "cible": <cible par repas selon FEDIAF 2023>, "pct": <arrondi>, "color": "#17706C" },
+    { "nom": "Lipides", "unite": "g", "valeur": <g lipides par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#B8301D" },
+    { "nom": "Calcium", "unite": "g", "valeur": <g calcium par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#17706C" },
+    { "nom": "Oméga-3", "unite": "g", "valeur": <g oméga-3 par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#F2B630" }
   ],
   "proteine_principale": "nom court de la protéine principale (ex: dinde, bœuf, saumon, agneau, poulet, cabillaud)",
   "email_html": "Texte complet du menu en Markdown. Utilise \\n pour les retours à la ligne et ** pour le gras. Commence par 'Voici le menu de la semaine de ${nom} !'. Présente la recette unique servie matin et soir, le batch cooking, la liste de courses et le coût."
@@ -365,65 +365,65 @@ function buildEmailMenuHtml(prenom, htmlContent) {
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#F6E7F3;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F6E7F3;padding:40px 20px;">
+<body style="margin:0;padding:0;background:#DDF3F1;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#DDF3F1;padding:40px 20px;">
     <tr><td align="center">
     <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
 
       <tr>
-        <td style="background:#451A36;border-radius:16px 16px 0 0;padding:36px 48px;text-align:center;border-bottom:3px solid #C93417;">
+        <td style="background:#451A36;border-radius:16px 16px 0 0;padding:36px 48px;text-align:center;border-bottom:3px solid #B8301D;">
           <img src="${SITE_URL}/kyno-logo-clair.png" alt="Kyno" height="40" style="display:block;margin:0 auto 8px;">
           <p style="margin:0;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);">Nutrition Canine Individualisée</p>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#451A36;padding:20px 48px;border-bottom:3px solid #FF5A3C;">
+        <td style="background:#451A36;padding:20px 48px;border-bottom:3px solid #E5432F;">
           <p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Menu personnalisé, semaine 1</p>
-          <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FFF9F2;">Le menu de la semaine de <em style="font-style:normal;color:#FFE83D;">${prenom}</em></p>
+          <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FFF4E0;">Le menu de la semaine de <em style="font-style:normal;color:#F2B630;">${prenom}</em></p>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FFF9F2;padding:40px 48px 0;">
+        <td style="background:#FFF4E0;padding:40px 48px 0;">
           <p style="margin:0 0 8px;font-size:15px;color:#451A36;">Bonjour !</p>
           <p style="margin:0 0 32px;font-size:14px;color:#6E4A63;line-height:1.8;">Voici le menu détaillé de la première semaine pour <strong style="color:#451A36;">${prenom}</strong>. Quantités précises, batch cooking et liste de courses inclus. Tu le retrouves aussi dans ton espace Kyno.</p>
-          <div style="height:3px;background:linear-gradient(to right,#8A3A7C,#C93417,#FFE83D);margin-bottom:32px;border-radius:2px;"></div>
+          <div style="height:3px;background:linear-gradient(to right,#17706C,#B8301D,#F2B630);margin-bottom:32px;border-radius:2px;"></div>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FFF9F2;padding:0 48px;">
-          <div style="background:white;border-radius:12px;padding:36px;border:1px solid #EBD9E6;border-left:4px solid #C93417;font-size:14px;line-height:1.85;color:#451A36;">
+        <td style="background:#FFF4E0;padding:0 48px;">
+          <div style="background:white;border-radius:12px;padding:36px;border:1px solid #E8DCC6;border-left:4px solid #B8301D;font-size:14px;line-height:1.85;color:#451A36;">
             ${htmlContent}
           </div>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FFF9F2;padding:32px 48px 40px;">
-          <div style="background:#451A36;border-radius:14px;padding:36px;text-align:center;border:3px solid #FF5A3C;">
+        <td style="background:#FFF4E0;padding:32px 48px 40px;">
+          <div style="background:#451A36;border-radius:14px;padding:36px;text-align:center;border:3px solid #E5432F;">
             <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.4);">Ton espace Kyno</p>
-            <p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#FFF9F2;line-height:1.3;">Retrouve ce menu<br><span style="font-size:14px;font-weight:400;color:rgba(245,240,232,0.5);">et discute des évolutions de ${prenom} avec Kyno</span></p>
-            <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:white;padding:16px 32px;border-radius:4px;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.04em;border:2px solid #FF5A3C;">Accéder à mon espace →</a>
+            <p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#FFF4E0;line-height:1.3;">Retrouve ce menu<br><span style="font-size:14px;font-weight:400;color:rgba(245,240,232,0.5);">et discute des évolutions de ${prenom} avec Kyno</span></p>
+            <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:white;padding:16px 32px;border-radius:4px;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.04em;border:2px solid #E5432F;">Accéder à mon espace →</a>
           </div>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FFF9F2;padding:0 48px 32px;">
-          <div style="border-top:1px solid #EBD9E6;padding-top:24px;">
+        <td style="background:#FFF4E0;padding:0 48px 32px;">
+          <div style="border-top:1px solid #E8DCC6;padding-top:24px;">
             <p style="margin:0;font-size:11px;color:#6E4A63;line-height:1.7;">⚠ Ce menu est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consulte ton vétérinaire avant tout changement alimentaire.</p>
           </div>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#451A36;border-radius:0 0 16px 16px;padding:28px 48px;border-top:3px solid #C93417;">
+        <td style="background:#451A36;border-radius:0 0 16px 16px;padding:28px 48px;border-top:3px solid #B8301D;">
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td>
-                <p style="margin:0;font-size:13px;font-weight:700;color:#FFF9F2;letter-spacing:0.04em;">kyno</p>
+                <p style="margin:0;font-size:13px;font-weight:700;color:#FFF4E0;letter-spacing:0.04em;">kyno</p>
                 <p style="margin:4px 0 0;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(245,240,232,0.25);">Lyon, France</p>
               </td>
               <td align="right">

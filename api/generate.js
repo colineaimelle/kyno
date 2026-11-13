@@ -372,8 +372,8 @@ function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}, saison = '') 
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#F3F7F1;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F3F7F1;padding:48px 20px;">
+<body style="margin:0;padding:0;background:#FFF4E0;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFF4E0;padding:48px 20px;">
     <tr><td align="center">
     <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
 
@@ -384,15 +384,15 @@ function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}, saison = '') 
       </tr>
 
       <tr>
-        <td style="background:#FFFFFF;border-radius:20px 20px 0 0;padding:28px 32px;border:1px solid #F6E7F3;border-bottom:none;">
+        <td style="background:#FFFFFF;border-radius:20px 20px 0 0;padding:28px 32px;border:1px solid #DDF3F1;border-bottom:none;">
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td width="56" valign="top">
                 <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="26" cy="26" r="26" fill="#FBE4D8"/>
+                  <circle cx="26" cy="26" r="26" fill="#FDE3EA"/>
                   <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
                   <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-                  <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#FF5A3C"/>
+                  <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#E5432F"/>
                   <circle cx="22" cy="27" r="1.4" fill="#451A36"/>
                   <circle cx="30" cy="27" r="1.4" fill="#451A36"/>
                   <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#451A36" stroke-width="1.4" stroke-linecap="round" fill="none"/>
@@ -401,10 +401,10 @@ function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}, saison = '') 
               </td>
               <td valign="middle" style="padding-left:12px;">
                 <p style="margin:0;font-size:17px;font-weight:700;color:#451A36;">${prenom}</p>
-                <p style="margin:2px 0 0;font-size:12px;color:#8A978A;">${sousTitre}</p>
+                <p style="margin:2px 0 0;font-size:12px;color:#6E4A63;">${sousTitre}</p>
               </td>
               <td align="right" valign="middle">
-                <span style="display:inline-block;background:#FBE4D8;color:#C85A2C;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:20px;">${saison}</span>
+                <span style="display:inline-block;background:#FDE3EA;color:#B8301D;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:20px;">${saison}</span>
               </td>
             </tr>
           </table>
@@ -413,22 +413,22 @@ function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}, saison = '') 
 
       <tr>
         <td style="background:#451A36;padding:24px 32px;">
-          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#7FBE98;font-weight:700;">Rapport nutritionnel</p>
-          <p style="margin:0;font-size:21px;font-weight:700;color:#FFF9F2;line-height:1.3;">Le profil complet de ${prenom} est prêt</p>
+          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#2BB3AE;font-weight:700;">Rapport nutritionnel</p>
+          <p style="margin:0;font-size:21px;font-weight:700;color:#FFF4E0;line-height:1.3;">Le profil complet de ${prenom} est prêt</p>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FFFFFF;padding:32px 32px 8px;border:1px solid #F6E7F3;border-top:none;">
-          <div style="font-size:14.5px;color:#3C473D;line-height:1.9;">
+        <td style="background:#FFFFFF;padding:32px 32px 8px;border:1px solid #DDF3F1;border-top:none;">
+          <div style="font-size:14.5px;color:#451A36;line-height:1.9;">
             ${htmlContent}
           </div>
         </td>
       </tr>
 
       <tr>
-        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #F6E7F3;border-top:none;border-radius:0 0 20px 20px;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #EBD9E6;">
+        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #DDF3F1;border-top:none;border-radius:0 0 20px 20px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #E8DCC6;">
             <tr><td style="padding-top:28px;text-align:center;">
               <a href="${accessUrl}" style="display:inline-block;background:#451A36;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Accéder à l'espace de ${prenom} →</a>
             </td></tr>
@@ -438,11 +438,11 @@ function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}, saison = '') 
 
       <tr>
         <td style="padding:24px 32px 0;">
-          <p style="margin:0 0 12px;font-size:11px;color:#9AA69B;line-height:1.7;">⚠ Ce rapport est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consulte ton vétérinaire avant tout changement alimentaire.</p>
+          <p style="margin:0 0 12px;font-size:11px;color:#6E4A63;line-height:1.7;">⚠ Ce rapport est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consulte ton vétérinaire avant tout changement alimentaire.</p>
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
-              <td><span style="font-size:12px;font-weight:700;color:#5B6B5D;">kyno</span> <span style="font-size:11px;color:#9AA69B;">· Lyon, France</span></td>
-              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:#9AA69B;text-decoration:none;">colinemngl@gmail.com</a></td>
+              <td><span style="font-size:12px;font-weight:700;color:#5B6B5D;">kyno</span> <span style="font-size:11px;color:#6E4A63;">· Lyon, France</span></td>
+              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:#6E4A63;text-decoration:none;">colinemngl@gmail.com</a></td>
             </tr>
           </table>
         </td>
