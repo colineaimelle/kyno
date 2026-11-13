@@ -620,6 +620,35 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   .places-xpl p small{font-size:14px;}
   .places-titre{font-size:24px;}
 }
+
+/* ── FAQ NOUVELLE CHARTE ────────────────────────────── */
+.s-faq-new{background:var(--papier);padding:100px 80px;display:grid;grid-template-columns:400px 1fr;gap:64px;align-items:start;}
+.faq-gauche{display:flex;flex-direction:column;gap:28px;}
+.faq-gauche-head{display:flex;flex-direction:column;gap:18px;}
+.faq-viva-box{position:relative;background:var(--rose);border:4px solid var(--aubergine);border-radius:24px;box-shadow:7px 7px 0 var(--aubergine);height:250px;overflow:hidden;display:flex;justify-content:center;padding-top:24px;}
+.faq-viva-dots{position:absolute;inset:0;background-image:radial-gradient(var(--rouge) 2.5px,transparent 3px);background-size:18px 18px;opacity:0.4;pointer-events:none;}
+.faq-bulle{position:relative;width:290px;height:145px;}
+.faq-bulle svg{position:absolute;inset:0;width:100%;height:100%;}
+.faq-bulle p{position:absolute;left:0;right:0;top:35px;text-align:center;font-family:var(--font-titre);font-size:32px;line-height:1.05;color:var(--aubergine);}
+.faq-viva-img{position:absolute;right:18px;bottom:0;width:130px;height:auto;}
+.faq-viva-img svg{width:100%;height:auto;}
+.faq-contact{margin:0;font-size:17px;line-height:1.55;}
+/* Accordéon nouvelle charte */
+.faq-droite{display:flex;flex-direction:column;gap:14px;}
+.faq-item-new{border:3px solid var(--aubergine);border-radius:20px;overflow:hidden;transition:box-shadow 0.2s;}
+.faq-item-new.open{box-shadow:5px 5px 0 var(--aubergine);background:var(--moutarde-pale);}
+.faq-q-new{width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 22px 18px 26px;background:none;border:none;cursor:pointer;font-family:var(--font-texte);font-size:18px;font-weight:700;color:var(--aubergine);text-align:left;line-height:1.35;}
+.faq-q-new:focus-visible{outline:3px solid var(--canard);outline-offset:-3px;}
+.faq-icon-new{flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--papier);color:var(--aubergine);border:3px solid var(--aubergine);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;line-height:1;}
+.faq-icon-new::after{content:'+';}
+.faq-item-new.open .faq-icon-new{background:var(--rouge);color:var(--papier);}
+.faq-item-new.open .faq-icon-new::after{content:'&#x2212;';}
+.faq-a-new{max-height:0;overflow:hidden;transition:max-height 0.38s cubic-bezier(.22,.61,.36,1);}
+.faq-a-new-inner{padding:0 26px 22px;font-size:16px;line-height:1.55;color:var(--aubergine);}
+@media(max-width:768px){
+  .s-faq-new{padding:56px 20px;grid-template-columns:1fr;}
+  .faq-gauche h2{font-size:36px;}
+}
 </style>
 </head>
 <body>
@@ -963,43 +992,48 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 <!-- PREUVE SOCIALE -->
 
 <!-- FAQ -->
-<section class="s-faq" id="faq">
-  <div class="faq-head">
-    <div class="s-label" style="justify-content:center;">On répond</div>
-    <h2>Questions fréquentes.</h2>
+<section id="faq" class="s-faq-new">
+  <div class="faq-gauche">
+    <div class="faq-gauche-head">
+      <span class="ky-pastille ky-pastille-rose">On répond</span>
+      <h2>Questions <span class="ky-sticker" style="background:var(--rose)">fréquentes.</span></h2>
+    </div>
+    <div class="faq-viva-box">
+      <div class="faq-viva-dots" aria-hidden="true"></div>
+      <div class="faq-bulle">
+        <svg aria-hidden="true" viewBox="0 0 420 210" preserveAspectRatio="none"><path d="M210 12 C320 12 404 50 404 100 C404 150 320 186 210 186 C182 186 156 184 132 178 L74 204 L92 166 C42 150 16 126 16 100 C16 50 100 12 210 12 Z" fill="#FFF4E0" stroke="#451A36" stroke-width="5" stroke-linejoin="round"/></svg>
+        <p>Une autre<br>question ?</p>
+      </div>
+      <div class="faq-viva-img" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 500" fill="none"><g stroke="#3A2A20" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M336 326 q56 -4 72 -50 q10 -28 -16 -36 q-26 -8 -34 22 q-8 30 -38 34 q-4 16 16 30 Z" fill="#BE6B41"/><path d="M120 470 q-26 -150 28 -208 q40 -42 132 -34 q70 8 86 78 q16 70 -10 164 Z" fill="#FFFFFF"/><path d="M250 252 q66 0 84 64 q12 44 4 96 q-44 14 -86 6 q14 -90 -22 -150 q9 -12 16 -16 Z" fill="#BE6B41"/><path d="M150 470 q-8 -64 8 -104 q24 -22 46 -2 q14 40 8 106 Z" fill="#FFFFFF"/><path d="M232 470 q-6 -62 10 -100 q24 -20 44 0 q12 40 8 100 Z" fill="#FFFFFF"/><g stroke-width="3.5"><path d="M150 470 h54" stroke="#CFC8BB"/><path d="M168 452 v18 M186 452 v18" stroke="#CFC8BB"/><path d="M236 470 h54" stroke="#CFC8BB"/><path d="M254 452 v18 M272 452 v18" stroke="#CFC8BB"/></g><path d="M118 150 q-58 8 -64 88 q-4 64 40 104 q40 18 58 -16 q16 -64 6 -132 q-6 -36 -40 -44 Z" fill="#BE6B41"/><path d="M320 150 q58 8 64 88 q4 64 -40 104 q-40 18 -58 -16 q-16 -64 -6 -132 q6 -36 40 -44 Z" fill="#BE6B41"/><path d="M220 86 q104 0 120 92 q12 74 -36 122 q-38 36 -84 36 q-46 0 -84 -36 q-48 -48 -36 -122 q16 -92 120 -92 Z" fill="#FFFFFF"/><path d="M220 86 q70 0 102 56 q-30 22 -70 18 q-44 -6 -70 8 q-22 -16 -28 -26 q22 -56 66 -56 Z" fill="#BE6B41"/><path d="M256 150 q40 -6 54 22 q10 30 -10 50 q-30 14 -50 -8 q-16 -34 6 -64 Z" fill="#BE6B41"/><path d="M220 196 q40 0 48 38 q4 34 -48 44 q-52 -10 -48 -44 q8 -38 48 -38 Z" fill="#FFFFFF"/><g stroke="none"><ellipse cx="160" cy="210" rx="13" ry="8" fill="#EFC3A6" opacity="0.7"/><ellipse cx="286" cy="210" rx="13" ry="8" fill="#EFC3A6" opacity="0.7"/></g><g stroke="none" fill="#3A2A20"><ellipse cx="178" cy="168" rx="12" ry="15"/><ellipse cx="262" cy="168" rx="12" ry="15"/></g><g stroke="none" fill="#FFFFFF"><circle cx="183" cy="162" r="4"/><circle cx="267" cy="162" r="4"/></g><path d="M163 147 q15 -9 30 -2" stroke-width="4.5"/><path d="M247 145 q15 -8 30 2" stroke-width="4.5"/><path d="M220 196 q17 0 17 13 q0 11 -17 13 q-17 -2 -17 -13 q0 -13 17 -13 Z" fill="#2E211A" stroke="none"/><path d="M220 222 v8" stroke-width="4.5"/><path d="M220 230 q-20 13 -38 4" stroke-width="4.5"/><path d="M220 230 q20 14 38 3" stroke-width="4.5"/><path d="M212 234 q8 18 18 18 q10 0 14 -13 q-16 6 -32 -5 Z" fill="#D98E80"/></g></svg>
+      </div>
+    </div>
+    <p class="faq-contact">Écris-nous à <strong>hello@kyno.fr</strong>.</p>
   </div>
-  <div class="faq-list" id="faqList">
-    <div class="faq-item">
-      <button class="faq-q" type="button"><h3 class="faq-h3">Combien de temps faut-il pour cuisiner ?</h3><span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
-      <div class="faq-a"><div class="faq-a-inner">Une session de batch cooking d'environ 1h par semaine. Tu cuisines une grande quantité en une fois, tu conserves au frigo pour les 3 premiers jours et au congélateur pour le reste. Pas de cuisine quotidienne.</div></div>
+  <div class="faq-droite">
+    <div class="faq-item-new open">
+      <button class="faq-q-new" type="button"><span>Combien de temps faut-il pour cuisiner ?</span><span class="faq-icon-new" aria-hidden="true"></span></button>
+      <div class="faq-a-new" style="max-height:200px"><div class="faq-a-new-inner">Une session de batch cooking d&#x2019;environ 1h par semaine. Tu cuisines une grande quantité en une fois, tu conserves au frigo pour les 3 premiers jours et au congélateur pour le reste.</div></div>
     </div>
-    <div class="faq-item">
-      <button class="faq-q" type="button"><h3 class="faq-h3">Dois-je arrêter les croquettes ?</h3><span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
-      <div class="faq-a"><div class="faq-a-inner">Non, pas forcément. Kyno s'adapte à ton rythme, tu peux commencer en mixte (une partie de ration ménagère, une partie de croquettes) et évoluer à ton rythme. Le plan indique toujours les quantités adaptées à chaque mode.</div></div>
+    <div class="faq-item-new">
+      <button class="faq-q-new" type="button"><span>Dois-je arrêter les croquettes ?</span><span class="faq-icon-new" aria-hidden="true"></span></button>
+      <div class="faq-a-new"><div class="faq-a-new-inner">Non, pas forcément. Kyno s&#x2019;adapte à ton rythme, tu peux commencer en mixte (une partie de ration ménagère, une partie de croquettes) et évoluer à ton rythme. Le plan indique toujours les quantités adaptées à chaque mode.</div></div>
     </div>
-    <div class="faq-item">
-      <button class="faq-q" type="button"><h3 class="faq-h3">Et si mon chien n'aime pas les recettes ?</h3><span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
-      <div class="faq-a"><div class="faq-a-inner">Chaque menu est conçu à partir de tes réponses au quiz : ingrédients que ton chien aime, ce qu'il a déjà mangé, ses intolérances. Et si une recette ne passe pas, tu nous le signales dans ton espace client et on adapte le menu suivant.</div></div>
+    <div class="faq-item-new">
+      <button class="faq-q-new" type="button"><span>Et si mon chien n&#x2019;aime pas les recettes ?</span><span class="faq-icon-new" aria-hidden="true"></span></button>
+      <div class="faq-a-new"><div class="faq-a-new-inner">Chaque menu est conçu à partir de tes réponses au quiz : ingrédients que ton chien aime, ce qu&#x2019;il a déjà mangé, ses intolérances. Et si une recette ne passe pas, tu nous le signales dans ton espace client et on adapte le menu suivant.</div></div>
     </div>
-    <div class="faq-item">
-      <button class="faq-q" type="button"><h3 class="faq-h3">Est-ce validé par des vétérinaires ?</h3><span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
-      <div class="faq-a"><div class="faq-a-inner">Les plans Kyno sont basés sur les références NRC 2006 et FEDIAF 2023, les mêmes standards utilisés par les nutritionnistes vétérinaires professionnels. Kyno est un outil éducatif et ne remplace pas un suivi vétérinaire, mais les calculs nutritionnels sont rigoureux et sourcés.</div></div>
+    <div class="faq-item-new">
+      <button class="faq-q-new" type="button"><span>Est-ce validé par des vétérinaires ?</span><span class="faq-icon-new" aria-hidden="true"></span></button>
+      <div class="faq-a-new"><div class="faq-a-new-inner">Les plans Kyno sont basés sur les références NRC 2006 et FEDIAF 2023, les mêmes standards utilisés par les nutritionnistes vétérinaires professionnels. Kyno est un outil éducatif et ne remplace pas un suivi vétérinaire, mais les calculs nutritionnels sont rigoureux et sourcés.</div></div>
     </div>
-    <div class="faq-item">
-      <button class="faq-q" type="button"><h3 class="faq-h3">Faut-il acheter des compléments spéciaux ?</h3><span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
-      <div class="faq-a"><div class="faq-a-inner">Oui, un complément minéral et vitaminé (CMV) est indispensable en ration ménagère, soit environ 2-3€/mois. Il est disponible en magasin bio ou sur internet. Kyno indique exactement lequel utiliser et en quelle quantité selon le poids de ton chien.</div></div>
+    <div class="faq-item-new">
+      <button class="faq-q-new" type="button"><span>Faut-il acheter des compléments spéciaux ?</span><span class="faq-icon-new" aria-hidden="true"></span></button>
+      <div class="faq-a-new"><div class="faq-a-new-inner">Oui, un complément minéral et vitaminé (CMV) est indispensable en ration ménagère, soit environ 2-3 &#x20AC;/mois. Il est disponible en magasin bio ou sur internet. Kyno indique exactement lequel utiliser et en quelle quantité selon le poids de ton chien.</div></div>
     </div>
-    <div class="faq-item">
-      <button class="faq-q" type="button"><h3 class="faq-h3">Quelle différence avec une calculatrice nutritionnelle gratuite en ligne ?</h3><span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
-      <div class="faq-a"><div class="faq-a-inner">Les calculatrices gratuites donnent des apports caloriques génériques. Kyno intègre la race, les prédispositions génétiques, la saison, les troubles de santé, les intolérances, le comportement alimentaire et l'environnement de vie, et génère des recettes concrètes avec des quantités précises, pas juste des chiffres.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" type="button"><h3 class="faq-h3">Pourquoi un abonnement mensuel ?</h3><span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
-      <div class="faq-a"><div class="faq-a-inner">Parce que les besoins de ton chien évoluent : avec l'âge, la saison, son poids, son activité. Un menu de janvier n'est pas adapté à juillet. L'abonnement inclut 4 nouveaux menus par mois, mis à jour selon l'évolution de ton chien via le chat de l'espace client.</div></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q" type="button"><h3 class="faq-h3">Puis-je résilier à tout moment ?</h3><span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></button>
-      <div class="faq-a"><div class="faq-a-inner">Oui, sans condition et sans frais. Tu résilies depuis ton espace client en un clic, quand tu veux.</div></div>
+    <div class="faq-item-new">
+      <button class="faq-q-new" type="button"><span>Puis-je résilier à tout moment ?</span><span class="faq-icon-new" aria-hidden="true"></span></button>
+      <div class="faq-a-new"><div class="faq-a-new-inner">Oui. Au mois, tu résilies en un clic depuis ton espace client, sans frais. À l&#x2019;année, tu peux désactiver le renouvellement à tout moment, et l&#x2019;année en cours n&#x2019;est pas remboursée.</div></div>
     </div>
   </div>
 </section>
@@ -1064,10 +1098,10 @@ document.getElementById('wl-email-full')?.addEventListener('keydown', function(e
 });
 
 // ── FAQ ACCORDÉON ─────────────────────────────────────────
-document.querySelectorAll('.faq-q').forEach(btn => {
+document.querySelectorAll('.faq-q-new').forEach(btn => {
   btn.addEventListener('click', () => {
-    const item = btn.closest('.faq-item');
-    const ans = item.querySelector('.faq-a');
+    const item = btn.closest('.faq-item-new');
+    const ans = item.querySelector('.faq-a-new');
     const isOpen = item.classList.contains('open');
     if (isOpen) {
       item.classList.remove('open');
