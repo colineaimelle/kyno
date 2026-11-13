@@ -481,6 +481,62 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   .nav-links a{font-size:16px;padding:12px 18px;border-radius:999px;border-bottom:none;text-align:left;}
   .nav-links a:hover,.nav-links a.active{background:#DDF3F1;}
 }
+
+/* ── PASTILLES & ÉLÉMENTS PARTAGÉS ─────────────────── */
+.ky-pastille{display:inline-block;align-self:flex-start;border:3px solid var(--aubergine);border-radius:var(--radius-pill);padding:6px 16px;font-size:15px;font-weight:700;}
+.ky-pastille-rose{background:var(--rose-pale);}
+.ky-pastille-papier{background:var(--papier);}
+.ky-pastille-blanc{background:var(--blanc);}
+.ky-btn-rouge{background:var(--rouge);color:var(--papier);}
+.ky-btn-rouge:hover,.ky-btn-rouge:focus{background:var(--rouge-fonce);}
+
+/* ── COMMENT ÇA MARCHE ─────────────────────────────── */
+.s-comment{position:relative;background:var(--papier);padding:100px 80px 96px;display:flex;flex-direction:column;gap:52px;}
+.s-comment-dots{position:absolute;right:0;top:0;width:300px;height:160px;background-image:radial-gradient(var(--rouge) 2.5px,transparent 3px);background-size:16px 16px;opacity:0.3;pointer-events:none;}
+.s-comment-head{display:flex;flex-direction:column;gap:18px;}
+.s-comment-grid{display:grid;grid-template-columns:480px 1fr;gap:72px;align-items:start;}
+.s-comment-left{display:flex;flex-direction:column;gap:30px;}
+.s-comment-right{display:flex;flex-direction:column;gap:26px;}
+.how-xpl{position:relative;flex:none;width:84px;height:84px;transform:rotate(-6deg);}
+.how-xpl svg{position:absolute;inset:0;width:100%;height:100%;}
+.how-xpl span{position:absolute;left:0;right:0;top:17px;text-align:center;font-family:var(--font-titre);font-size:40px;line-height:1;color:var(--aubergine);}
+.how-new-step{display:flex;gap:20px;align-items:flex-start;}
+.how-new-step > div{padding-top:10px;}
+.how-new-title{margin:0;font-family:var(--font-titre);font-size:28px;line-height:1.1;}
+.how-new-desc{margin:8px 0 0;font-size:16px;line-height:1.55;}
+.s-fiche-wrap{position:relative;transform:rotate(1.5deg);}
+.s-comment .fiche-panel{max-width:none;box-shadow:10px 10px 0 var(--aubergine);padding:28px 30px;}
+.s-fiche-sticker{position:absolute;top:-24px;right:28px;color:var(--papier);font-family:var(--font-titre);font-size:24px;padding:2px 16px 6px;transform:rotate(2.5deg);}
+.nf-head{display:flex;align-items:center;gap:18px;margin-bottom:22px;}
+.nf-av{width:84px;height:84px;border-radius:50%;border:3px solid var(--aubergine);overflow:hidden;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center;}
+.nf-av svg{width:78px;height:auto;}
+.nf-name{margin:0;font-family:var(--font-titre);font-size:32px;line-height:1;}
+.nf-sub{margin:6px 0 0;font-size:15px;color:var(--aubergine-doux);font-weight:500;}
+.nf-mid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px;}
+.nf-score-box{background:var(--turquoise);border:3px solid var(--aubergine);border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:4px;}
+.nf-score-lbl{font-size:15px;font-weight:700;}
+.nf-score-val{font-family:var(--font-titre);font-size:56px;line-height:1;}
+.nf-score-u{font-size:24px;}
+.nf-bars{display:flex;flex-direction:column;gap:12px;justify-content:center;}
+.nf-bar{display:grid;grid-template-columns:90px 1fr 44px;align-items:center;gap:12px;font-size:15px;font-weight:700;}
+.nf-bar-track{height:14px;border:2px solid var(--aubergine);border-radius:var(--radius-pill);background:var(--papier);overflow:hidden;}
+.nf-bar-fill{height:100%;}
+.nf-block{border:3px solid var(--aubergine);border-radius:18px;padding:16px 18px;margin-bottom:22px;}
+.nf-block:last-child{margin-bottom:0;}
+.nf-block-moutarde{background:var(--moutarde-pale);}
+.nf-block-rose{background:var(--rose-pale);}
+.nf-blbl{margin:0 0 6px;font-size:15px;font-weight:700;}
+.nf-bval{margin:0;font-size:16px;line-height:1.45;}
+.s-chips-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.s-chips-label{font-size:15px;font-weight:700;margin-right:4px;}
+.breed-chip{background:var(--blanc);border:3px solid var(--aubergine);border-radius:var(--radius-pill);padding:8px 16px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font-texte);color:var(--aubergine);transition:background 0.15s;}
+.breed-chip:hover{background:var(--turquoise-pale);}
+.breed-chip.active{background:var(--turquoise);}
+@media(max-width:768px){
+  .s-comment{padding:56px 20px;}
+  .s-comment-grid{grid-template-columns:1fr;}
+  .s-comment-head h2,.s-comment-head .s-pourquoi-titre{font-size:36px;}
+}
 </style>
 </head>
 <body>
@@ -608,28 +664,57 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 
 </section>
 <!-- DÉMO FICHE SANTÉ -->
-<section class="s-demo">
-  <div class="s-demo-wrap">
-    <div>
-      <p class="hero-fiche-intro">Chaque semaine, tu reçois le profil complet de ton chien : score santé, répartition nutritionnelle, menus à cuisiner, alertes liées à sa race et compléments ciblés. Choisis une race pour voir un exemple.</p>
-      <div class="breed-carousel" id="breedChips"></div>
-    </div>
-    <div class="fiche-panel" id="fichePanel"></div>
-  </div>
-</section>
-
-
-
 <!-- COMMENT ÇA MARCHE -->
-<section class="s-how" id="comment">
-  <div class="how-wrap">
-    <div class="s-label" style="justify-content:center;">En 3 étapes</div>
-    <h2>Simple comme<br><span class="ky-sticker">bonjour.</span></h2>
+<section id="comment" class="s-comment">
+  <div class="s-comment-dots" aria-hidden="true"></div>
+  <div class="s-comment-head">
+    <span class="ky-pastille ky-pastille-rose">Comment ça marche</span>
+    <h2>Simple comme <span class="ky-sticker">bonjour.</span></h2>
   </div>
-  <div class="how-steps">
-    <div class="how-step"><div class="step-ring">1</div><div class="step-title">Son profil</div><p class="step-desc">Tu réponds à un questionnaire complet sur ton chien : race, âge, poids, activité, sensibilités et intolérances. <span class="mark">5 minutes</span>, pas plus.</p></div>
-    <div class="how-step"><div class="step-ring">2</div><div class="step-title">Son plan nutritionnel</div><p class="step-desc">Kyno analyse son profil et t’envoie par email un rapport sur mesure : ses besoins, ses menus de la semaine, ses compléments ciblés. Tout est aussi disponible dans ton espace client.</p></div>
-    <div class="how-step"><div class="step-ring">3</div><div class="step-title">Le suivi continu</div><p class="step-desc">Chaque semaine, un nouveau menu s’adapte à la saison et à l’évolution de ton chien. Une question ? Le chat de ton espace client répond à tout moment.</p></div>
+  <div class="s-comment-grid">
+    <div class="s-comment-left">
+      <div class="how-new-step">
+        <div class="how-xpl">
+          <svg aria-hidden="true" viewBox="0 0 160 160"><polygon points="80,2 92,40 124,14 114,52 156,48 122,74 158,98 116,100 132,140 96,116 82,158 70,116 30,142 46,102 4,100 40,76 6,48 48,52 36,12 68,40" fill="#2BB3AE" stroke="#451A36" stroke-width="5" stroke-linejoin="round"/></svg>
+          <span>1</span>
+        </div>
+        <div>
+          <p class="how-new-title">Son profil</p>
+          <p class="how-new-desc">Tu réponds à un questionnaire complet sur ton chien : race, âge, poids, activité, sensibilités et intolérances. <b>5 minutes</b>, pas plus.</p>
+        </div>
+      </div>
+      <div class="how-new-step">
+        <div class="how-xpl">
+          <svg aria-hidden="true" viewBox="0 0 160 160"><polygon points="80,2 92,40 124,14 114,52 156,48 122,74 158,98 116,100 132,140 96,116 82,158 70,116 30,142 46,102 4,100 40,76 6,48 48,52 36,12 68,40" fill="#F2B630" stroke="#451A36" stroke-width="5" stroke-linejoin="round"/></svg>
+          <span>2</span>
+        </div>
+        <div>
+          <p class="how-new-title">Son plan nutritionnel</p>
+          <p class="how-new-desc">Kyno t&#x2019;envoie par email un rapport sur mesure : ses besoins, ses menus de la semaine, ses compléments ciblés. Tout est aussi dans ton espace client.</p>
+        </div>
+      </div>
+      <div class="how-new-step">
+        <div class="how-xpl">
+          <svg aria-hidden="true" viewBox="0 0 160 160"><polygon points="80,2 92,40 124,14 114,52 156,48 122,74 158,98 116,100 132,140 96,116 82,158 70,116 30,142 46,102 4,100 40,76 6,48 48,52 36,12 68,40" fill="#F27A9B" stroke="#451A36" stroke-width="5" stroke-linejoin="round"/></svg>
+          <span>3</span>
+        </div>
+        <div>
+          <p class="how-new-title">Le suivi continu</p>
+          <p class="how-new-desc">Chaque semaine, un nouveau menu s&#x2019;adapte à la saison et à l&#x2019;évolution de ton chien. Une question ? Le chat de ton espace client répond à tout moment.</p>
+        </div>
+      </div>
+      <a href="quiz.html" class="ky-btn ky-btn-rouge">Faire le bilan gratuit</a>
+    </div>
+    <div class="s-comment-right">
+      <div class="s-fiche-wrap">
+        <div class="fiche-panel" id="fichePanel"></div>
+        <span class="ky-sticker s-fiche-sticker">Exemple</span>
+      </div>
+      <div class="s-chips-row">
+        <span class="s-chips-label">Voir un autre exemple :</span>
+        <div id="breedChips"></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1023,50 +1108,42 @@ function renderHeroCard(b){
 
 function renderFiche(key){
   const b = BREEDS[key];
-  const macros = b.macros.map(m=>`<div class="f-bar"><div class="m"><span>${m[0]}</span><span>${m[1]} %</span></div><div class="f-track"><div class="f-fill" style="width:${m[1]}%;background:${m[2]}"></div></div></div>`).join('');
-  const meals = b.meals.map(m=>`<div class="f-meal"><span class="n">${m[0]}</span><span class="q">${m[1]}</span></div>`).join('');
-  const alerts = b.alerts.map(a=>`<div class="f-li">${ICONS[a[0]]}<div><b>${a[1]}</b> : ${a[2]}</div></div>`).join('');
+  const macros = b.macros.map(m=>`<div class="nf-bar"><span>${m[0]}</span><div class="nf-bar-track"><div class="nf-bar-fill" style="width:${m[1]}%;background:${m[2]}"></div></div><span style="text-align:right">${m[1]}&nbsp;%</span></div>`).join('');
   document.getElementById('fichePanel').innerHTML = `
-    <div class="fiche-prow">
-      <div class="fiche-photo" style="background:${b.bg}">${b.portrait}</div>
-      <div><div class="fiche-pname">${b.name.trim()}</div><div class="fiche-pmeta">${b.meta}</div></div>
-      <div class="fiche-season">${b.season}</div>
+    <div class="nf-head">
+      <div class="nf-av" style="background:${b.bg}">${b.portrait}</div>
+      <div><p class="nf-name">${b.name.trim()}</p><p class="nf-sub">Son rapport de la semaine</p></div>
     </div>
-    <div class="fiche-score">
-      <div><div class="lbl">Score santé</div><div class="val">${b.score}<small>/100</small></div></div>
-      <div style="text-align:right;"><div class="trend">${b.trend}</div></div>
+    <div class="nf-mid">
+      <div class="nf-score-box">
+        <span class="nf-score-lbl">Score santé</span>
+        <span class="nf-score-val">${b.score}<span class="nf-score-u">/100</span></span>
+      </div>
+      <div class="nf-bars">${macros}</div>
     </div>
-    <div class="fiche-block">
-      <div class="fiche-blabel">Répartition nutritionnelle</div>
-      <div class="f-bars">${macros}</div>
+    <div class="nf-block nf-block-moutarde">
+      <p class="nf-blbl">Menu de la semaine</p>
+      <p class="nf-bval">${b.meals[0][0]}.</p>
     </div>
-    <div class="fiche-block">
-      <div class="fiche-blabel">Menu du jour</div>
-      <div class="f-meals">${meals}</div>
-      <div class="f-cook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 014 4c0 2-1.5 3-1.5 5h-5C9.5 9 8 8 8 6a4 4 0 014-4z"/><path d="M9 17h6M10 21h4"/></svg>À cuisiner toi-même · recette et dosages fournis</div>
-    </div>
-    <div class="fiche-block">
-      <div class="fiche-blabel">Alertes &amp; compléments</div>
-      <div class="f-list">${alerts}</div>
+    <div class="nf-block nf-block-rose">
+      <p class="nf-blbl">Alerte race</p>
+      <p class="nf-bval">${b.alerts[0][1]}&nbsp;: ${b.alerts[0][2]}.</p>
     </div>`;
 }
 
-// Carrousels (hero + fiche) — partagent la même sélection
-function buildCarousel(id){
-  const el = document.getElementById(id);
+const CHIP_LABELS={epagneul:'Viva',labrador:'Pongo, labrador',berger:'Filou, berger',bouledogue:'Gaston, bouledogue',croise:'Nala, croisée'};
+
+function buildChipsRow(id){
+  const el=document.getElementById(id);
   if(!el) return;
-  el.innerHTML = Object.keys(BREEDS).map(k=>{
-    const b = BREEDS[k];
-    return `<button class="breed-ava" data-breed="${k}"><span class="ph" style="background:${b.bg}">${b.portrait}</span><span class="nm">${b.name.trim()}</span></button>`;
-  }).join('');
-  el.querySelectorAll('.breed-ava').forEach(btn=>btn.addEventListener('click',()=>selectBreed(btn.dataset.breed)));
+  el.innerHTML=Object.keys(BREEDS).map(k=>`<button class="breed-chip" data-breed="${k}">${CHIP_LABELS[k]}</button>`).join('');
+  el.querySelectorAll('.breed-chip').forEach(btn=>btn.addEventListener('click',()=>selectBreed(btn.dataset.breed)));
 }
 function selectBreed(key){
   renderFiche(key);
-  document.querySelectorAll('.breed-ava').forEach(el=>el.classList.toggle('active', el.dataset.breed===key));
+  document.querySelectorAll('.breed-chip').forEach(el=>el.classList.toggle('active',el.dataset.breed===key));
 }
-buildCarousel('breedChips');
-buildCarousel('heroBreedChips');
+buildChipsRow('breedChips');
 selectBreed('epagneul');
 </script>
 
