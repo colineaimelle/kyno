@@ -578,6 +578,48 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   .pourquoi-tableau-card{display:none;}
   .s-pourquoi .compare-mobile{display:flex;}
 }
+
+/* ── TARIFS ─────────────────────────────────────────── */
+.s-tarifs{position:relative;background:var(--turquoise-pale);padding:100px 80px;overflow:hidden;display:flex;flex-direction:column;gap:48px;}
+.s-tarifs-head{display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center;}
+.s-tarifs-grid{display:grid;grid-template-columns:1fr 1.08fr 1.15fr;gap:28px;align-items:start;}
+.tarif-card{background:var(--blanc);border:4px solid var(--aubergine);border-radius:24px;box-shadow:6px 6px 0 var(--aubergine);padding:30px 28px;display:flex;flex-direction:column;gap:16px;}
+.tarif-card-forte{position:relative;background:var(--turquoise);box-shadow:8px 8px 0 var(--aubergine);}
+.tarif-card-forte-sticker{position:absolute;top:-22px;right:22px;display:inline-block;background:var(--moutarde);border:4px solid var(--aubergine);border-radius:var(--radius-16);box-shadow:5px 5px 0 var(--aubergine);transform:rotate(-2deg);font-family:var(--font-titre);font-size:20px;padding:4px 14px 6px;}
+.tarif-nom{margin:0;font-family:var(--font-titre);font-weight:400;font-size:28px;}
+.tarif-prix{margin:0;font-family:var(--font-titre);font-weight:400;font-size:52px;line-height:1;}
+.tarif-prix small{font-size:22px;}
+.tarif-prix-alt{display:flex;align-items:flex-end;gap:18px;}
+.tarif-prix-alt .tarif-prix-ann{margin:0 0 4px;font-family:var(--font-titre);font-weight:400;font-size:26px;}
+.tarif-prix-ann small{font-size:18px;}
+.tarif-note{margin:0;font-size:15px;line-height:1.45;}
+.tarif-note-doux{color:var(--aubergine-doux);}
+.tarif-liste{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;}
+.tarif-liste li{display:flex;gap:10px;font-size:16px;line-height:1.45;}
+.tarif-liste .tl-check{flex:none;font-weight:700;color:var(--canard);}
+.tarif-btn-sec{display:inline-flex;align-items:center;justify-content:center;padding:13px 24px;border:3px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:17px;font-weight:700;text-decoration:none;color:var(--aubergine);background:var(--blanc);margin-top:8px;align-self:flex-start;}
+.tarif-btn{display:inline-flex;align-items:center;justify-content:center;padding:16px 26px;border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:17px;font-weight:700;text-decoration:none;color:var(--papier);background:var(--aubergine);margin-top:4px;align-self:flex-start;}
+/* Places fondatrices */
+.places-bandeau{position:relative;background:var(--aubergine);color:var(--papier);border-radius:24px;border:4px solid var(--aubergine);box-shadow:8px 8px 0 var(--rouge);padding:30px 40px 30px 230px;min-height:170px;display:flex;flex-direction:column;justify-content:center;}
+.places-xpl-wrap{position:absolute;left:24px;top:50%;transform:translateY(-50%);}
+.places-xpl{position:relative;width:200px;height:200px;transform:rotate(-10deg);}
+.places-xpl svg{position:absolute;inset:0;width:100%;height:100%;}
+.places-xpl p{position:absolute;left:0;right:0;top:50px;text-align:center;font-family:var(--font-titre);font-size:52px;line-height:1;color:var(--papier);}
+.places-xpl p small{font-size:22px;display:block;}
+.places-titre{margin:0;font-family:var(--font-titre);font-size:34px;line-height:1.1;}
+.places-desc{margin:12px 0 0;font-size:16px;line-height:1.5;max-width:720px;}
+.tarif-annuel-note{margin:-20px 0 0;font-size:14px;line-height:1.5;color:var(--aubergine-doux);text-align:center;max-width:860px;align-self:center;}
+@media(max-width:768px){
+  .s-tarifs{padding:56px 20px;}
+  .s-tarifs-grid{grid-template-columns:1fr;}
+  .s-tarifs-head h2{font-size:36px;}
+  .places-bandeau{padding:140px 24px 30px;min-height:auto;}
+  .places-xpl-wrap{top:24px;left:50%;transform:translateX(-50%);}
+  .places-xpl{width:120px;height:120px;}
+  .places-xpl p{font-size:30px;top:28px;}
+  .places-xpl p small{font-size:14px;}
+  .places-titre{font-size:24px;}
+}
 </style>
 </head>
 <body>
@@ -857,76 +899,65 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   </div>
 </section>
 
-<!-- OFFRES -->
-<section class="s-offers" id="offres">
-  <div class="offers-wrap">
-    <h2>Commence avec le bilan,<br>reste si ça t'aide.</h2>
-
-    <!-- Gratuit -->
-    <div class="ky-carte" style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:24px;">
-      <div>
-        <h3 style="font-family:var(--font-titre);font-weight:400;font-size:28px;margin:0 0 6px;">Bilan nutritionnel</h3>
-        <p style="margin:0;font-size:15px;line-height:1.5;color:var(--aubergine-doux);">Quiz de 21 questions et rapport nutritionnel personnalisé.</p>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0;">
-        <div style="font-family:var(--font-titre);font-weight:400;font-size:52px;line-height:1;">Gratuit</div>
-        <a href="quiz.html" class="ky-btn ky-btn-secondaire">Faire le bilan</a>
-      </div>
-    </div>
-
-    <!-- Kyno + Kyno+ -->
-    <div class="ky-offres">
-
-      <!-- Kyno -->
-      <div class="ky-offre ky-carte">
-        <h3>Kyno</h3>
-        <div class="ky-offre-prix">12 <small>€/mois</small></div>
-        <p>Résiliable à tout moment.</p>
-        <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:15px;line-height:1.5;">
-          <li>Menus hebdomadaires personnalisés</li>
-          <li>Liste de courses et batch-cooking</li>
-          <li>Profil modifiable à tout moment</li>
-          <li>Chat IA pour les adaptations au quotidien<br><small style="font-size:13px;color:var(--aubergine-doux);">Usage raisonnable, sans limite pour un usage personnel normal.</small></li>
-        </ul>
-        <p>Chien supplémentaire : +6 €/mois.<br><small style="font-size:13px;color:var(--aubergine-doux);">Menus distincts par chien, ingrédients partagés quand c'est possible, une seule liste de courses.</small></p>
-        <a href="quiz.html" class="ky-btn ky-btn-principal" style="margin-top:auto;">Commencer</a>
-      </div>
-
-      <!-- Kyno+ -->
-      <div class="ky-offre ky-carte ky-offre-forte">
-        <h3>Kyno+</h3>
-
-        <div>
-          <div class="ky-offre-prix">21 <small>€/mois</small></div>
-          <p><strong>Au mois : 21 €/mois.</strong> Résiliable à tout moment.</p>
-        </div>
-
-        <div style="border-top:2px solid var(--aubergine);padding-top:12px;">
-          <div class="ky-offre-prix">180 <small>€/an</small></div>
-          <p><strong>À l'année : 180 €/an, soit 15 €/mois.</strong> Engagement de 12 mois, payé en une fois et renouvelé automatiquement. Tu peux désactiver le renouvellement à tout moment, et l'année en cours n'est pas remboursée.</p>
-        </div>
-
-        <div>
-          <p style="font-weight:700;margin-bottom:8px;">Tout Kyno, plus :</p>
-          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:15px;line-height:1.5;">
-            <li>IA avancée : menus avec ce qu'on a dans le frigo, anti-gaspillage <span class="ky-pastille">Bientôt disponible</span></li>
-            <li>Guides numériques inclus <span class="ky-pastille">Bientôt disponible</span></li>
-            <li>Suivi santé renforcé : courbe de poids, rapport pour le vétérinaire <span class="ky-pastille">Bientôt disponible</span></li>
-          </ul>
-        </div>
-
-        <p>Chien supplémentaire : +10,50 €/mois ou +90 €/an.</p>
-        <a href="quiz.html" class="ky-btn ky-btn-principal" style="margin-top:auto;">Commencer</a>
-      </div>
-
-    </div>
-
-    <!-- Places fondatrices -->
-    <div class="ky-encart" style="margin-top:24px;">
-      <p><strong>100 places fondatrices :</strong> les 100 premiers abonnés, bêta-testeurs compris, ont Kyno+ à 12 €/mois et le chien supplémentaire à 6 €/mois. Tarif garanti tant que ton abonnement reste actif, perdu en cas de résiliation.</p>
-    </div>
-
+<!-- TARIFS -->
+<section id="offres" class="s-tarifs">
+  <div class="s-tarifs-head">
+    <span class="ky-pastille ky-pastille-blanc">Tarifs</span>
+    <h2>Commence avec <span class="ky-sticker" style="background:var(--turquoise)">le bilan,</span> reste si ça t&#x2019;aide.</h2>
   </div>
+  <div class="s-tarifs-grid">
+    <!-- Bilan gratuit -->
+    <div class="tarif-card">
+      <p class="tarif-nom">Bilan nutritionnel</p>
+      <p class="tarif-prix">Gratuit</p>
+      <p class="tarif-note">Quiz de 21 questions et rapport nutritionnel personnalisé.</p>
+      <a href="quiz.html" class="tarif-btn-sec">Faire le bilan</a>
+    </div>
+    <!-- Kyno -->
+    <div class="tarif-card">
+      <p class="tarif-nom">Kyno</p>
+      <p class="tarif-prix">12 <small>&#x20AC;/mois</small></p>
+      <p class="tarif-note"><strong>Résiliable à tout moment.</strong></p>
+      <ul class="tarif-liste">
+        <li><span class="tl-check">&#10003;</span><span>Menus hebdomadaires personnalisés</span></li>
+        <li><span class="tl-check">&#10003;</span><span>Liste de courses et batch-cooking</span></li>
+        <li><span class="tl-check">&#10003;</span><span>Profil modifiable à tout moment</span></li>
+        <li><span class="tl-check">&#10003;</span><span>Chat IA pour les adaptations au quotidien</span></li>
+      </ul>
+      <p class="tarif-note tarif-note-doux">Chien supplémentaire : +6 &#x20AC;/mois. Menus distincts, une seule liste de courses.</p>
+      <a href="quiz.html" class="tarif-btn">Commencer</a>
+    </div>
+    <!-- Kyno+ -->
+    <div class="tarif-card tarif-card-forte">
+      <span class="tarif-card-forte-sticker">Pour les gourmands</span>
+      <p class="tarif-nom">Kyno+</p>
+      <div class="tarif-prix-alt">
+        <p class="tarif-prix">21 <small>&#x20AC;/mois</small></p>
+        <p class="tarif-prix-ann">ou 180 &#x20AC;<small>/an</small></p>
+      </div>
+      <p class="tarif-note">Au mois : résiliable à tout moment. À l&#x2019;année : soit 15 &#x20AC;/mois, engagement de 12 mois.</p>
+      <p class="tarif-note"><strong>Tout Kyno, plus :</strong></p>
+      <ul class="tarif-liste">
+        <li><span class="tl-check">&#10003;</span><span>IA avancée : menus avec ce qu&#x2019;il y a dans le frigo, anti-gaspillage <span class="ky-pastille" style="font-size:13px;padding:2px 10px;">Bientôt disponible</span></span></li>
+        <li><span class="tl-check">&#10003;</span><span>Guides numériques inclus <span class="ky-pastille" style="font-size:13px;padding:2px 10px;">Bientôt disponible</span></span></li>
+        <li><span class="tl-check">&#10003;</span><span>Suivi santé renforcé : courbe de poids, rapport pour le vétérinaire <span class="ky-pastille" style="font-size:13px;padding:2px 10px;">Bientôt disponible</span></span></li>
+      </ul>
+      <p class="tarif-note">Chien supplémentaire : +10,50 &#x20AC;/mois ou +90 &#x20AC;/an.</p>
+      <a href="quiz.html" class="tarif-btn">Commencer</a>
+    </div>
+  </div>
+  <!-- Places fondatrices -->
+  <div class="places-bandeau">
+    <div class="places-xpl-wrap" aria-hidden="true">
+      <div class="places-xpl">
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="80,2 92,40 124,14 114,52 156,48 122,74 158,98 116,100 132,140 96,116 82,158 70,116 30,142 46,102 4,100 40,76 6,48 48,52 36,12 68,40" fill="#E5432F" stroke="#FFF4E0" stroke-width="5" stroke-linejoin="round"/></svg>
+        <p>100<small>places</small></p>
+      </div>
+    </div>
+    <p class="places-titre">Places fondatrices : <span class="ky-sticker ky-sticker-moutarde" style="font-size:28px;">Kyno+ à 12 &#x20AC;/mois.</span></p>
+    <p class="places-desc">Les 100 premiers abonnés, bêta-testeurs compris, ont Kyno+ à 12 &#x20AC;/mois et le chien supplémentaire à 6 &#x20AC;/mois. Tarif garanti tant que ton abonnement reste actif, perdu en cas de résiliation.</p>
+  </div>
+  <p class="tarif-annuel-note">Formule annuelle : engagement de 12 mois, payé en une fois et renouvelé automatiquement. Tu peux désactiver le renouvellement à tout moment, et l&#x2019;année en cours n&#x2019;est pas remboursée.</p>
 </section>
 
 <!-- PREUVE SOCIALE -->
