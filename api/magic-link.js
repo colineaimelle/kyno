@@ -405,7 +405,7 @@ function buildEmailMenuHtml(prenom, htmlContent) {
           <div style="background:#451A36;border-radius:14px;padding:36px;text-align:center;border:3px solid #E5432F;">
             <p style="margin:0 0 6px;font-size:10px;color:rgba(245,240,232,0.4);">Ton espace Kyno</p>
             <p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#FFF4E0;line-height:1.3;">Retrouve ce menu<br><span style="font-size:14px;font-weight:400;color:rgba(245,240,232,0.5);">et discute des évolutions de ${prenom} avec Kyno</span></p>
-            <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#E5432F;color:#FFF4E0;padding:16px 32px;border-radius:999px;text-decoration:none;font-size:13px;font-weight:700;border:2px solid #451A36;">Accéder à mon espace →</a>
+            <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:#FFF4E0;padding:16px 32px;border-radius:999px;text-decoration:none;font-size:13px;font-weight:700;border:2px solid #E5432F;">Accéder à mon espace →</a>
           </div>
         </td>
       </tr>
