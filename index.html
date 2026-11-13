@@ -130,7 +130,7 @@ h1{font-family:var(--font-titre);font-size:clamp(44px,5vw,64px);line-height:1.08
 .hero-content .ky-btn-principal{background:var(--rouge);color:var(--papier);box-shadow:none;}
 .hero-content .ky-btn-principal:hover,.hero-content .ky-btn-principal:active{background:#B8301D;}
 /* grande case */
-.hero-grande{position:relative;overflow:hidden;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:0!important;padding:32px 40px 40px 40px!important;}
+.hero-grande{position:relative;overflow:hidden;background:var(--turquoise);display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:0!important;padding:32px 40px 40px 40px!important;}
 .hero-grande-bg{position:absolute;inset:0;border-radius:var(--radius-case);overflow:hidden;pointer-events:none;background:repeating-conic-gradient(from 0deg at 72% 82%,#2BB3AE 0deg 7deg,#3FC0BB 7deg 14deg);opacity:.45;}
 .hero-grande-dots{position:absolute;top:0;left:0;width:220px;height:220px;background:radial-gradient(circle,#451A36 1.5px,transparent 1.5px);background-size:20px 20px;opacity:.35;pointer-events:none;}
 .hero-content{position:relative;z-index:4;max-width:500px;display:flex;flex-direction:column;gap:24px;}
@@ -138,12 +138,13 @@ h1{font-family:var(--font-titre);font-size:clamp(44px,5vw,64px);line-height:1.08
 .hero-viva-disc{position:absolute;right:-20px;bottom:-15px;width:240px;height:240px;border-radius:50%;background:var(--moutarde);border:4px solid var(--aubergine);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;box-shadow:var(--ombre-bd);z-index:3;}
 .hero-viva-disc svg{width:220px;height:auto;margin-bottom:0;}
 /* textures petites cases */
-.hero-case-rose{position:relative;}
+.hero-case-rose{position:relative;background:var(--rose);display:flex;align-items:center;justify-content:center;padding:20px;}
 .hero-case-rose::before{content:'';position:absolute;inset:0;background:radial-gradient(circle,#E5432F 1.5px,transparent 1.5px);background-size:16px 16px;opacity:.45;pointer-events:none;border-radius:inherit;}
-.hero-case-moutarde{position:relative;}
+.hero-case-moutarde{position:relative;background:var(--moutarde);display:flex;align-items:center;justify-content:center;padding:20px;}
 .hero-case-moutarde::before{content:'';position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 50%,#F2B630 0deg 10deg,#F5C451 10deg 20deg);opacity:.35;pointer-events:none;border-radius:inherit;}
-.hero-case-rouge{position:relative;}
+.hero-case-rouge{position:relative;background:var(--rouge);display:flex;align-items:center;justify-content:center;padding:20px;}
 .hero-case-rouge::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,#451A36 1.5px,transparent 1.5px);background-size:14px 14px;opacity:.3;pointer-events:none;}
+.hero-case-papier{background:var(--papier);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 20px;}
 /* explosion Fait maison */
 .hero-explosion{position:relative;width:170px;height:170px;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg);z-index:1;}
 .hero-explosion-svg{position:absolute;inset:0;width:100%;height:100%;}
@@ -432,26 +433,27 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 }
 @media(max-width:768px){
   /* Planche hero */
-  .hero-bd{grid-template-columns:1fr 1fr!important;grid-template-rows:none!important;height:auto!important;padding:66px 10px 10px!important;gap:10px!important;}
-  /* Placement des cases mobile */
-  .hero-bd .ky-case-grande{grid-column:1/span 2!important;grid-row:auto!important;}
-  .hero-bd .hero-case-rose{grid-column:1/span 2!important;grid-row:auto!important;}
-  .hero-bd .hero-case-moutarde{grid-column:1!important;grid-row:auto!important;}
-  .hero-bd .hero-case-rouge{grid-column:2!important;grid-row:auto!important;}
-  .hero-bd .hero-case-papier{grid-column:1/span 2!important;grid-row:auto!important;}
-  /* Grande case */
-  .hero-grande{padding:28px 24px 0!important;justify-content:flex-start!important;}
+  .hero-bd{height:auto!important;grid-template-columns:1fr 1fr!important;grid-template-rows:auto!important;grid-auto-rows:auto!important;gap:10px!important;padding:66px 10px 10px!important;}
+  /* Reset hauteur sur toutes les cases */
+  .hero-bd .ky-case{height:auto!important;min-height:0!important;}
+  /* Placement mobile */
+  .hero-bd .ky-case-grande{grid-column:1/-1!important;grid-row:auto!important;}
+  .hero-bd .hero-case-rose{grid-column:1/-1!important;grid-row:auto!important;min-height:200px!important;padding:24px!important;}
+  .hero-bd .hero-case-moutarde{grid-column:1!important;grid-row:auto!important;min-height:170px!important;padding:24px!important;}
+  .hero-bd .hero-case-rouge{grid-column:2!important;grid-row:auto!important;min-height:170px!important;padding:24px!important;}
+  .hero-bd .hero-case-papier{grid-column:1/-1!important;grid-row:auto!important;padding:24px!important;}
+  /* Grande case layout interne — spécificité 2 classes pour l'emporter sur .hero-bd .ky-case */
+  .hero-bd .hero-grande{padding:28px 24px 0!important;justify-content:flex-start!important;}
   .hero-desc{max-width:100%!important;}
   .hero-viva-disc{position:static!important;width:200px!important;height:200px!important;margin:20px auto -40px!important;}
   .hero-viva-disc svg{width:180px!important;}
-  /* Case rose */
-  .hero-case-rose{min-height:200px;}
+  /* Bulle */
   .hero-bulle{width:260px!important;height:115px!important;}
   .hero-bulle p{font-size:22px!important;top:28px!important;}
-  /* Cases moutarde + rouge côte à côte */
-  .hero-case-moutarde,.hero-case-rouge{min-height:170px;}
+  /* Explosion */
   .hero-explosion{width:130px!important;height:130px!important;}
   .hero-explosion span{font-size:22px!important;}
+  /* Rouge text */
   .hero-rouge-text{font-size:26px!important;}
 }
 @media(max-width:560px){
@@ -504,7 +506,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 <section class="ky-planche hero-bd">
 
   <!-- Grande case gauche — col 1, rows 1-4 -->
-  <div class="ky-case ky-case-grande hero-grande" style="background:var(--turquoise);">
+  <div class="ky-case ky-case-grande hero-grande">
     <div class="hero-grande-bg" aria-hidden="true"></div>
     <div class="hero-grande-dots" aria-hidden="true"></div>
     <div class="hero-content">
@@ -569,7 +571,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   </div>
 
   <!-- Case rose — bulle -->
-  <div class="ky-case hero-case-rose" style="background:var(--rose);display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div class="ky-case hero-case-rose">
     <div class="ky-bulle hero-bulle" style="position:relative;z-index:1;">
       <svg viewBox="0 0 340 150" xmlns="http://www.w3.org/2000/svg">
         <path d="M170 12 C268 12 328 48 328 84 C328 120 268 138 170 138 C110 138 55 128 28 110 L10 148 L62 124 C40 115 12 102 12 84 C12 48 72 12 170 12 Z"/>
@@ -579,7 +581,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   </div>
 
   <!-- Case moutarde — Fait maison explosion -->
-  <div class="ky-case hero-case-moutarde" style="background:var(--moutarde);display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div class="ky-case hero-case-moutarde">
     <div class="hero-explosion">
       <svg class="hero-explosion-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M100 10 L117 55 L160 20 L143 68 L190 60 L163 100 L190 140 L143 132 L160 180 L117 145 L100 190 L83 145 L40 180 L57 132 L10 140 L37 100 L10 60 L57 68 L40 20 L83 55 Z" fill="#E5432F" stroke="#451A36" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
@@ -589,12 +591,12 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   </div>
 
   <!-- Case rouge — Pas une recette -->
-  <div class="ky-case hero-case-rouge" style="background:var(--rouge);display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div class="ky-case hero-case-rouge">
     <div class="hero-rouge-text" style="position:relative;z-index:1;font-family:var(--font-titre);font-size:24px;text-align:center;line-height:1.3;"><span style="color:#FFF4E0;">Pas une recette.</span><br><span style="color:#451A36;">Son menu.</span></div>
   </div>
 
   <!-- Case papier — saisie prénom -->
-  <div class="ky-case hero-case-papier" style="background:var(--papier);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 20px;">
+  <div class="ky-case hero-case-papier">
     <p style="font-family:var(--font-texte);font-size:15px;font-weight:700;color:var(--aubergine);margin:0;text-align:center;">Question 1 sur 21</p>
     <label for="heroPrenom" style="font-family:var(--font-titre);font-size:34px;line-height:1.05;color:var(--aubergine);margin:0;text-align:center;width:100%;">Comment s'appelle ton chien&nbsp;?</label>
     <input id="heroPrenom" type="text" placeholder="Ex : Viva, Max…" autocomplete="off"
