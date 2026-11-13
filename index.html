@@ -489,6 +489,10 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 .ky-pastille-blanc{background:var(--blanc);}
 .ky-btn-rouge{background:var(--rouge);color:var(--papier);}
 .ky-btn-rouge:hover,.ky-btn-rouge:focus{background:var(--rouge-fonce);}
+.ky-sticker-turquoise{background:var(--turquoise);}
+.ky-sticker-rose{background:var(--rose);}
+.ky-sticker-lg{font-size:28px;}
+.ky-pastille-sm{font-size:13px;padding:2px 10px;}
 
 /* ── COMMENT ÇA MARCHE ─────────────────────────────── */
 .s-comment{position:relative;background:var(--papier);padding:100px 80px 96px;display:flex;flex-direction:column;gap:52px;}
@@ -519,6 +523,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 .nf-score-u{font-size:24px;}
 .nf-bars{display:flex;flex-direction:column;gap:12px;justify-content:center;}
 .nf-bar{display:grid;grid-template-columns:90px 1fr 44px;align-items:center;gap:12px;font-size:15px;font-weight:700;}
+.nf-bar-pct{text-align:right;}
 .nf-bar-track{height:14px;border:2px solid var(--aubergine);border-radius:var(--radius-pill);background:var(--papier);overflow:hidden;}
 .nf-bar-fill{height:100%;}
 .nf-block{border:3px solid var(--aubergine);border-radius:18px;padding:16px 18px;margin-bottom:22px;}
@@ -642,7 +647,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 .faq-icon-new{flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--papier);color:var(--aubergine);border:3px solid var(--aubergine);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;line-height:1;}
 .faq-icon-new::after{content:'+';}
 .faq-item-new.open .faq-icon-new{background:var(--rouge);color:var(--papier);}
-.faq-item-new.open .faq-icon-new::after{content:'&#x2212;';}
+.faq-item-new.open .faq-icon-new::after{content:'\2212';}
 .faq-a-new{max-height:0;overflow:hidden;transition:max-height 0.38s cubic-bezier(.22,.61,.36,1);}
 .faq-a-new-inner{padding:0 26px 22px;font-size:16px;line-height:1.55;color:var(--aubergine);}
 @media(max-width:768px){
@@ -963,7 +968,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 <section id="offres" class="s-tarifs">
   <div class="s-tarifs-head">
     <span class="ky-pastille ky-pastille-blanc">Tarifs</span>
-    <h2>Commence avec <span class="ky-sticker" style="background:var(--turquoise)">le bilan,</span> reste si ça t&#x2019;aide.</h2>
+    <h2>Commence avec <span class="ky-sticker ky-sticker-turquoise">le bilan,</span> reste si ça t&#x2019;aide.</h2>
   </div>
   <div class="s-tarifs-grid">
     <!-- Bilan gratuit -->
@@ -998,9 +1003,9 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
       <p class="tarif-note">Au mois : résiliable à tout moment. À l&#x2019;année : soit 15 &#x20AC;/mois, engagement de 12 mois.</p>
       <p class="tarif-note"><strong>Tout Kyno, plus :</strong></p>
       <ul class="tarif-liste">
-        <li><span class="tl-check">&#10003;</span><span>IA avancée : menus avec ce qu&#x2019;il y a dans le frigo, anti-gaspillage <span class="ky-pastille" style="font-size:13px;padding:2px 10px;">Bientôt disponible</span></span></li>
-        <li><span class="tl-check">&#10003;</span><span>Guides numériques inclus <span class="ky-pastille" style="font-size:13px;padding:2px 10px;">Bientôt disponible</span></span></li>
-        <li><span class="tl-check">&#10003;</span><span>Suivi santé renforcé : courbe de poids, rapport pour le vétérinaire <span class="ky-pastille" style="font-size:13px;padding:2px 10px;">Bientôt disponible</span></span></li>
+        <li><span class="tl-check">&#10003;</span><span>IA avancée : menus avec ce qu&#x2019;il y a dans le frigo, anti-gaspillage <span class="ky-pastille ky-pastille-sm">Bientôt disponible</span></span></li>
+        <li><span class="tl-check">&#10003;</span><span>Guides numériques inclus <span class="ky-pastille ky-pastille-sm">Bientôt disponible</span></span></li>
+        <li><span class="tl-check">&#10003;</span><span>Suivi santé renforcé : courbe de poids, rapport pour le vétérinaire <span class="ky-pastille ky-pastille-sm">Bientôt disponible</span></span></li>
       </ul>
       <p class="tarif-note">Chien supplémentaire : +10,50 &#x20AC;/mois ou +90 &#x20AC;/an.</p>
       <a href="quiz.html" class="tarif-btn">Commencer</a>
@@ -1014,7 +1019,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
         <p>100<small>places</small></p>
       </div>
     </div>
-    <p class="places-titre">Places fondatrices : <span class="ky-sticker ky-sticker-moutarde" style="font-size:28px;">Kyno+ à 12 &#x20AC;/mois.</span></p>
+    <p class="places-titre">Places fondatrices : <span class="ky-sticker ky-sticker-moutarde ky-sticker-lg">Kyno+ à 12 &#x20AC;/mois.</span></p>
     <p class="places-desc">Les 100 premiers abonnés, bêta-testeurs compris, ont Kyno+ à 12 &#x20AC;/mois et le chien supplémentaire à 6 &#x20AC;/mois. Tarif garanti tant que ton abonnement reste actif, perdu en cas de résiliation.</p>
   </div>
   <p class="tarif-annuel-note">Formule annuelle : engagement de 12 mois, payé en une fois et renouvelé automatiquement. Tu peux désactiver le renouvellement à tout moment, et l&#x2019;année en cours n&#x2019;est pas remboursée.</p>
@@ -1027,7 +1032,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   <div class="faq-gauche">
     <div class="faq-gauche-head">
       <span class="ky-pastille ky-pastille-rose">On répond</span>
-      <h2>Questions <span class="ky-sticker" style="background:var(--rose)">fréquentes.</span></h2>
+      <h2>Questions <span class="ky-sticker ky-sticker-rose">fréquentes.</span></h2>
     </div>
     <div class="faq-viva-box">
       <div class="faq-viva-dots" aria-hidden="true"></div>
@@ -1279,7 +1284,7 @@ function renderHeroCard(b){
 
 function renderFiche(key){
   const b = BREEDS[key];
-  const macros = b.macros.map(m=>`<div class="nf-bar"><span>${m[0]}</span><div class="nf-bar-track"><div class="nf-bar-fill" style="width:${m[1]}%;background:${m[2]}"></div></div><span style="text-align:right">${m[1]}&nbsp;%</span></div>`).join('');
+  const macros = b.macros.map(m=>`<div class="nf-bar"><span>${m[0]}</span><div class="nf-bar-track"><div class="nf-bar-fill" style="width:${m[1]}%;background:${m[2]}"></div></div><span class="nf-bar-pct">${m[1]}&nbsp;%</span></div>`).join('');
   document.getElementById('fichePanel').innerHTML = `
     <div class="nf-head">
       <div class="nf-av" style="background:${b.bg}">${b.portrait}</div>
