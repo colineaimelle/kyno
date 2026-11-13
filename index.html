@@ -119,15 +119,34 @@ nav{
 /* HERO BD */
 .hero-bd{padding-top:56px;min-height:100vh;}
 .hero-bd .ky-case-grande{grid-column:1;grid-row:1/span 4;}
-.eyebrow{font-size:13px;color:var(--aubergine);font-weight:700;}
-h1{font-family:var(--font-titre);font-size:clamp(44px,6.5vw,78px);line-height:1.08;font-weight:400;font-synthesis:none;color:var(--aubergine);margin:0;}
+h1{font-family:var(--font-titre);font-size:clamp(44px,5vw,64px);line-height:1.08;font-weight:400;font-synthesis:none;color:var(--aubergine);margin:0;max-width:600px;}
 .hero-desc{font-size:16px;line-height:1.8;color:var(--aubergine);max-width:430px;font-weight:400;}
 .hero-fineprint{font-size:12px;color:var(--aubergine-doux);font-weight:400;margin-top:4px;}
 .hero-proof{display:flex;gap:28px;padding-top:20px;border-top:2px solid var(--aubergine);}
 .proof-num{font-family:var(--font-titre);font-size:30px;font-weight:400;color:var(--aubergine);line-height:1;}
 .proof-lbl{font-size:11px;color:var(--aubergine);margin-top:4px;font-weight:600;}
-.hero-viva-disc{width:280px;height:280px;border-radius:50%;background:var(--moutarde);border:4px solid var(--aubergine);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;box-shadow:var(--ombre-bd);flex-shrink:0;}
+/* grande case */
+.hero-grande{position:relative;overflow:visible!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;gap:0!important;padding:80px 40px 120px 64px!important;}
+.hero-grande-bg{position:absolute;inset:0;border-radius:var(--radius-case);overflow:hidden;pointer-events:none;background:repeating-conic-gradient(from 0deg at 72% 82%,#2BB3AE 0deg 7deg,#3FC0BB 7deg 14deg);opacity:.45;}
+.hero-grande-dots{position:absolute;top:0;left:0;width:220px;height:220px;background:radial-gradient(circle,#451A36 1.5px,transparent 1.5px);background-size:20px 20px;opacity:.35;pointer-events:none;}
+.hero-content{position:relative;z-index:1;max-width:500px;display:flex;flex-direction:column;gap:24px;}
+/* viva disc — absolute, ancré bas-droite, déborde */
+.hero-viva-disc{position:absolute;right:-20px;bottom:-70px;width:280px;height:280px;border-radius:50%;background:var(--moutarde);border:4px solid var(--aubergine);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;box-shadow:var(--ombre-bd);z-index:3;}
 .hero-viva-disc svg{width:260px;height:auto;margin-bottom:-20px;}
+/* textures petites cases */
+.hero-case-rose{position:relative;}
+.hero-case-rose::before{content:'';position:absolute;inset:0;background:radial-gradient(circle,#E5432F 1.5px,transparent 1.5px);background-size:16px 16px;opacity:.45;pointer-events:none;border-radius:inherit;}
+.hero-case-moutarde{position:relative;}
+.hero-case-moutarde::before{content:'';position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 50%,#F2B630 0deg 10deg,#F5C451 10deg 20deg);opacity:.35;pointer-events:none;border-radius:inherit;}
+.hero-case-rouge{position:relative;}
+.hero-case-rouge::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,#451A36 1.5px,transparent 1.5px);background-size:14px 14px;opacity:.3;pointer-events:none;}
+/* explosion Fait maison */
+.hero-explosion{position:relative;width:170px;height:170px;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg);z-index:1;}
+.hero-explosion-svg{position:absolute;inset:0;width:100%;height:100%;}
+.hero-explosion span{position:relative;z-index:1;font-family:var(--font-titre);font-size:28px;color:var(--aubergine);text-align:center;line-height:1.1;}
+/* bulle hero */
+.hero-bulle{width:420px;height:210px;}
+.hero-bulle p{font-size:clamp(32px,4vw,48px);top:52px;}
 /* S-DEMO */
 .s-demo{background:var(--papier);padding:80px 48px;}
 .s-demo-wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1.3fr;gap:48px;align-items:flex-start;}
@@ -388,9 +407,11 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   nav{padding:0 20px;}
   .nav-links{display:none;}
   .hero-bd{grid-template-columns:1fr;}
-  .hero-bd .ky-case-grande{grid-row:auto;flex-direction:column;align-items:flex-start;gap:24px;padding:88px 24px 48px;}
-  .hero-viva-disc{width:200px;height:200px;}
+  .hero-grande{overflow:hidden!important;padding:88px 24px 48px!important;}
+  .hero-viva-disc{position:static!important;width:200px;height:200px;margin:28px auto 0;}
   .hero-viva-disc svg{width:180px;}
+  .hero-bulle{width:260px;height:130px;}
+  .hero-bulle p{font-size:26px;top:30px;}
   .hero-desc{max-width:100%;}
   .s-fiche{padding:80px 24px;}
   h1{font-size:clamp(38px,10vw,52px);}
@@ -454,7 +475,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
     <a href="#comment">Comment ça marche</a>
     <a href="#offres">Tarifs</a>
     <a href="login.html" class="nav-espace">Mon espace</a>
-    <a href="quiz.html" class="nav-cta">Commencer</a>
+    <a href="quiz.html" class="nav-cta" style="background:#451A36;color:#FFF4E0;">Créer le profil de mon chien</a>
   </div>
   <button class="nav-burger" id="navBurger" onclick="toggleMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -465,9 +486,10 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 <section class="ky-planche hero-bd">
 
   <!-- Grande case gauche — col 1, rows 1-4 -->
-  <div class="ky-case ky-case-grande" style="background:var(--turquoise);grid-column:1;grid-row:1/span 4;display:flex;align-items:center;justify-content:space-between;gap:40px;padding:80px 40px 80px 64px;min-height:92vh;">
-    <div style="max-width:400px;display:flex;flex-direction:column;gap:24px;">
-      <img src="kyno-logo.svg" alt="Kyno" height="40" style="width:auto;display:block;">
+  <div class="ky-case ky-case-grande hero-grande" style="background:var(--turquoise);grid-column:1;grid-row:1/span 4;min-height:92vh;">
+    <div class="hero-grande-bg" aria-hidden="true"></div>
+    <div class="hero-grande-dots" aria-hidden="true"></div>
+    <div class="hero-content">
       <h1>Le nutritionniste personnel de <span class="ky-sticker ky-sticker-moutarde">ton chien.</span></h1>
       <p class="hero-desc">Kyno crée chaque semaine des repas faits maison, adaptés à son âge, sa race, son activité et sa santé.</p>
       <div>
@@ -529,23 +551,28 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   </div>
 
   <!-- Case rose — bulle -->
-  <div class="ky-case" style="background:var(--rose);display:flex;align-items:center;justify-content:center;padding:20px;">
-    <div class="ky-bulle" style="width:220px;height:110px;">
+  <div class="ky-case hero-case-rose" style="background:var(--rose);display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div class="ky-bulle hero-bulle" style="position:relative;z-index:1;">
       <svg viewBox="0 0 340 170" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 10 Q10 10 10 20 L10 115 Q10 125 20 125 L150 125 L170 150 L190 125 L320 125 Q330 125 330 115 L330 20 Q330 10 320 10 Z"/>
       </svg>
-      <p style="font-size:24px;top:22px;">Miam, c'est<br>pour moi ?</p>
+      <p>Miam, c'est<br>pour moi ?</p>
     </div>
   </div>
 
-  <!-- Case moutarde — Fait maison -->
-  <div class="ky-case" style="background:var(--moutarde);display:flex;align-items:center;justify-content:center;padding:20px;">
-    <div style="font-family:var(--font-titre);font-size:28px;color:var(--aubergine);text-align:center;line-height:1.1;transform:rotate(-3deg);">Fait<br>maison !</div>
+  <!-- Case moutarde — Fait maison explosion -->
+  <div class="ky-case hero-case-moutarde" style="background:var(--moutarde);display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div class="hero-explosion">
+      <svg class="hero-explosion-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M100 10 L117 55 L160 20 L143 68 L190 60 L163 100 L190 140 L143 132 L160 180 L117 145 L100 190 L83 145 L40 180 L57 132 L10 140 L37 100 L10 60 L57 68 L40 20 L83 55 Z" fill="#E5432F" stroke="#451A36" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+      <span>Fait<br>maison !</span>
+    </div>
   </div>
 
   <!-- Case rouge — Pas une recette -->
-  <div class="ky-case" style="background:var(--rouge);display:flex;align-items:center;justify-content:center;padding:20px;">
-    <div style="font-family:var(--font-titre);font-size:24px;color:var(--papier);text-align:center;line-height:1.2;">Pas une recette.<br>Son menu.</div>
+  <div class="ky-case hero-case-rouge" style="background:var(--rouge);display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="position:relative;z-index:1;font-family:var(--font-titre);font-size:24px;text-align:center;line-height:1.3;"><span style="color:#FFF4E0;">Pas une recette.</span><br><span style="color:#451A36;">Son menu.</span></div>
   </div>
 
   <!-- Case papier — première question quiz -->
