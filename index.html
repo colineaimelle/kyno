@@ -614,6 +614,13 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 .places-titre{margin:0;font-family:var(--font-titre);font-size:34px;line-height:1.1;}
 .places-desc{margin:12px 0 0;font-size:16px;line-height:1.5;max-width:720px;}
 .tarif-annuel-note{margin:-20px 0 0;font-size:14px;line-height:1.5;color:var(--aubergine-doux);text-align:center;max-width:860px;align-self:center;}
+/* Case vidéo Viva */
+.tarif-col1{display:flex;flex-direction:column;gap:30px;}
+.tarif-viva-case{position:relative;background:#FAFAFA;border:4px solid var(--aubergine);border-radius:24px;box-shadow:6px 6px 0 var(--aubergine);overflow:hidden;transform:rotate(-1.5deg);}
+.tarif-viva-case video{display:block;width:100%;}
+.tarif-viva-sticker{position:absolute;top:12px;left:12px;display:inline-block;background:#E5432F;color:#FFF4E0;font-family:var(--font-titre);font-size:28px;border:4px solid var(--aubergine);border-radius:var(--radius-16);padding:2px 14px 6px;box-shadow:5px 5px 0 var(--aubergine);transform:rotate(-6deg);z-index:1;}
+.tarif-viva-fallback{display:none;width:100%;}
+@media(prefers-reduced-motion:reduce){.tarif-viva-case video{display:none;}.tarif-viva-fallback{display:block;}}
 @media(max-width:768px){
   .s-tarifs{padding:56px 20px;}
   .s-tarifs-grid{grid-template-columns:1fr;}
@@ -971,12 +978,19 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
     <h2>Commence avec <span class="ky-sticker ky-sticker-turquoise">le bilan,</span> reste si ça t&#x2019;aide.</h2>
   </div>
   <div class="s-tarifs-grid">
-    <!-- Bilan gratuit -->
-    <div class="tarif-card">
-      <p class="tarif-nom">Bilan nutritionnel</p>
-      <p class="tarif-prix">Gratuit</p>
-      <p class="tarif-note">Quiz de 21 questions et rapport nutritionnel personnalisé.</p>
-      <a href="quiz.html" class="tarif-btn-sec">Faire le bilan</a>
+    <!-- Colonne 1 : Bilan + case vidéo Viva -->
+    <div class="tarif-col1">
+      <div class="tarif-card">
+        <p class="tarif-nom">Bilan nutritionnel</p>
+        <p class="tarif-prix">Gratuit</p>
+        <p class="tarif-note">Quiz de 21 questions et rapport nutritionnel personnalisé.</p>
+        <a href="quiz.html" class="tarif-btn-sec">Faire le bilan</a>
+      </div>
+      <div class="tarif-viva-case">
+        <span class="tarif-viva-sticker">Miam !</span>
+        <video src="viva-gamelle.mp4" poster="viva-gamelle.jpg" autoplay muted loop playsinline aria-label="Viva qui se régale dans sa gamelle"></video>
+        <img class="tarif-viva-fallback" src="viva-gamelle.jpg" alt="Viva qui se régale dans sa gamelle">
+      </div>
     </div>
     <!-- Kyno -->
     <div class="tarif-card">
