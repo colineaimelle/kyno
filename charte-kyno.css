@@ -53,8 +53,8 @@ body{font-family:var(--font-texte);color:var(--aubergine);background:var(--papie
 .ky-btn-action{background:var(--moutarde);color:var(--aubergine);box-shadow:var(--ombre-bd)}
 .ky-btn-secondaire{background:var(--blanc);color:var(--aubergine);box-shadow:var(--ombre-bd-petite)}
 .ky-btn[disabled]{background:var(--trait);color:var(--aubergine-doux);border-color:var(--trait);box-shadow:none;cursor:not-allowed;transform:none}
-.ky-sticker{display:inline-block;background:var(--rouge);color:var(--aubergine);border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-16);padding:2px 16px 8px;box-shadow:var(--ombre-bd);transform:rotate(-2deg)}
-.ky-sticker-moutarde{background:var(--moutarde)}
+.ky-sticker{display:inline-block;background:var(--rouge);color:var(--papier);border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-16);padding:2px 16px 8px;box-shadow:var(--ombre-bd);transform:rotate(-2deg)}
+.ky-sticker-moutarde{background:var(--moutarde);color:var(--aubergine)}
 .ky-etoile{position:relative;width:160px;height:160px;transform:rotate(10deg)}
 .ky-etoile svg{position:absolute;inset:0}
 .ky-etoile p{position:absolute;left:0;right:0;top:50px;margin:0;text-align:center;font-family:var(--font-titre);font-size:24px;line-height:1.05;color:var(--aubergine)}
