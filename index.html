@@ -535,7 +535,48 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 @media(max-width:768px){
   .s-comment{padding:56px 20px;}
   .s-comment-grid{grid-template-columns:1fr;}
-  .s-comment-head h2,.s-comment-head .s-pourquoi-titre{font-size:36px;}
+  .s-comment-head h2{font-size:36px;}
+}
+
+/* ── POURQUOI KYNO ──────────────────────────────────── */
+.s-pourquoi{position:relative;background:var(--rouge);padding:100px 80px;display:flex;flex-direction:column;gap:52px;overflow:hidden;}
+.s-pourquoi-dots{position:absolute;left:0;bottom:0;width:340px;height:220px;background-image:radial-gradient(var(--aubergine) 2.5px,transparent 3px);background-size:16px 16px;opacity:0.35;pointer-events:none;}
+.s-pourquoi-wouf{position:absolute;right:90px;top:60px;width:190px;height:190px;transform:rotate(10deg);}
+.s-pourquoi-wouf svg{position:absolute;inset:0;width:100%;height:100%;}
+.s-pourquoi-wouf p{position:absolute;left:0;right:0;top:68px;text-align:center;font-family:var(--font-titre);font-size:40px;line-height:1;color:var(--aubergine);}
+.s-pourquoi-head{position:relative;display:flex;flex-direction:column;gap:18px;max-width:820px;}
+.s-pourquoi-titre{font-size:60px;color:var(--papier);line-height:1.05;}
+.s-pourquoi-cards{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+.pourquoi-card{background:var(--papier);border:4px solid var(--aubergine);border-radius:24px;box-shadow:7px 7px 0 var(--aubergine);padding:26px 26px 28px;display:flex;flex-direction:column;gap:12px;}
+.pourquoi-card p{margin:0;font-size:16px;line-height:1.55;}
+.ky-ptitre{align-self:flex-start;border:3px solid var(--aubergine);border-radius:var(--radius-pill);padding:6px 16px;font-family:var(--font-titre);font-size:22px;transform:rotate(-2deg);display:inline-block;}
+.ky-ptitre-turquoise{background:var(--turquoise);}
+.ky-ptitre-moutarde{background:var(--moutarde);}
+.ky-ptitre-rose{background:var(--rose);}
+/* Tableau comparaison */
+.pourquoi-tableau-card{position:relative;background:var(--blanc);border:4px solid var(--aubergine);border-radius:24px;box-shadow:8px 8px 0 var(--aubergine);overflow:hidden;}
+.pt-row{display:grid;grid-template-columns:1.3fr 1fr 1fr;}
+.pt-head{font-family:var(--font-titre);font-size:24px;border-bottom:4px solid var(--aubergine);}
+.pt-head > div{padding:20px 28px;}
+.pt-head .pt-kyno{background:var(--turquoise);border-left:4px solid var(--aubergine);border-right:4px solid var(--aubergine);padding-left:24px;}
+.pt-head .pt-sans{color:var(--aubergine-doux);padding-left:24px;}
+.pt-data-row + .pt-data-row{border-top:2px solid var(--trait);}
+.pt-data-row > div{padding:20px 24px;font-size:16px;}
+.pt-data-row > div:first-child{padding:20px 28px;font-size:17px;font-weight:700;line-height:1.35;}
+.pt-ok{background:var(--turquoise-pale);display:flex;gap:12px;align-items:center;font-weight:500;}
+.pt-no{display:flex;gap:12px;align-items:center;color:var(--aubergine-doux);}
+.pt-check{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--aubergine);display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;}
+.pt-check-ok{background:var(--turquoise);}
+.pt-check-no{background:var(--blanc);border-color:var(--aubergine-doux);color:var(--rouge-fonce);}
+.pt-check-mid{background:var(--blanc);border-color:var(--aubergine-doux);color:var(--aubergine-doux);font-size:17px;}
+@media(max-width:768px){
+  .s-pourquoi{padding:56px 20px;}
+  .s-pourquoi-titre{font-size:36px;}
+  .s-pourquoi-wouf{width:110px;height:110px;right:12px;top:40px;}
+  .s-pourquoi-wouf p{font-size:22px;top:38px;}
+  .s-pourquoi-cards{grid-template-columns:1fr;}
+  .pourquoi-tableau-card{display:none;}
+  .s-pourquoi .compare-mobile{display:flex;}
 }
 </style>
 </head>
@@ -718,75 +759,100 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   </div>
 </section>
 
-<!-- LA DIFFÉRENCE -->
-<section class="s-diff" id="difference">
-  <div class="diff-intro">
-    <div>
-      <div class="s-label">Pourquoi Kyno</div>
-      <h2>Pas une recette.<br><span class="ky-sticker">Son</span> menu.</h2>
+<!-- POURQUOI KYNO -->
+<section id="difference" class="s-pourquoi">
+  <div class="s-pourquoi-dots" aria-hidden="true"></div>
+  <div class="s-pourquoi-wouf" aria-hidden="true">
+    <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="80,2 92,40 124,14 114,52 156,48 122,74 158,98 116,100 132,140 96,116 82,158 70,116 30,142 46,102 4,100 40,76 6,48 48,52 36,12 68,40" fill="#F2B630" stroke="#451A36" stroke-width="5" stroke-linejoin="round"/></svg>
+    <p>Wouf !</p>
+  </div>
+  <div class="s-pourquoi-head">
+    <span class="ky-pastille ky-pastille-papier">Pourquoi Kyno</span>
+    <h2 class="s-pourquoi-titre">On part de <span class="ky-sticker ky-sticker-moutarde">ton chien,</span><br>pas d&#x2019;une recette.</h2>
+  </div>
+  <div class="s-pourquoi-cards">
+    <div class="pourquoi-card">
+      <span class="ky-ptitre ky-ptitre-turquoise">Vraiment sur-mesure</span>
+      <p>Race, âge, poids, activité, sensibilités, saison : ses besoins réels, recalculés à mesure qu&#x2019;il évolue.</p>
     </div>
-    <p class="diff-body">La plupart des solutions servent à peu près la même chose à tous les chiens. Kyno prend le problème à l'envers&nbsp;: on part de <span class="mark">ton chien</span> : sa race, son âge, son mode de vie, sa santé, et on construit tout autour. Jusqu'aux compléments ciblés et aux ajustements de chaque saison.</p>
+    <div class="pourquoi-card">
+      <span class="ky-ptitre ky-ptitre-moutarde">Adapté à ton quotidien</span>
+      <p>Il s&#x2019;ajuste à ton budget. Liste de courses prête, batch cooking pour la semaine.</p>
+    </div>
+    <div class="pourquoi-card">
+      <span class="ky-ptitre ky-ptitre-rose">Bon pour sa santé</span>
+      <p>Moins de troubles digestifs, un pelage plus sain, plus d&#x2019;énergie pour se balader.</p>
+    </div>
   </div>
-  <div class="diff-grid">
-    <div class="diff-card"><div class="diff-n">01</div><div class="diff-title">Vraiment sur-mesure</div><p class="diff-desc">Race, âge, poids, activité, sensibilités, saison : Kyno calcule les besoins réels de ton chien à partir de tous ses paramètres, et ajuste ses menus à mesure qu’il évolue.</p></div>
-    <div class="diff-card"><div class="diff-n">02</div><div class="diff-title">Adapté à ton quotidien</div><p class="diff-desc">Le menu s’ajuste aussi à ton budget. Liste de courses prête, recettes en batch cooking pour toute la semaine : tu gardes juste la cuisine. Une question ? Le chat de ton espace client répond en direct.</p></div>
-    <div class="diff-card"><div class="diff-n">03</div><div class="diff-title">Une vraie différence pour sa santé</div><p class="diff-desc">Une alimentation vraiment adaptée à sa race et à son âge, c’est moins de troubles digestifs, un pelage plus sain, et plus d’énergie pour courir et se balader.</p></div>
+  <!-- Tableau desktop -->
+  <div class="pourquoi-tableau-card">
+    <div class="pt-row pt-head">
+      <div>Ce que ça change</div>
+      <div class="pt-kyno">Avec Kyno</div>
+      <div class="pt-sans">Sans Kyno</div>
+    </div>
+    <div class="pt-row pt-data-row">
+      <div>Besoins nutritionnels couverts avec précision</div>
+      <div class="pt-ok"><span class="pt-check pt-check-ok">&#10003;</span>Calcul NRC / FEDIAF</div>
+      <div class="pt-no"><span class="pt-check pt-check-no">&#10007;</span>Estimation approximative</div>
+    </div>
+    <div class="pt-row pt-data-row">
+      <div>Carences et excès détectés en amont</div>
+      <div class="pt-ok"><span class="pt-check pt-check-ok">&#10003;</span>Alertes intégrées au profil</div>
+      <div class="pt-no"><span class="pt-check pt-check-no">&#10007;</span>Découverts trop tard</div>
+    </div>
+    <div class="pt-row pt-data-row">
+      <div>Adaptation aux intolérances et pathologies</div>
+      <div class="pt-ok"><span class="pt-check pt-check-ok">&#10003;</span>Intégrée dès le profil</div>
+      <div class="pt-no"><span class="pt-check pt-check-mid">~</span>Partiel ou absent</div>
+    </div>
+    <div class="pt-row pt-data-row">
+      <div>Ajustement selon la saison et l&#x2019;âge</div>
+      <div class="pt-ok"><span class="pt-check pt-check-ok">&#10003;</span>Mensuel et automatique</div>
+      <div class="pt-no"><span class="pt-check pt-check-no">&#10007;</span>Statique</div>
+    </div>
+    <div class="pt-row pt-data-row">
+      <div>Prévention des troubles digestifs, cutanés, articulaires</div>
+      <div class="pt-ok"><span class="pt-check pt-check-ok">&#10003;</span>Anticipé dans le plan</div>
+      <div class="pt-no"><span class="pt-check pt-check-no">&#10007;</span>Traité en curatif</div>
+    </div>
+    <div class="pt-row pt-data-row">
+      <div>Suivi santé proactif chaque mois</div>
+      <div class="pt-ok"><span class="pt-check pt-check-ok">&#10003;</span>Suivi mensuel adaptatif</div>
+      <div class="pt-no"><span class="pt-check pt-check-no">&#10007;</span>Uniquement en consultation</div>
+    </div>
   </div>
-</section>
-
-<!-- COMPARAISON -->
-<section class="s-compare">
-  <div class="s-label">L'impact concret</div>
-  <h2>Ce que ça change<br><span class="ky-sticker">pour ton chien.</span></h2>
-  <table class="compare-table">
-    <thead>
-      <tr>
-        <th style="width:40%">Ce que ça change</th>
-        <th class="th-kyno" style="width:30%">Avec Kyno</th>
-        <th class="th-others" style="width:30%">Sans Kyno</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td>Besoins nutritionnels couverts avec précision</td><td class="td-check">✓ Calcul NRC / FEDIAF</td><td class="td-cross">✗ Estimation approximative</td></tr>
-      <tr><td>Carences et excès détectés en amont</td><td class="td-check">✓ Alertes intégrées au profil</td><td class="td-cross">✗ Découverts trop tard</td></tr>
-      <tr><td>Adaptation aux intolérances &amp; pathologies</td><td class="td-check">✓ Intégrée dès le profil</td><td class="td-cross">Partiel ou absent</td></tr>
-      <tr><td>Ajustement selon la saison et l'âge</td><td class="td-check">✓ Mensuel et automatique</td><td class="td-cross">✗ Statique</td></tr>
-      <tr><td>Prévention des troubles digestifs, cutanés, articulaires</td><td class="td-check">✓ Anticipé dans le plan</td><td class="td-cross">✗ Traité en curatif</td></tr>
-      <tr><td>Suivi santé proactif chaque mois</td><td class="td-check">✓ Suivi mensuel adaptatif</td><td class="td-cross">✗ Uniquement en consultation</td></tr>
-    </tbody>
-  </table>
-
-  <!-- Version mobile : 6 cards empilées (visible sur tous les écrans <= 900px) -->
+  <!-- Tableau mobile : cartes empilées -->
   <div class="compare-mobile">
     <div class="cm-card">
       <div class="cm-row-title">Besoins nutritionnels couverts avec précision</div>
-      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> : Calcul NRC / FEDIAF</span></div>
-      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres : Estimation approximative</span></div>
+      <div class="cm-line kyno"><span class="cm-mark ok">&#10003;</span><span><strong>Kyno</strong> : Calcul NRC / FEDIAF</span></div>
+      <div class="cm-line others"><span class="cm-mark no">&#10007;</span><span>Les autres : Estimation approximative</span></div>
     </div>
     <div class="cm-card">
       <div class="cm-row-title">Carences et excès détectés en amont</div>
-      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> : Alertes intégrées au profil</span></div>
-      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres : Découverts trop tard</span></div>
+      <div class="cm-line kyno"><span class="cm-mark ok">&#10003;</span><span><strong>Kyno</strong> : Alertes intégrées au profil</span></div>
+      <div class="cm-line others"><span class="cm-mark no">&#10007;</span><span>Les autres : Découverts trop tard</span></div>
     </div>
     <div class="cm-card">
-      <div class="cm-row-title">Adaptation aux intolérances &amp; pathologies</div>
-      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> : Intégrée dès le profil</span></div>
-      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres : Partiel ou absent</span></div>
+      <div class="cm-row-title">Adaptation aux intolérances et pathologies</div>
+      <div class="cm-line kyno"><span class="cm-mark ok">&#10003;</span><span><strong>Kyno</strong> : Intégrée dès le profil</span></div>
+      <div class="cm-line others"><span class="cm-mark no">~</span><span>Les autres : Partiel ou absent</span></div>
     </div>
     <div class="cm-card">
-      <div class="cm-row-title">Ajustement selon la saison et l'âge</div>
-      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> : Mensuel et automatique</span></div>
-      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres : Statique</span></div>
+      <div class="cm-row-title">Ajustement selon la saison et l&#x2019;âge</div>
+      <div class="cm-line kyno"><span class="cm-mark ok">&#10003;</span><span><strong>Kyno</strong> : Mensuel et automatique</span></div>
+      <div class="cm-line others"><span class="cm-mark no">&#10007;</span><span>Les autres : Statique</span></div>
     </div>
     <div class="cm-card">
       <div class="cm-row-title">Prévention des troubles digestifs, cutanés, articulaires</div>
-      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> : Anticipé dans le plan</span></div>
-      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres : Traité en curatif</span></div>
+      <div class="cm-line kyno"><span class="cm-mark ok">&#10003;</span><span><strong>Kyno</strong> : Anticipé dans le plan</span></div>
+      <div class="cm-line others"><span class="cm-mark no">&#10007;</span><span>Les autres : Traité en curatif</span></div>
     </div>
     <div class="cm-card">
       <div class="cm-row-title">Suivi santé proactif chaque mois</div>
-      <div class="cm-line kyno"><span class="cm-mark ok">✓</span><span><strong>Kyno</strong> : Suivi mensuel adaptatif</span></div>
-      <div class="cm-line others"><span class="cm-mark no">✗</span><span>Les autres : Uniquement en consultation</span></div>
+      <div class="cm-line kyno"><span class="cm-mark ok">&#10003;</span><span><strong>Kyno</strong> : Suivi mensuel adaptatif</span></div>
+      <div class="cm-line others"><span class="cm-mark no">&#10007;</span><span>Les autres : Uniquement en consultation</span></div>
     </div>
   </div>
 </section>
