@@ -48,7 +48,8 @@ body{font-family:var(--font-texte);color:var(--aubergine);background:var(--papie
 .ky-btn:hover{transform:translate(-2px,-2px)}
 .ky-btn:active{transform:translate(2px,2px);box-shadow:none}
 .ky-btn:focus-visible,.ky-champ input:focus-visible,.ky-option:focus-visible,.ky-acc summary:focus-visible{outline:3px solid var(--canard);outline-offset:3px}
-.ky-btn-principal{background:var(--aubergine);color:var(--papier);box-shadow:var(--ombre-rouge)}
+.ky-btn-principal{background:var(--aubergine);color:var(--papier)}
+.ky-btn-principal:hover,.ky-btn-principal:active{background:#6E4A63}
 .ky-btn-action{background:var(--moutarde);color:var(--aubergine);box-shadow:var(--ombre-bd)}
 .ky-btn-secondaire{background:var(--blanc);color:var(--aubergine);box-shadow:var(--ombre-bd-petite)}
 .ky-btn[disabled]{background:var(--trait);color:var(--aubergine-doux);border-color:var(--trait);box-shadow:none;cursor:not-allowed;transform:none}

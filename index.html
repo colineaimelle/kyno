@@ -103,18 +103,14 @@ nav{
   height:56px;background:rgba(255,244,224,0.92);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border-bottom:1px solid var(--trait);
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:center;
   padding:0 48px;
 }
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.nav-links{display:flex;align-items:center;gap:36px;}
-.nav-links a{font-size:12px;color:var(--aubergine);text-decoration:none;opacity:0.7;transition:opacity 0.2s;font-weight:400;}
-.nav-links a:hover{opacity:1;}
-.nav-cta{display:inline-flex;align-items:center;justify-content:center;padding:8px 20px;min-height:36px;border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:14px;font-weight:700;background:var(--aubergine);color:var(--papier);box-shadow:var(--ombre-rouge);text-decoration:none;cursor:pointer;transition:transform .16s cubic-bezier(.22,.61,.36,1),box-shadow .16s;}
-.nav-cta:hover{transform:translate(-2px,-2px);}
-.nav-cta:active{transform:translate(2px,2px);box-shadow:none;}
-.nav-espace{font-size:12px;color:var(--canard);text-decoration:none;font-weight:600;padding:8px 16px;border-radius:var(--radius-pill);border:1.5px solid var(--turquoise);transition:all 0.2s;font-family:var(--font-texte);}
-.nav-espace:hover{background:var(--turquoise-pale);border-color:var(--canard);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+.nav-links{flex:1;display:flex;justify-content:center;align-items:center;gap:4px;}
+.nav-links a{font-family:var(--font-texte);font-size:16px;font-weight:600;color:#451A36;border-radius:999px;padding:10px 18px;text-decoration:none;transition:background 0.2s;}
+.nav-links a:hover,.nav-links a.active{background:#DDF3F1;}
+.nav-links a:focus-visible{outline:3px solid var(--canard);outline-offset:3px;}
 
 /* HERO BD */
 .hero-bd{padding-top:56px;min-height:100vh;}
@@ -449,15 +445,13 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   .nav-links{
     display:none;flex-direction:column;position:fixed;
     top:56px;left:0;right:0;z-index:199;
-    background:rgba(252,253,248,0.98);backdrop-filter:blur(12px);
-    border-bottom:2px solid var(--rouge);
-    padding:20px 28px 24px;gap:16px;
+    background:rgba(255,244,224,0.98);backdrop-filter:blur(12px);
+    border-bottom:2px solid var(--aubergine);
+    padding:16px 20px 20px;gap:4px;
   }
   .nav-links.open{display:flex;}
-  .nav-links a{font-size:14px;opacity:1;padding:8px 0;border-bottom:1px solid var(--trait);}
-  .nav-links a:last-child{border-bottom:none;}
-  .nav-cta{padding:12px 24px;text-align:center;}
-  .nav-espace{text-align:center;padding:8px 0!important;border:none!important;}
+  .nav-links a{font-size:16px;padding:12px 18px;border-radius:999px;border-bottom:none;text-align:left;}
+  .nav-links a:hover,.nav-links a.active{background:#DDF3F1;}
 }
 </style>
 </head>
@@ -474,8 +468,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
     <a href="#difference">Le concept</a>
     <a href="#comment">Comment ça marche</a>
     <a href="#offres">Tarifs</a>
-    <a href="login.html" class="nav-espace">Mon espace</a>
-    <a href="quiz.html" class="nav-cta" style="background:#451A36;color:#FFF4E0;">Créer le profil de mon chien</a>
+    <a href="login.html">Mon espace</a>
   </div>
   <button class="nav-burger" id="navBurger" onclick="toggleMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -575,10 +568,13 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
     <div style="position:relative;z-index:1;font-family:var(--font-titre);font-size:24px;text-align:center;line-height:1.3;"><span style="color:#FFF4E0;">Pas une recette.</span><br><span style="color:#451A36;">Son menu.</span></div>
   </div>
 
-  <!-- Case papier — première question quiz -->
-  <div class="ky-case" style="background:var(--papier);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:12px;padding:20px 24px;">
-    <p style="font-size:14px;font-weight:700;color:var(--aubergine);line-height:1.4;">Comment s'appelle ton chien ?</p>
-    <a href="quiz.html" class="ky-btn ky-btn-secondaire" style="font-size:14px;min-height:40px;padding:8px 18px;">Commencer gratuitement</a>
+  <!-- Case papier — saisie prénom -->
+  <div class="ky-case" style="background:var(--papier);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:10px;padding:20px 24px;">
+    <label for="heroPrenom" style="font-size:13px;font-weight:700;color:var(--aubergine);">Comment s'appelle ton chien ?</label>
+    <input id="heroPrenom" type="text" placeholder="Ex : Viva, Max…" autocomplete="off"
+      style="width:100%;border:2px solid var(--aubergine);border-radius:var(--radius-pill);padding:9px 16px;font-family:var(--font-texte);font-size:14px;color:var(--aubergine);background:#fff;box-sizing:border-box;"
+      onkeydown="if(event.key==='Enter')demarrerQuiz()">
+    <button onclick="demarrerQuiz()" class="ky-btn ky-btn-principal" style="font-size:14px;min-height:40px;padding:8px 18px;width:100%;">Continuer</button>
   </div>
 
 </section>
@@ -1048,6 +1044,11 @@ selectBreed('epagneul');
 
 
 <script>
+function demarrerQuiz(){
+  var n = (document.getElementById('heroPrenom')||{}).value||'';
+  if(n.trim()) sessionStorage.setItem('kyno_prenom', n.trim());
+  window.location.href='quiz.html';
+}
 function toggleMenu(){
   var links = document.getElementById('navLinks');
   var burger = document.getElementById('navBurger');
