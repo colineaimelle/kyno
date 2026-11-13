@@ -95,6 +95,7 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{font-family:var(--font-texte);background:var(--papier);color:var(--aubergine);font-weight:400;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+:focus-visible{outline:3px solid var(--canard);outline-offset:3px;}
 
 /* NAV */
 nav{
@@ -119,7 +120,7 @@ nav{
 .hero-bd{padding-top:56px;min-height:100vh;}
 .hero-bd .ky-case-grande{grid-column:1;grid-row:1/span 4;}
 .eyebrow{font-size:13px;color:var(--aubergine);font-weight:700;}
-h1{font-family:var(--font-titre);font-size:clamp(44px,5vw,68px);line-height:1.08;font-weight:400;font-synthesis:none;color:var(--aubergine);margin:0;}
+h1{font-family:var(--font-titre);font-size:clamp(44px,6.5vw,78px);line-height:1.08;font-weight:400;font-synthesis:none;color:var(--aubergine);margin:0;}
 .hero-desc{font-size:16px;line-height:1.8;color:var(--aubergine);max-width:430px;font-weight:400;}
 .hero-fineprint{font-size:12px;color:var(--aubergine-doux);font-weight:400;margin-top:4px;}
 .hero-proof{display:flex;gap:28px;padding-top:20px;border-top:2px solid var(--aubergine);}
@@ -412,7 +413,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   .faq-q{font-size:16px;padding:20px 22px;}
 }
 @media(max-width:560px){
-  h1{font-size:42px;}
+  h1{font-size:44px;}
   .fiche-panel{padding:22px;}
 }
 
@@ -464,9 +465,9 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 <section class="ky-planche hero-bd">
 
   <!-- Grande case gauche — col 1, rows 1-4 -->
-  <div class="ky-case ky-case-grande" style="background:var(--turquoise-pale);grid-column:1;grid-row:1/span 4;display:flex;align-items:center;justify-content:space-between;gap:40px;padding:80px 40px 80px 64px;min-height:92vh;">
+  <div class="ky-case ky-case-grande" style="background:var(--turquoise);grid-column:1;grid-row:1/span 4;display:flex;align-items:center;justify-content:space-between;gap:40px;padding:80px 40px 80px 64px;min-height:92vh;">
     <div style="max-width:400px;display:flex;flex-direction:column;gap:24px;">
-      <div class="eyebrow">Nutrition canine individualisée</div>
+      <img src="kyno-logo.svg" alt="Kyno" height="40" style="width:auto;display:block;">
       <h1>Le nutritionniste personnel de <span class="ky-sticker ky-sticker-moutarde">ton chien.</span></h1>
       <p class="hero-desc">Kyno crée chaque semaine des repas faits maison, adaptés à son âge, sa race, son activité et sa santé.</p>
       <div>

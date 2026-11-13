@@ -443,8 +443,8 @@ async function sendEmailRelance(email, prenom) {
       htmlContent: `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#F3F7F1;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F3F7F1;padding:48px 20px;">
+<body style="margin:0;padding:0;background:#FFF4E0;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFF4E0;padding:48px 20px;">
     <tr><td align="center">
     <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
       <tr>
@@ -453,25 +453,25 @@ async function sendEmailRelance(email, prenom) {
         </td>
       </tr>
       <tr>
-        <td style="background:#FFFFFF;border-radius:20px;padding:40px 36px;border:1px solid #F6E7F3;text-align:center;">
+        <td style="background:#FFFFFF;border-radius:20px;padding:40px 36px;border:1px solid #E8DCC6;text-align:center;">
           <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:16px;">
-            <circle cx="26" cy="26" r="26" fill="#FBE4D8"/>
+            <circle cx="26" cy="26" r="26" fill="#FCEBC4"/>
             <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
             <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-            <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#FF5A3C"/>
+            <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#E5432F"/>
             <circle cx="22" cy="27" r="1.4" fill="#451A36"/>
             <circle cx="30" cy="27" r="1.4" fill="#451A36"/>
             <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#451A36" stroke-width="1.4" stroke-linecap="round" fill="none"/>
             <ellipse cx="26" cy="30.5" rx="1.4" ry="1" fill="#451A36"/>
           </svg>
-          <p style="margin:0 0 10px;font-size:19px;font-weight:700;color:#451A36;line-height:1.4;">Des nouvelles de <span style="color:#8A3A7C;">${prenom}</span> ?</p>
-          <p style="margin:0 0 28px;font-size:14px;color:#8A978A;line-height:1.8;max-width:380px;margin-left:auto;margin-right:auto;">Ça fait deux semaines qu'on ne t'a pas vue par ici. Le nouveau menu de la semaine est prêt quand tu veux faire le point.</p>
-          <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Voir l'espace de ${prenom} →</a>
+          <p style="margin:0 0 10px;font-size:19px;font-weight:700;color:#451A36;line-height:1.4;">Des nouvelles de <span style="color:#17706C;">${prenom}</span> ?</p>
+          <p style="margin:0 0 28px;font-size:14px;color:#6E4A63;line-height:1.8;max-width:380px;margin-left:auto;margin-right:auto;">Ça fait deux semaines qu'on ne t'a pas vue par ici. Le nouveau menu de la semaine est prêt quand tu veux faire le point.</p>
+          <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:#FFF4E0;padding:14px 30px;border-radius:999px;text-decoration:none;font-size:14px;font-weight:700;">Voir l'espace de ${prenom} →</a>
         </td>
       </tr>
       <tr>
         <td style="padding:24px 32px 0;text-align:center;">
-          <a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:#9AA69B;text-decoration:none;">kyno · colinemngl@gmail.com</a>
+          <a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:#6E4A63;text-decoration:none;">kyno · colinemngl@gmail.com</a>
         </td>
       </tr>
     </table>

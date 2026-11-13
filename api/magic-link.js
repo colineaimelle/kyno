@@ -373,13 +373,13 @@ function buildEmailMenuHtml(prenom, htmlContent) {
       <tr>
         <td style="background:#451A36;border-radius:16px 16px 0 0;padding:36px 48px;text-align:center;border-bottom:3px solid #B8301D;">
           <img src="${SITE_URL}/kyno-logo-clair.png" alt="Kyno" height="40" style="display:block;margin:0 auto 8px;">
-          <p style="margin:0;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.35);">Nutrition Canine Individualisée</p>
+          <p style="margin:0;font-size:10px;color:rgba(245,240,232,0.35);">Nutrition canine individualisée</p>
         </td>
       </tr>
 
       <tr>
         <td style="background:#451A36;padding:20px 48px;border-bottom:3px solid #E5432F;">
-          <p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Menu personnalisé, semaine 1</p>
+          <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.7);font-weight:600;">Menu personnalisé, semaine 1</p>
           <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FFF4E0;">Le menu de la semaine de <em style="font-style:normal;color:#F2B630;">${prenom}</em></p>
         </td>
       </tr>
@@ -403,9 +403,9 @@ function buildEmailMenuHtml(prenom, htmlContent) {
       <tr>
         <td style="background:#FFF4E0;padding:32px 48px 40px;">
           <div style="background:#451A36;border-radius:14px;padding:36px;text-align:center;border:3px solid #E5432F;">
-            <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(245,240,232,0.4);">Ton espace Kyno</p>
+            <p style="margin:0 0 6px;font-size:10px;color:rgba(245,240,232,0.4);">Ton espace Kyno</p>
             <p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#FFF4E0;line-height:1.3;">Retrouve ce menu<br><span style="font-size:14px;font-weight:400;color:rgba(245,240,232,0.5);">et discute des évolutions de ${prenom} avec Kyno</span></p>
-            <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:white;padding:16px 32px;border-radius:4px;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.04em;border:2px solid #E5432F;">Accéder à mon espace →</a>
+            <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#E5432F;color:#FFF4E0;padding:16px 32px;border-radius:999px;text-decoration:none;font-size:13px;font-weight:700;border:2px solid #451A36;">Accéder à mon espace →</a>
           </div>
         </td>
       </tr>
@@ -423,8 +423,8 @@ function buildEmailMenuHtml(prenom, htmlContent) {
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td>
-                <p style="margin:0;font-size:13px;font-weight:700;color:#FFF4E0;letter-spacing:0.04em;">kyno</p>
-                <p style="margin:4px 0 0;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(245,240,232,0.25);">Lyon, France</p>
+                <p style="margin:0;font-size:13px;font-weight:700;color:#FFF4E0;">kyno</p>
+                <p style="margin:4px 0 0;font-size:10px;color:rgba(245,240,232,0.25);">Lyon, France</p>
               </td>
               <td align="right">
                 <a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:rgba(245,240,232,0.35);text-decoration:none;">colinemngl@gmail.com</a>
