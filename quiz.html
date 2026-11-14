@@ -95,19 +95,18 @@ html{scroll-behavior:smooth;}
 body{font-family:var(--font-texte);background:var(--papier);color:var(--aubergine);font-weight:400;min-height:100vh;-webkit-font-smoothing:antialiased;}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(60% 50% at 100% 0%,var(--turquoise-pale) 0%,transparent 55%),radial-gradient(50% 45% at 0% 100%,var(--moutarde-pale) 0%,transparent 55%),radial-gradient(55% 40% at 0% 0%,var(--turquoise-pale) 0%,transparent 50%);opacity:0.6;}
 
-/* NAV — identique landing */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:56px;background:rgba(255,244,224,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--trait);display:flex;align-items:center;justify-content:space-between;padding:0 28px;}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.logo-mark{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--canard);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.logo-mark span{font-family:var(--font-texte);font-weight:700;font-size:18px;color:var(--canard);line-height:1;margin-top:-1px;}
-.logo-word{font-family:var(--font-titre);font-weight:600;font-size:21px;letter-spacing:0.04em;color:var(--aubergine);}
-.nav-step{font-family:var(--font-texte);font-size:12px;color:var(--canard);font-weight:700;letter-spacing:0.04em;background:var(--turquoise-pale);padding:6px 13px;border-radius:999px;border:1.5px solid var(--turquoise);}
+/* QUIZ HEADER */
+.quiz-header{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--papier);border-bottom:3px solid var(--trait);padding:16px 48px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.quiz-logo-link img{height:34px;display:block;}
+.quiz-counter-wrap{display:flex;flex-direction:column;gap:8px;width:420px;}
+.quiz-counter{font-family:var(--font-texte);font-size:15px;font-weight:700;text-align:center;}
+.quiz-segs{display:flex;gap:6px;}
+.quiz-seg{height:12px;border:2px solid var(--aubergine);border-radius:999px;background:#fff;overflow:hidden;}
+.quiz-seg-fill{height:100%;background:var(--canard);transition:width 0.45s cubic-bezier(.22,.61,.36,1);width:0%;}
+.quiz-quitter{font-family:var(--font-texte);font-size:15px;font-weight:700;color:var(--aubergine-doux);text-decoration:none;white-space:nowrap;}
+.quiz-quitter:hover{color:var(--aubergine);}
 
-/* PROGRESS — 5px, vert sage */
-.progress-bar{position:fixed;top:56px;left:0;right:0;z-index:199;height:5px;background:var(--trait);}
-.progress-fill{height:100%;background:var(--canard);transition:width 0.45s cubic-bezier(.22,.61,.36,1);width:5%;}
-
-.wrap{max-width:640px;margin:0 auto;padding:120px 24px 90px;}
+.quiz-wrap{max-width:1280px;margin:0 auto;padding:100px 24px 40px;}
 .step{display:none;}
 .step.active{display:block;animation:fadeUp 0.45s cubic-bezier(.22,.61,.36,1) both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
@@ -192,10 +191,6 @@ textarea{resize:vertical;min-height:100px;}
 .step-error::before{content:"!";display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#D6452F;color:#fff;font-family:var(--font-texte);font-size:12px;font-weight:700;flex-shrink:0;}
 .error-msg{display:none;background:var(--rose-pale);border:2px solid var(--rouge);border-radius:11px;padding:13px 16px;font-size:13.5px;color:#B8301D;font-weight:500;margin-top:14px;}
 
-/* BADGE BETA */
-.beta-badge{display:inline-flex;align-items:center;gap:8px;background:var(--moutarde-pale);color:var(--aubergine);font-family:var(--font-texte);font-size:11px;font-weight:700;padding:7px 14px;border-radius:999px;margin-bottom:22px;border:2px solid var(--moutarde);}
-.beta-dot{width:7px;height:7px;border-radius:50%;background:var(--rouge);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
 
 /* ACTIVITÉ — cards illustrées */
 .activite-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
@@ -257,23 +252,23 @@ textarea{resize:vertical;min-height:100px;}
 </head>
 <body>
 
-<nav>
-  <a href="index.html" class="nav-logo">
-    <img src="kyno-logo.svg" alt="Kyno" height="30">
-  </a>
-  <span class="nav-step" id="navStep">Question 1 / 21</span>
-</nav>
+<header class="quiz-header">
+  <a href="index.html" class="quiz-logo-link"><img src="kyno-logo.svg" alt="Kyno" height="34"></a>
+  <div class="quiz-counter-wrap">
+    <span class="quiz-counter" id="quizCounter">Question 1 sur 21</span>
+    <div class="quiz-segs">
+      <div class="quiz-seg" style="flex:6"><div class="quiz-seg-fill" id="fill0"></div></div>
+      <div class="quiz-seg" style="flex:7"><div class="quiz-seg-fill" id="fill1"></div></div>
+      <div class="quiz-seg" style="flex:6"><div class="quiz-seg-fill" id="fill2"></div></div>
+      <div class="quiz-seg" style="flex:2"><div class="quiz-seg-fill" id="fill3"></div></div>
+    </div>
+  </div>
+  <a href="index.html" class="quiz-quitter">Quitter le quiz</a>
+</header>
 
-
-
-<div class="progress-bar">
-  <div class="progress-fill" id="progressFill"></div>
-</div>
-
-<div class="wrap" id="quizWrap">
+<div class="quiz-wrap" id="quizWrap">
   <!-- Q1 — PRÉNOM -->
   <div class="step active" data-step="1">
-    <div class="beta-badge"><div class="beta-dot"></div>Bêta gratuite, 100 places</div>
     <div class="step-num">Profil · 1 / 6</div>
     <h2 class="step-question">Comment s'appelle<br><em>ton chien ?</em></h2>
     <p class="step-hint">Son prénom apparaîtra dans tout son rapport nutritionnel personnalisé.</p>
@@ -934,8 +929,8 @@ if (IS_AJOUT) {
   document.title = 'Kyno : Ajouter un chien';
   const visible = [];
   for (let i = 1; i <= total; i++) if (!FOYER_STEPS.has(i)) visible.push(i);
-  document.getElementById('navStep').textContent = 'Question 1 / ' + visible.length;
-  document.getElementById('progressFill').style.width = Math.round(1 / visible.length * 100) + '%';
+  const counter = document.getElementById('quizCounter');
+  if (counter) counter.textContent = 'Question 1 sur ' + visible.length;
 }
 
 
@@ -1121,16 +1116,29 @@ function show(step) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.querySelector(`[data-step="${step}"]`)?.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
-  let displayStep = step, displayTotal = total;
+
+  // 4-segment progress (Profil 6, Santé 7, Projet 6, Fin 2)
+  const segs = [{start:1,end:6,count:6},{start:7,end:13,count:7},{start:14,end:19,count:6},{start:20,end:21,count:2}];
+  const fills = [0,0,0,0];
+  for (let i = 0; i < 4; i++) {
+    const s = segs[i];
+    if (step > s.end) fills[i] = 100;
+    else if (step >= s.start) fills[i] = Math.round((step - s.start + 1) / s.count * 100);
+  }
+  if (step >= 22) fills[3] = 100;
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById(`fill${i}`);
+    if (el) el.style.width = fills[i] + '%';
+  }
+
+  let counterText = step <= 21 ? `Question ${step} sur 21` : 'Question finale';
   if (IS_AJOUT) {
     const visible = [];
     for (let i = 1; i <= total; i++) if (!FOYER_STEPS.has(i)) visible.push(i);
-    displayTotal = visible.length;
-    displayStep = visible.indexOf(step) + 1;
+    counterText = `Question ${visible.indexOf(step)+1} sur ${visible.length}`;
   }
-  const pct = Math.round((displayStep / displayTotal) * 100);
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('navStep').textContent = `Question ${displayStep} / ${displayTotal}`;
+  const counter = document.getElementById('quizCounter');
+  if (counter) counter.textContent = counterText;
 }
 
 function saveText(step) {
