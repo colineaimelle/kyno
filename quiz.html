@@ -265,15 +265,18 @@ textarea{resize:vertical;min-height:100px;}
   .quiz-quitter{order:2;}
   .quiz-counter-wrap{order:3;width:100%;}
   .quiz-wrap{padding:12px 12px calc(90px + env(safe-area-inset-bottom));}
-  .planche{grid-template-columns:1fr;min-height:auto;}
-  .planche-d{order:1;height:130px;width:100%;justify-content:center;align-items:center;flex-direction:row;padding-top:0;gap:16px;}
-  .planche-g{order:2;padding:24px 20px;gap:16px;}
-  .viva-bulle-wrap{width:200px;height:100px;flex-shrink:0;}
-  .viva-bulle-txt{font-size:15px;top:18px;}
-  .viva-disque{width:110px;height:110px;margin-bottom:0;flex-shrink:0;}
-  .viva-illo{width:82px;margin-top:-8px;}
+  .planche{grid-template-columns:1fr;min-height:auto;padding:8px;gap:8px;}
+  .planche-d{order:1;height:96px;width:100%;justify-content:center;align-items:center;flex-direction:row;padding-top:0;gap:10px;}
+  .planche-g{order:2;padding:18px 16px;gap:12px;}
+  .viva-bulle-wrap{width:155px;height:74px;flex-shrink:0;}
+  .viva-bulle-txt{font-size:11px;top:12px;}
+  .viva-disque{width:84px;height:84px;margin-bottom:0;flex-shrink:0;}
+  .viva-illo{width:62px;margin-top:-4px;}
   .step-question{font-size:30px;}
-  .narrateur{font-size:14px;}
+  .step-hint{font-size:15px;line-height:1.4;}
+  .narrateur{font-size:13px;padding:4px 10px;}
+  .narrateur[data-short]{font-size:0;}
+  .narrateur[data-short]::before{content:attr(data-short);font-size:13px;font-weight:700;}
   .bd-cards{grid-template-columns:repeat(2,1fr);gap:10px;}
   .bd-cards.cols-4{grid-template-columns:repeat(2,1fr);}
   .bd-cards.cols-3{grid-template-columns:repeat(2,1fr);}
@@ -330,7 +333,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step active" data-step="1">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 1 : son profil · question 1 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 1 · question 1 sur 6">Chapitre 1 : son profil · question 1 sur 6</span>
         <div>
           <h2 class="step-question">Comment s'appelle<br><em>ton chien ?</em></h2>
           <p class="step-hint">Son prénom apparaîtra dans tout son rapport nutritionnel personnalisé.</p>
@@ -350,7 +353,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="2">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 1 : son profil · question 2 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 1 · question 2 sur 6">Chapitre 1 : son profil · question 2 sur 6</span>
         <div>
           <h2 class="step-question">Quelle est<br><em>sa race ?</em></h2>
           <p class="step-hint">Si croisé, indique le croisement principal. Chaque race a des prédispositions nutritionnelles spécifiques.</p>
@@ -371,7 +374,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="3">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 1 : son profil · question 3 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 1 · question 3 sur 6">Chapitre 1 : son profil · question 3 sur 6</span>
         <div>
           <h2 class="step-question">Quel âge<br><em>a <span id="q3Prenom">ton chien</span> ?</em></h2>
           <p class="step-hint">L'âge détermine ses besoins énergétiques et le ratio calcium/phosphore idéal.</p>
@@ -397,7 +400,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="4">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 1 : son profil · question 4 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 1 · question 4 sur 6">Chapitre 1 : son profil · question 4 sur 6</span>
         <div>
           <h2 class="step-question" id="q4Title">Combien pèse-t-il<br><em>en kg ?</em></h2>
           <p class="step-hint">La base du calcul de ses besoins caloriques selon la formule NRC.</p>
@@ -431,7 +434,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="5">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 1 : son profil · question 5 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 1 · question 5 sur 6">Chapitre 1 : son profil · question 5 sur 6</span>
         <div>
           <h2 class="step-question" id="q5Title">C'est un garçon<br><em>ou une fille ?</em></h2>
           <p class="step-hint">La stérilisation réduit les besoins énergétiques de 20 à 30 %, un ajustement crucial.</p>
@@ -461,7 +464,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="6">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 1 : son profil · question 6 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 1 · question 6 sur 6">Chapitre 1 : son profil · question 6 sur 6</span>
         <div>
           <h2 class="step-question">Son niveau<br><em>d'activité de <span id="q6Prenom">ton chien</span></em></h2>
           <p class="step-hint">Un chien très actif peut avoir des besoins caloriques 2× supérieurs à un chien sédentaire.</p>
@@ -485,7 +488,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="7">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 2 : sa santé · question 1 sur 7</span>
+        <span class="narrateur" data-short="Chapitre 2 · question 1 sur 7">Chapitre 2 : sa santé · question 1 sur 7</span>
         <div>
           <h2 class="step-question">Comment le<br><em>nourris-tu ?</em></h2>
           <p class="step-hint">Plusieurs choix possibles. Kyno analysera ce qui manque dans son alimentation actuelle.</p>
@@ -514,7 +517,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="8">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 2 : sa santé · question 2 sur 7</span>
+        <span class="narrateur" data-short="Chapitre 2 · question 2 sur 7">Chapitre 2 : sa santé · question 2 sur 7</span>
         <div>
           <h2 class="step-question">Un vétérinaire a-t-il<br><em>diagnostiqué une maladie ?</em></h2>
           <p class="step-hint">Ces informations permettent d'adapter le plan nutritionnel en toute sécurité.</p>
@@ -566,7 +569,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="9">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 2 : sa santé · question 3 sur 7</span>
+        <span class="narrateur" data-short="Chapitre 2 · question 3 sur 7">Chapitre 2 : sa santé · question 3 sur 7</span>
         <div>
           <h2 class="step-question">Est-il sous<br><em>traitement ?</em></h2>
           <p class="step-hint">Médicaments, antiparasitaires, compléments. Certains interagissent avec l'alimentation.</p>
@@ -594,7 +597,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="10">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 2 : sa santé · question 4 sur 7</span>
+        <span class="narrateur" data-short="Chapitre 2 · question 4 sur 7">Chapitre 2 : sa santé · question 4 sur 7</span>
         <div>
           <h2 class="step-question">Des petits tracas<br><em>au quotidien ?</em></h2>
           <p class="step-hint">Plusieurs choix. Ces signaux nous permettent d'adapter les recettes et les compléments.</p>
@@ -628,7 +631,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="11">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 2 : sa santé · question 5 sur 7</span>
+        <span class="narrateur" data-short="Chapitre 2 · question 5 sur 7">Chapitre 2 : sa santé · question 5 sur 7</span>
         <div>
           <h2 class="step-question">A-t-il déjà eu des<br><em>réactions allergiques ?</em></h2>
           <p class="step-hint">Cutanées, digestives ou les deux.</p>
@@ -661,7 +664,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="12">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 2 : sa santé · question 6 sur 7</span>
+        <span class="narrateur" data-short="Chapitre 2 · question 6 sur 7">Chapitre 2 : sa santé · question 6 sur 7</span>
         <div>
           <h2 class="step-question">Des intolérances<br><em>alimentaires connues ?</em></h2>
           <p class="step-hint">Ces ingrédients seront exclus de tous ses menus, y compris dans les compléments.</p>
@@ -696,7 +699,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="13">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 2 : sa santé · question 7 sur 7</span>
+        <span class="narrateur" data-short="Chapitre 2 · question 7 sur 7">Chapitre 2 : sa santé · question 7 sur 7</span>
         <div>
           <h2 class="step-question">Son comportement<br><em>et son caractère ?</em></h2>
           <p class="step-hint">Plusieurs choix. Certains comportements sont liés à des carences nutritionnelles.</p>
@@ -725,7 +728,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="14">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 3 : ton projet · question 1 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 3 · question 1 sur 6">Chapitre 3 : ton projet · question 1 sur 6</span>
         <div>
           <h2 class="step-question">Quel mode de cuisine<br><em>t'attire ?</em></h2>
           <p class="step-hint">Les menus seront entièrement adaptés à ton choix et tes contraintes.</p>
@@ -749,7 +752,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="15">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 3 : ton projet · question 2 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 3 · question 2 sur 6">Chapitre 3 : ton projet · question 2 sur 6</span>
         <div>
           <h2 class="step-question">Quel budget pour<br><em>son alimentation ?</em></h2>
           <p class="step-hint">Par semaine, pour les ingrédients frais. Le coût varie selon la taille de ton chien.</p>
@@ -772,7 +775,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="16">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 3 : ton projet · question 3 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 3 · question 3 sur 6">Chapitre 3 : ton projet · question 3 sur 6</span>
         <div>
           <h2 class="step-question">Quel équipement<br><em>en cuisine ?</em></h2>
           <p class="step-hint">Plusieurs choix. Les recettes s'adapteront à ce que tu as.</p>
@@ -798,7 +801,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="17">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 3 : ton projet · question 4 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 3 · question 4 sur 6">Chapitre 3 : ton projet · question 4 sur 6</span>
         <div>
           <h2 class="step-question">Combien de temps<br><em>pour cuisiner par semaine ?</em></h2>
           <p class="step-hint">Honnêtement, les menus seront adaptés à ta réalité.</p>
@@ -822,7 +825,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="18">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 3 : ton projet · question 5 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 3 · question 5 sur 6">Chapitre 3 : ton projet · question 5 sur 6</span>
         <div>
           <h2 class="step-question">Où fais-tu<br><em>tes courses ?</em></h2>
           <p class="step-hint">Plusieurs choix. Les ingrédients recommandés tiendront compte de tes habitudes.</p>
@@ -849,7 +852,7 @@ textarea{resize:vertical;min-height:100px;}
   <div class="step" data-step="19">
     <div class="planche">
       <section class="planche-g">
-        <span class="narrateur">Chapitre 3 : ton projet · question 6 sur 6</span>
+        <span class="narrateur" data-short="Chapitre 3 · question 6 sur 6">Chapitre 3 : ton projet · question 6 sur 6</span>
         <div>
           <h2 class="step-question">Quel est ton<br><em>objectif principal ?</em></h2>
           <p class="step-hint">Plusieurs choix. Ce qui t'a amené à chercher une meilleure alimentation pour ton chien.</p>
@@ -1363,6 +1366,7 @@ function prevTrans(n) { current = n === 1 ? 6 : 13; show(current); }
 function show(step) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.querySelector(`[data-step="${step}"]`)?.classList.add('active');
+  document.activeElement?.blur();
   window.scrollTo({top:0,behavior:'smooth'});
 
   if (step === 'trans1' || step === 'trans2') return;
