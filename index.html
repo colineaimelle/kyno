@@ -127,8 +127,6 @@ h1{font-family:var(--font-titre);font-size:clamp(44px,5vw,64px);line-height:1.08
 .hero-bd .hero-case-rouge{grid-column:3;grid-row:2;}
 .hero-bd .hero-case-papier{grid-column:2/span 2;grid-row:3;}
 /* bouton hero */
-.hero-content .ky-btn-principal{background:var(--rouge);color:var(--papier);box-shadow:none;}
-.hero-content .ky-btn-principal:hover,.hero-content .ky-btn-principal:active{background:#B8301D;}
 /* grande case */
 .hero-grande{position:relative;overflow:hidden;background:var(--turquoise);display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:0!important;padding:32px 40px 40px 40px!important;}
 .hero-grande-bg{position:absolute;inset:0;border-radius:var(--radius-case);overflow:hidden;pointer-events:none;background:repeating-conic-gradient(from 0deg at 72% 82%,#2BB3AE 0deg 7deg,#3FC0BB 7deg 14deg);opacity:.45;}
@@ -487,8 +485,6 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 .ky-pastille-rose{background:var(--rose-pale);}
 .ky-pastille-papier{background:var(--papier);}
 .ky-pastille-blanc{background:var(--blanc);}
-.ky-btn-rouge{background:var(--rouge);color:var(--papier);}
-.ky-btn-rouge:hover,.ky-btn-rouge:focus{background:var(--rouge-fonce);}
 .ky-sticker-turquoise{background:var(--turquoise);color:var(--aubergine);}
 .ky-sticker-rose{background:var(--rose);color:var(--aubergine);}
 .ky-sticker-lg{font-size:28px;}
@@ -602,10 +598,12 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 .tarif-liste{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;}
 .tarif-liste li{display:flex;gap:10px;font-size:16px;line-height:1.45;}
 .tarif-liste .tl-check{flex:none;font-weight:700;color:var(--canard);}
-.tarif-btn-sec{display:inline-flex;align-items:center;justify-content:center;padding:13px 24px;border:3px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:17px;font-weight:700;text-decoration:none;color:var(--aubergine);background:var(--blanc);margin-top:8px;align-self:flex-start;}
-.tarif-btn{display:inline-flex;align-items:center;justify-content:center;padding:16px 26px;border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:17px;font-weight:700;text-decoration:none;color:var(--papier);background:var(--aubergine);margin-top:4px;align-self:flex-start;}
+.tarif-btn-sec{display:inline-flex;align-items:center;justify-content:center;padding:13px 24px;border:3px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:17px;font-weight:700;text-decoration:none;color:var(--aubergine);background:var(--blanc);margin-top:8px;align-self:flex-start;transition:background .15s;}
+.tarif-btn-sec:hover{background:var(--moutarde-pale);}
+.tarif-btn{display:inline-flex;align-items:center;justify-content:center;padding:16px 26px;border:3px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:17px;font-weight:700;text-decoration:none;color:var(--aubergine);background:var(--moutarde);margin-top:4px;align-self:flex-start;transition:background .15s;}
+.tarif-btn:hover{background:#E5A51F;}
 /* Places fondatrices */
-.places-bandeau{position:relative;background:var(--aubergine);color:var(--papier);border-radius:24px;border:4px solid var(--aubergine);box-shadow:8px 8px 0 var(--rouge);padding:30px 40px 30px 230px;min-height:170px;display:flex;flex-direction:column;justify-content:center;}
+.places-bandeau{position:relative;background:var(--moutarde);color:var(--aubergine);border-radius:24px;border:4px solid var(--aubergine);box-shadow:8px 8px 0 var(--aubergine);padding:30px 40px 30px 230px;min-height:170px;display:flex;flex-direction:column;justify-content:center;}
 .places-xpl-wrap{position:absolute;left:24px;top:50%;transform:translateY(-50%);}
 .places-xpl{position:relative;width:200px;height:200px;transform:rotate(-10deg);}
 .places-xpl svg{position:absolute;inset:0;width:100%;height:100%;}
@@ -830,7 +828,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
     <input id="heroPrenom" type="text" placeholder="Ex : Viva, Max…" autocomplete="off"
       style="width:100%;border:2px solid var(--aubergine);border-radius:var(--radius-pill);padding:8px 16px;font-family:var(--font-texte);font-size:14px;color:var(--aubergine);background:#fff;box-sizing:border-box;"
       onkeydown="if(event.key==='Enter')demarrerQuiz()">
-    <button onclick="demarrerQuiz()" class="ky-btn ky-btn-principal" style="font-size:14px;min-height:40px;padding:8px 18px;width:100%;">Continuer</button>
+    <button onclick="demarrerQuiz()" class="ky-btn ky-btn-action" style="font-size:14px;min-height:40px;padding:8px 18px;width:100%;">Continuer</button>
   </div>
 
 </section>
@@ -874,7 +872,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
           <p class="how-new-desc">Chaque semaine, un nouveau menu s&#x2019;adapte à la saison et à l&#x2019;évolution de ton chien. Une question ? Le chat de ton espace client répond à tout moment.</p>
         </div>
       </div>
-      <a href="quiz.html" class="ky-btn ky-btn-rouge">Faire le bilan gratuit</a>
+      <a href="quiz.html" class="ky-btn ky-btn-principal">Faire le bilan gratuit</a>
     </div>
     <div class="s-comment-right">
       <div class="s-fiche-wrap">
@@ -1049,7 +1047,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
         <p>100<small>places</small></p>
       </div>
     </div>
-    <p class="places-titre">Places fondatrices : <span class="ky-sticker ky-sticker-moutarde ky-sticker-lg">Kyno+ à 12 &#x20AC;/mois.</span></p>
+    <p class="places-titre">Places fondatrices : <span class="ky-sticker ky-sticker-lg">Kyno+ à 12 &#x20AC;/mois.</span></p>
     <p class="places-desc">Les 100 premiers abonnés, bêta-testeurs compris, ont Kyno+ à 12 &#x20AC;/mois et le chien supplémentaire à 6 &#x20AC;/mois. Tarif garanti tant que ton abonnement reste actif, perdu en cas de résiliation.</p>
   </div>
   <p class="tarif-annuel-note">Formule annuelle : engagement de 12 mois, payé en une fois et renouvelé automatiquement. Tu peux désactiver le renouvellement à tout moment, et l&#x2019;année en cours n&#x2019;est pas remboursée.</p>
@@ -1119,7 +1117,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
     <h2 class="s-cta-h2">Ton chien mérite une nutrition qui lui <span class="ky-sticker ky-sticker-moutarde">ressemble.</span></h2>
     <p class="s-cta-desc">Commence par le bilan nutritionnel gratuit. 100 places fondatrices pour Kyno+ à 12 &#x20AC;/mois.</p>
     <div class="s-cta-actions">
-      <a href="quiz.html" class="ky-btn ky-btn-rouge">Faire le bilan gratuit</a>
+      <a href="quiz.html" class="ky-btn ky-btn-principal">Faire le bilan gratuit</a>
       <span class="s-cta-note">Résiliable à tout moment.</span>
     </div>
   </div>

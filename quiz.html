@@ -177,14 +177,15 @@ textarea{resize:vertical;min-height:100px;}
 
 /* NAV BOUTONS */
 .step-nav{display:flex;gap:12px;margin-top:28px;align-items:center;}
-.btn-next{flex:1;padding:16px;background:var(--aubergine);color:var(--papier);border:4px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:15px;font-weight:700;cursor:pointer;transition:transform 0.16s cubic-bezier(.22,.61,.36,1),background 0.16s;}
-.btn-next:hover,.btn-next:active{background:#6E4A63;}
+.btn-next{flex:1;padding:16px;background:var(--moutarde);color:var(--aubergine);border:3px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:15px;font-weight:700;cursor:pointer;transition:transform 0.16s cubic-bezier(.22,.61,.36,1),background 0.16s;}
+.btn-next:hover,.btn-next:active{background:#E5A51F;}
 .btn-next:hover{transform:translate(-2px,-2px);}
 .btn-next:active{transform:translate(2px,2px);}
-.btn-next:disabled{background:var(--trait);border-color:var(--trait);box-shadow:none;cursor:not-allowed;color:var(--aubergine-doux);}
+.btn-next:disabled{background:var(--trait);border-color:var(--trait);cursor:not-allowed;color:var(--aubergine-doux);}
 .btn-next:focus-visible{outline:3px solid var(--canard);outline-offset:3px;}
-.btn-back{padding:14px 24px;background:var(--blanc);color:var(--aubergine);border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:15px;font-weight:700;cursor:pointer;box-shadow:var(--ombre-bd-petite);transition:transform 0.16s,box-shadow 0.16s;}
-.btn-back:hover{transform:translate(-2px,-2px);}
+.btn-back{padding:14px 24px;background:var(--blanc);color:var(--aubergine);border:3px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:15px;font-weight:700;cursor:pointer;transition:transform 0.16s,background 0.15s;}
+.btn-back:hover{transform:translate(-2px,-2px);background:var(--moutarde-pale);}
+.btn-back:focus-visible{outline:3px solid var(--canard);outline-offset:3px;}
 
 /* ERREUR */
 .step-error{color:#D6452F;font-size:13.5px;font-weight:500;margin-top:12px;display:flex;align-items:center;gap:7px;}

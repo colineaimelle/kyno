@@ -44,14 +44,16 @@
 body{font-family:var(--font-texte);color:var(--aubergine);background:var(--papier);margin:0}
 .ky-rang{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-16);padding:var(--space-12)}
 .ky-pile{display:flex;flex-direction:column;gap:var(--space-16);padding:var(--space-12)}
-.ky-btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);min-height:48px;box-sizing:border-box;padding:14px 28px;border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:18px;line-height:1.2;font-weight:700;text-decoration:none;cursor:pointer;transition:transform .16s cubic-bezier(.22,.61,.36,1),box-shadow .16s}
+.ky-btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);min-height:48px;box-sizing:border-box;padding:14px 28px;border:3px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:18px;line-height:1.2;font-weight:700;text-decoration:none;cursor:pointer;transition:transform .16s cubic-bezier(.22,.61,.36,1),background .16s}
 .ky-btn:hover{transform:translate(-2px,-2px)}
-.ky-btn:active{transform:translate(2px,2px);box-shadow:none}
+.ky-btn:active{transform:translate(2px,2px)}
 .ky-btn:focus-visible,.ky-champ input:focus-visible,.ky-option:focus-visible,.ky-acc summary:focus-visible{outline:3px solid var(--canard);outline-offset:3px}
-.ky-btn-principal{background:var(--aubergine);color:var(--papier)}
-.ky-btn-principal:hover,.ky-btn-principal:active{background:#6E4A63}
-.ky-btn-action{background:var(--moutarde);color:var(--aubergine);box-shadow:var(--ombre-bd)}
-.ky-btn-secondaire{background:var(--blanc);color:var(--aubergine);box-shadow:var(--ombre-bd-petite)}
+.ky-btn-principal{background:var(--rouge);color:var(--papier);font-size:19px}
+.ky-btn-principal:hover,.ky-btn-principal:active{background:var(--rouge-fonce)}
+.ky-btn-action{background:var(--moutarde);color:var(--aubergine)}
+.ky-btn-action:hover,.ky-btn-action:active{background:#E5A51F}
+.ky-btn-secondaire{background:var(--blanc);color:var(--aubergine)}
+.ky-btn-secondaire:hover{background:var(--moutarde-pale)}
 .ky-btn[disabled]{background:var(--trait);color:var(--aubergine-doux);border-color:var(--trait);box-shadow:none;cursor:not-allowed;transform:none}
 .ky-sticker{display:inline-block;background:var(--rouge);color:var(--papier);border:var(--contour-fort) solid var(--aubergine);border-radius:var(--radius-16);padding:2px 16px 8px;box-shadow:var(--ombre-bd);transform:rotate(-2deg)}
 .ky-sticker-moutarde{background:var(--moutarde);color:var(--aubergine)}
