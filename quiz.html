@@ -244,6 +244,18 @@ textarea{resize:vertical;min-height:100px;}
 .success p{font-size:15px;color:var(--aubergine-doux);line-height:1.8;max-width:440px;margin:0 auto 26px;font-weight:400;}
 .success-note{background:#fff;border:2.5px solid var(--moutarde);border-radius:16px;padding:20px 24px;font-size:13.5px;color:var(--aubergine);line-height:1.75;font-weight:400;max-width:460px;margin:0 auto;box-shadow:5px 5px 0 var(--moutarde-pale);text-align:left;}
 .success-note b{font-weight:600;color:var(--canard);}
+
+/* TRANSITION CHAPITRES */
+.planche-trans{background:var(--aubergine);padding:12px;border-radius:10px;display:grid;grid-template-columns:1fr 280px 1fr;gap:12px;min-height:560px;}
+.trans-gauche,.trans-milieu,.trans-droite{position:relative;border-radius:6px;overflow:hidden;}
+.trans-gauche{display:flex;align-items:center;justify-content:center;}
+.trans-milieu{background:var(--papier);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;}
+.trans-droite{display:flex;flex-direction:column;justify-content:center;padding:40px 36px;gap:20px;}
+.explosion{width:200px;height:200px;clip-path:polygon(50% 0%,61% 35%,96% 20%,73% 44%,100% 55%,66% 60%,79% 95%,50% 75%,21% 95%,34% 60%,0% 55%,27% 44%,4% 20%,39% 35%);background:var(--moutarde);display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--font-titre);font-size:28px;line-height:1.1;color:var(--aubergine);filter:drop-shadow(4px 4px 0 var(--aubergine));flex-shrink:0;}
+.trans-chap-num{font-family:var(--font-texte);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--aubergine);opacity:0.75;}
+.trans-chap-titre{font-family:var(--font-titre);font-size:44px;font-weight:400;color:var(--aubergine);line-height:1.05;margin:0;}
+.trans-encart{background:var(--papier);border:2px solid var(--aubergine);border-radius:14px;padding:16px 20px;font-size:16px;line-height:1.6;color:var(--aubergine);}
+.trans-nav{display:flex;gap:12px;align-items:center;margin-top:4px;}
 </style>
 </head>
 <body>
@@ -883,6 +895,50 @@ textarea{resize:vertical;min-height:100px;}
     </div>
   </div>
 
+  <!-- TRANSITION 1 : Profil → Santé -->
+  <div class="step" data-step="trans1">
+    <div class="planche-trans">
+      <section class="trans-gauche ch-profil" aria-hidden="true">
+        <div class="explosion">Profil<br>terminé !</div>
+      </section>
+      <section class="trans-milieu">
+        <div class="viva-bulle-wrap"><svg class="viva-bulle-svg" viewBox="0 0 420 210" preserveAspectRatio="none"><path d="M210 12 C320 12 404 50 404 100 C404 150 320 186 210 186 C182 186 156 184 132 178 L74 204 L92 166 C42 150 16 126 16 100 C16 50 100 12 210 12 Z" fill="#FFF4E0" stroke="#451A36" stroke-width="6" stroke-linejoin="round"/></svg><p class="viva-bulle-txt">On parle de<br>ma santé ?</p></div>
+        <div class="viva-disque"><span class="viva-illo" data-illo="viva"></span></div>
+      </section>
+      <section class="trans-droite ch-sante">
+        <span class="trans-chap-num">Chapitre 2 sur 3</span>
+        <h2 class="trans-chap-titre">Sa santé</h2>
+        <div class="trans-encart">7 questions sur sa santé, ses traitements et ce qui le gêne au quotidien. Environ 2 minutes.</div>
+        <div class="trans-nav">
+          <button class="btn-back" onclick="prevTrans(1)">Retour</button>
+          <button class="btn-next" onclick="nextTrans(1)">C'est parti</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- TRANSITION 2 : Santé → Projet -->
+  <div class="step" data-step="trans2">
+    <div class="planche-trans">
+      <section class="trans-gauche ch-sante" aria-hidden="true">
+        <div class="explosion">Santé<br>terminée !</div>
+      </section>
+      <section class="trans-milieu">
+        <div class="viva-bulle-wrap"><svg class="viva-bulle-svg" viewBox="0 0 420 210" preserveAspectRatio="none"><path d="M210 12 C320 12 404 50 404 100 C404 150 320 186 210 186 C182 186 156 184 132 178 L74 204 L92 166 C42 150 16 126 16 100 C16 50 100 12 210 12 Z" fill="#FFF4E0" stroke="#451A36" stroke-width="6" stroke-linejoin="round"/></svg><p class="viva-bulle-txt">On parle de<br>ton projet ?</p></div>
+        <div class="viva-disque"><span class="viva-illo" data-illo="viva"></span></div>
+      </section>
+      <section class="trans-droite ch-projet">
+        <span class="trans-chap-num">Chapitre 3 sur 3</span>
+        <h2 class="trans-chap-titre">Ton projet</h2>
+        <div class="trans-encart">6 questions sur ta cuisine, ton budget et ton temps. Environ 2 minutes.</div>
+        <div class="trans-nav">
+          <button class="btn-back" onclick="prevTrans(2)">Retour</button>
+          <button class="btn-next" onclick="nextTrans(2)">C'est parti</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
 <!--STEPS-->
 </div>
 
@@ -1207,6 +1263,9 @@ function next(step) {
     var el = document.getElementById(id); if (el) el.textContent = nom;
   });
 
+  if (!IS_AJOUT && step === 6) { current = 'trans1'; show('trans1'); return; }
+  if (!IS_AJOUT && step === 13) { current = 'trans2'; show('trans2'); return; }
+
   let nextStep = step + 1;
   if (IS_AJOUT) {
     while (FOYER_STEPS.has(nextStep) && nextStep <= total) nextStep++;
@@ -1218,6 +1277,8 @@ function next(step) {
 }
 
 function prev(step) {
+  if (!IS_AJOUT && step === 7) { current = 'trans1'; show('trans1'); return; }
+  if (!IS_AJOUT && step === 14) { current = 'trans2'; show('trans2'); return; }
   let prevStep = step - 1;
   if (IS_AJOUT) {
     while (FOYER_STEPS.has(prevStep) && prevStep >= 1) prevStep--;
@@ -1226,10 +1287,15 @@ function prev(step) {
   show(current);
 }
 
+function nextTrans(n) { current = n === 1 ? 7 : 14; show(current); }
+function prevTrans(n) { current = n === 1 ? 6 : 13; show(current); }
+
 function show(step) {
   document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
   document.querySelector(`[data-step="${step}"]`)?.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
+
+  if (step === 'trans1' || step === 'trans2') return;
 
   // 4-segment progress (Profil 6, Santé 7, Projet 6, Fin 2)
   const segs = [{start:1,end:6,count:6},{start:7,end:13,count:7},{start:14,end:19,count:6},{start:20,end:21,count:2}];
