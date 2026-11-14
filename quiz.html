@@ -310,7 +310,7 @@ textarea{resize:vertical;min-height:100px;}
       <section class="planche-g">
         <span class="narrateur">Chapitre 1 : son profil · question 3 sur 6</span>
         <div>
-          <h2 class="step-question" id="q3Title">Quel âge<br><em>a-t-il ?</em></h2>
+          <h2 class="step-question">Quel âge<br><em>a <span id="q3Prenom">ton chien</span> ?</em></h2>
           <p class="step-hint">L'âge détermine ses besoins énergétiques et le ratio calcium/phosphore idéal.</p>
         </div>
         <div class="bd-texts" id="q3">
@@ -400,7 +400,7 @@ textarea{resize:vertical;min-height:100px;}
       <section class="planche-g">
         <span class="narrateur">Chapitre 1 : son profil · question 6 sur 6</span>
         <div>
-          <h2 class="step-question" id="q6Title">Son niveau<br><em>d'activité ?</em></h2>
+          <h2 class="step-question">Son niveau<br><em>d'activité de <span id="q6Prenom">ton chien</span></em></h2>
           <p class="step-hint">Un chien très actif peut avoir des besoins caloriques 2× supérieurs à un chien sédentaire.</p>
         </div>
         <div class="bd-cards cols-4">
@@ -1033,9 +1033,8 @@ const IS_AJOUT = new URLSearchParams(window.location.search).has('ajout');
   if (!inp) return;
   inp.value = prenom;
   answers.q1 = prenom;
-  ['loadingName','successName','prenomQ20','prenomQ22'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (el) el.textContent = prenom;
+  ['loadingName','successName','prenomQ20','prenomQ22','q3Prenom','q6Prenom'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.textContent = prenom;
   });
   current = 2;
   show(2);
@@ -1204,10 +1203,9 @@ function next(step) {
   saveText(step);
 
   const nom = answers.q1 || 'ton chien';
-  document.getElementById('loadingName').textContent = nom;
-  document.getElementById('successName').textContent = nom;
-  document.getElementById('prenomQ20').textContent = nom;
-  document.getElementById('prenomQ22').textContent = nom;
+  ['loadingName','successName','prenomQ20','prenomQ22','q3Prenom','q6Prenom'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.textContent = nom;
+  });
 
   let nextStep = step + 1;
   if (IS_AJOUT) {
