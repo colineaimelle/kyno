@@ -118,7 +118,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .ch-profil{background:#2BB3AE;}
 .ch-sante{background:#F27A9B;}
 .ch-projet{background:#F2B630;}
-.ch-profil::before,.ch-projet::before{content:'';position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 100%,transparent 0deg 8deg,rgba(0,0,0,.07) 8deg 16deg);pointer-events:none;}
+.ch-profil::before,.ch-projet::before{content:'';position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 100%,transparent 0deg 10deg,rgba(0,0,0,.07) 10deg 20deg);pointer-events:none;}
 .ch-sante::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.3) 1.5px,transparent 1.5px);background-size:18px 18px;pointer-events:none;}
 /* trame de points restreinte aux transitions */
 .trans-gauche.ch-sante::before,.trans-droite.ch-sante::before{inset:0 0 auto auto;width:45%;height:110px;}
@@ -243,6 +243,9 @@ textarea{resize:vertical;min-height:100px;}
 /* SUCCESS */
 .success{display:none;padding:100px 24px 60px;text-align:center;}
 .success-inner{max-width:580px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:20px;}
+.success-actions a{text-decoration:none;}
+.success-retry-box{background:var(--rose-pale);border:2px solid var(--rouge);border-radius:14px;padding:16px 20px;font-size:14px;color:#B8301D;width:100%;text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:12px;}
+.success-retry-box p{margin:0;line-height:1.5;}
 @keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.022);}}
 .viva-tail{transform-box:fill-box;transform-origin:bottom left;animation:wag 0.7s ease-in-out infinite;}
 @keyframes wag{0%,100%{transform:rotate(-7deg);}50%{transform:rotate(9deg);}}
@@ -250,7 +253,7 @@ textarea{resize:vertical;min-height:100px;}
 .success h2{font-family:var(--font-titre);font-size:40px;font-weight:400;font-synthesis:none;color:var(--aubergine);line-height:1.1;letter-spacing:-0.02em;margin:0;}
 .success-prenom{display:inline-block;background:var(--moutarde);color:var(--aubergine);border:3px solid var(--aubergine);border-radius:12px;padding:0 10px 4px;box-shadow:3px 3px 0 var(--aubergine);transform:rotate(-1.5deg);font-style:normal;}
 .success p{font-size:15px;color:var(--aubergine-doux);line-height:1.8;margin:0;}
-.success-note{background:var(--moutarde-pale);border:2.5px solid var(--moutarde);border-radius:16px;padding:20px 24px;font-size:14px;color:var(--aubergine);line-height:1.75;width:100%;text-align:left;box-shadow:4px 4px 0 var(--moutarde);}
+.success-note{background:var(--moutarde-pale);border:3px solid var(--aubergine);border-radius:16px;padding:20px 24px;font-size:14px;color:var(--aubergine);line-height:1.75;width:100%;text-align:left;box-shadow:4px 4px 0 var(--aubergine);}
 .success-actions{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;}
 .success-note b{font-weight:600;color:var(--canard);}
 
@@ -291,9 +294,9 @@ textarea{resize:vertical;min-height:100px;}
 .trans-gauche{display:flex;align-items:center;justify-content:center;}
 .trans-milieu{background:var(--papier);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;}
 .trans-droite{display:flex;flex-direction:column;justify-content:center;padding:40px 36px;gap:20px;}
-.explosion{position:relative;width:230px;height:230px;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg);flex-shrink:0;}
+.explosion{position:relative;width:250px;height:250px;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg);flex-shrink:0;}
 .explosion-svg{position:absolute;inset:0;width:100%;height:100%;}
-.explosion-text{position:relative;z-index:1;font-family:var(--font-titre);font-size:38px;color:var(--aubergine);text-align:center;line-height:1.05;pointer-events:none;}
+.explosion-text{position:relative;z-index:1;font-family:var(--font-titre);font-size:32px;color:var(--aubergine);text-align:center;line-height:1.1;pointer-events:none;}
 .trans-chap-titre{font-family:var(--font-titre);font-size:44px;font-weight:400;color:var(--aubergine);line-height:1.05;margin:0;}
 .trans-encart{background:var(--papier);border:2px solid var(--aubergine);border-radius:14px;padding:16px 20px;font-size:16px;line-height:1.6;color:var(--aubergine);}
 .trans-nav{display:flex;gap:12px;align-items:center;margin-top:4px;}
@@ -1442,10 +1445,50 @@ function clearErrors(step) {
 }
 
 // ── SUBMIT ───────────────────────────────────────────────────
+var _lastQuizData = null;
+
+function _capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+
+function _doShowSuccess(nom) {
+  document.getElementById('loadingScreen').style.display = 'none';
+  var el = document.getElementById('successName');
+  if (el) el.textContent = _capitalize(nom || 'ton chien');
+  document.getElementById('successScreen').style.display = 'block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function _showSuccessError() {
+  if (document.getElementById('successRetryBox')) return;
+  var box = document.createElement('div');
+  box.id = 'successRetryBox';
+  box.className = 'success-retry-box';
+  box.innerHTML = '<p>L\'envoi n\'a pas abouti. Vérifie ta connexion et réessaie.</p>' +
+    '<button class="btn-next" onclick="retrySubmit()">Réessayer</button>';
+  var inner = document.querySelector('.success-inner');
+  if (inner) inner.appendChild(box);
+}
+
+async function retrySubmit() {
+  if (!_lastQuizData) return;
+  var box = document.getElementById('successRetryBox');
+  if (box) box.remove();
+  try {
+    const res = await fetch('/api/generate', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(_lastQuizData)
+    });
+    if (!res.ok) throw new Error('Erreur serveur');
+    const result = await res.json();
+    if (!result.success) throw new Error(result.error || 'Erreur inconnue');
+  } catch(err) {
+    _showSuccessError();
+  }
+}
+
 async function submitQuiz() {
   if (!validate(22)) return;
 
-  // Construire le sexe complet (combinaison sexe + castration)
   const sexeBase = answers.q5 || '';
   const castre = answers.q5b || '';
   let sexeComplet = sexeBase;
@@ -1455,19 +1498,12 @@ async function submitQuiz() {
     sexeComplet = castre === 'oui' ? 'femelle stérilisée' : castre === 'non' ? 'femelle entière' : 'femelle';
   }
 
-  // Maladies diagnostiquées
   const maladies = answers.q8 === 'oui' ? (answers.q8maladies || []) : [];
   const maladiesAutre = document.getElementById('q8maladies-autre')?.value.trim() || '';
   if (maladiesAutre) maladies.push(maladiesAutre);
-
-  // Traitement
   const traitement = answers.q9 === 'oui' ? (document.getElementById('q9traitement')?.value.trim() || '') : '';
-
-  // Intolérances
   const intolerances = (answers.q12 || []).filter(v => v !== 'aucune');
   const intolerancesAutre = document.getElementById('q12-autre')?.value.trim() || '';
-
-  // Objectif
   const objectifAutre = document.getElementById('q19-autre')?.value.trim() || '';
 
   const quizData = {
@@ -1499,10 +1535,23 @@ async function submitQuiz() {
     jourEnvoi:     answers.jourEnvoi || 1,
     plan:          'beta',
   };
+  _lastQuizData = quizData;
 
+  const nom = answers.q1 || '';
   document.getElementById('quizWrap').style.display = 'none';
   document.getElementById('loadingScreen').style.display = 'block';
   window.scrollTo({top:0,behavior:'smooth'});
+
+  var successShown = false;
+
+  function doShowSuccess() {
+    if (successShown) return;
+    successShown = true;
+    _doShowSuccess(nom);
+  }
+
+  // Affiche le succès après 10 s max (≈ 2 boucles vidéo), sans attendre l'API
+  var timer = setTimeout(doShowSuccess, 10000);
 
   try {
     const res = await fetch('/api/generate', {
@@ -1510,18 +1559,23 @@ async function submitQuiz() {
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(quizData)
     });
+    clearTimeout(timer);
     if (!res.ok) throw new Error('Erreur serveur');
     const result = await res.json();
     if (result.success) {
-      document.getElementById('loadingScreen').style.display = 'none';
-      document.getElementById('successScreen').style.display = 'block';
+      doShowSuccess();
     } else throw new Error(result.error || 'Erreur inconnue');
   } catch(err) {
+    clearTimeout(timer);
     console.error(err);
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('quizWrap').style.display = 'block';
-    document.getElementById('errorMsg').textContent = 'Une erreur est survenue. Réessaie dans quelques secondes.';
-    document.getElementById('errorMsg').style.display = 'block';
+    if (successShown) {
+      _showSuccessError();
+    } else {
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('quizWrap').style.display = 'block';
+      document.getElementById('errorMsg').textContent = 'Une erreur est survenue. Réessaie dans quelques secondes.';
+      document.getElementById('errorMsg').style.display = 'block';
+    }
   }
 }
 
