@@ -678,7 +678,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
 .s-cta-note{font-size:15px;font-weight:500;}
 /* Pied de page */
 .ft-new{background:var(--aubergine);color:var(--papier);padding:56px 80px 40px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;}
-.ft-new-brand{display:flex;flex-direction:column;gap:14px;}
+.ft-new-brand{display:flex;flex-direction:column;gap:14px;align-items:flex-start;}
 .ft-new-tagline{margin:0;font-size:16px;line-height:1.5;}
 .ft-new-copy{margin:0;font-size:14px;color:var(--trait);}
 .ft-new-col{display:flex;flex-direction:column;gap:10px;}
@@ -1212,7 +1212,7 @@ const BREEDS = {
     score:87, trend:'↑ +4 ce mois',
     macros:[['Protéines',68,'var(--canard)'],['Lipides',22,'var(--rouge)'],['Glucides',10,'var(--moutarde)']],
     meals:[['Dinde vapeur + courgette + riz','185 g'],['Sardine fraîche','40 g'],['Oméga-3 · Vitamine D3','2 ml']],
-    alerts:[['shield','Race de chasse active','Surveiller les articulations dès 5 ans'],['leaf','Mue de printemps','Oméga-3 renforcés pour le poil']],
+    alerts:[['shield','Race de chasse active','surveiller les articulations dès 5 ans'],['leaf','Mue de printemps','oméga-3 renforcés pour le poil']],
     portrait:'<svg viewBox="0 0 200 200"><g stroke="#3A2A20" stroke-width="3.5" stroke-linejoin="round"><path d="M62 70 q-34 6 -34 52 q2 40 26 54 q22 8 30 -14 q6 -40 0 -78 q-4 -18 -22 -14Z" fill="#BE6B41"/><path d="M138 70 q34 6 34 52 q-2 40 -26 54 q-22 8 -30 -14 q-6 -40 0 -78 q4 -18 22 -14Z" fill="#BE6B41"/><path d="M100 40 q56 0 64 56 q6 44 -22 72 q-20 18 -42 18 q-22 0 -42 -18 q-28 -28 -22 -72 q8 -56 64 -56Z" fill="#fff"/><path d="M100 40 q42 0 56 40 q-28 12 -56 8 q-28 -4 -56 8 q14 -56 56 -56Z" fill="#BE6B41"/><ellipse cx="138" cy="96" rx="22" ry="26" fill="#BE6B41" stroke="none"/><circle cx="78" cy="104" r="9" fill="#3A2A20" stroke="none"/><circle cx="122" cy="104" r="9" fill="#3A2A20" stroke="none"/><path d="M100 120 q14 0 16 14 q0 12 -16 14 q-16 -2 -16 -14 q2 -14 16 -14Z" fill="#fff"/><ellipse cx="100" cy="128" rx="9" ry="7" fill="#2E211A" stroke="none"/><path d="M100 135 v8 M100 143 q-9 5 -16 1 M100 143 q9 6 17 1" stroke-width="2.5"/></g></svg>'
   },
   labrador: {
@@ -1220,7 +1220,7 @@ const BREEDS = {
     score:79, trend:'↑ +6 ce mois',
     macros:[['Protéines',60,'var(--canard)'],['Lipides',20,'var(--rouge)'],['Glucides',20,'var(--moutarde)']],
     meals:[['Bœuf maigre + patate douce + haricots','340 g'],['Huile de colza','5 ml'],['Glucosamine · Chondroïtine','1 dose']],
-    alerts:[['shield','Prédisposition surpoids','Ration calibrée, friandises limitées'],['activity','Grand actif','+ articulations surveillées']],
+    alerts:[['shield','Prédisposition surpoids','ration calibrée, friandises limitées'],['activity','Grand actif','+ articulations surveillées']],
     portrait:'<svg viewBox="0 0 200 200"><g stroke="#3A2A20" stroke-width="3.5" stroke-linejoin="round"><path d="M52 64 q-22 4 -18 48 q4 36 26 44 q14 2 18 -16 q4 -36 -4 -66 q-6 -14 -22 -10Z" fill="#3A2A20" opacity="0.85"/><path d="M148 64 q22 4 18 48 q-4 36 -26 44 q-14 2 -18 -16 q-4 -36 4 -66 q6 -14 22 -10Z" fill="#3A2A20" opacity="0.85"/><path d="M100 44 q52 0 60 54 q5 42 -20 70 q-18 16 -40 16 q-22 0 -40 -16 q-25 -28 -20 -70 q8 -54 60 -54Z" fill="#E2A157"/><circle cx="80" cy="106" r="9" fill="#3A2A20" stroke="none"/><circle cx="120" cy="106" r="9" fill="#3A2A20" stroke="none"/><path d="M76 134 q24 -10 48 0 q-6 26 -24 26 q-18 0 -24 -26Z" fill="#F0D2A0"/><ellipse cx="100" cy="130" rx="11" ry="8" fill="#2E211A" stroke="none"/></g></svg>'
   },
   berger: {
@@ -1228,7 +1228,7 @@ const BREEDS = {
     score:74, trend:'↑ +3 ce mois',
     macros:[['Protéines',64,'var(--canard)'],['Lipides',24,'var(--rouge)'],['Glucides',12,'var(--moutarde)']],
     meals:[['Poulet + carotte + flocons d\'avoine','360 g'],['Œuf entier','1 unité'],['Oméga-3 · Vitamine E','3 ml']],
-    alerts:[['shield','Risque dysplasie hanche','Poids stable + glucosamine'],['heart','Digestion sensible','Fibres douces, repas fractionnés']],
+    alerts:[['shield','Risque dysplasie hanche','poids stable + glucosamine'],['heart','Digestion sensible','fibres douces, repas fractionnés']],
     portrait:'<svg viewBox="0 0 200 200"><g stroke="#3A2A20" stroke-width="3.5" stroke-linejoin="round"><path d="M58 30 q-12 30 4 64 q10 -2 22 -10 q-8 -34 -8 -54 q-8 -8 -18 0Z" fill="#3A2A20" opacity="0.85"/><path d="M142 30 q12 30 -4 64 q-10 -2 -22 -10 q8 -34 8 -54 q8 -8 18 0Z" fill="#3A2A20" opacity="0.85"/><path d="M100 56 q44 0 54 48 q6 40 -18 66 q-16 16 -36 16 q-20 0 -36 -16 q-24 -26 -18 -66 q10 -48 54 -48Z" fill="#C98A4E"/><path d="M100 92 q30 0 38 40 q4 28 -12 46 q-12 10 -26 10 q-14 0 -26 -10 q-16 -18 -12 -46 q8 -40 38 -40Z" fill="#E8C99A"/><circle cx="82" cy="108" r="8.5" fill="#3A2A20" stroke="none"/><circle cx="118" cy="108" r="8.5" fill="#3A2A20" stroke="none"/><ellipse cx="100" cy="146" rx="11" ry="8" fill="#2E211A" stroke="none"/></g></svg>'
   },
   bouledogue: {
@@ -1236,7 +1236,7 @@ const BREEDS = {
     score:72, trend:'↑ +5 ce mois',
     macros:[['Protéines',58,'var(--canard)'],['Lipides',22,'var(--rouge)'],['Glucides',20,'var(--moutarde)']],
     meals:[['Dinde + courgette + quinoa','165 g'],['Huile de saumon','3 ml'],['Probiotiques digestifs','1 dose']],
-    alerts:[['shield','Sensibilité respiratoire','Éviter l\'effort par forte chaleur'],['heart','Peau sensible','Oméga-3 + zinc pour les plis']],
+    alerts:[['shield','Sensibilité respiratoire','éviter l\'effort par forte chaleur'],['heart','Peau sensible','oméga-3 + zinc pour les plis']],
     portrait:'<svg viewBox="0 0 200 200"><g stroke="#3A2A20" stroke-width="3.5" stroke-linejoin="round"><path d="M58 50 q-16 -2 -18 22 q0 18 18 22 q8 -20 8 -34 q-2 -10 -8 -10Z" fill="#9A8472"/><path d="M142 50 q16 -2 18 22 q0 18 -18 22 q-8 -20 -8 -34 q2 -10 8 -10Z" fill="#9A8472"/><path d="M100 56 q46 0 52 48 q4 36 -16 60 q-16 18 -36 18 q-20 0 -36 -18 q-20 -24 -16 -60 q6 -48 52 -48Z" fill="#B8A48E"/><path d="M70 100 q30 -6 60 0" stroke-width="3"/><circle cx="80" cy="100" r="9" fill="#3A2A20" stroke="none"/><circle cx="120" cy="100" r="9" fill="#3A2A20" stroke="none"/><path d="M70 134 q30 -8 60 0 q-8 30 -30 30 q-22 0 -30 -30Z" fill="#D8C8B4"/><ellipse cx="100" cy="132" rx="13" ry="9" fill="#2E211A" stroke="none"/></g></svg>'
   },
   croise: {
@@ -1244,7 +1244,7 @@ const BREEDS = {
     score:84, trend:'↑ +4 ce mois',
     macros:[['Protéines',62,'var(--canard)'],['Lipides',23,'var(--rouge)'],['Glucides',15,'var(--moutarde)']],
     meals:[['Poisson blanc + riz + épinards','220 g'],['Huile de colza','4 ml'],['Multivitamines','1 dose']],
-    alerts:[['leaf','Profil équilibré','Maintien du poids de forme'],['activity','Activité modérée','Ration ajustée aux balades']],
+    alerts:[['leaf','Profil équilibré','maintien du poids de forme'],['activity','Activité modérée','ration ajustée aux balades']],
     portrait:'<svg viewBox="0 0 200 200"><g stroke="#3A2A20" stroke-width="3.5" stroke-linejoin="round"><path d="M56 56 q-20 8 -16 46 q4 30 24 36 q-2 -40 6 -72 q-6 -14 -14 -10Z" fill="#8B6B4E"/><path d="M144 58 q22 2 22 40 q-2 28 -22 38 q2 -42 -6 -70 q4 -12 6 -8Z" fill="#fff"/><path d="M100 50 q48 0 56 50 q6 40 -18 66 q-18 18 -38 18 q-20 0 -38 -18 q-24 -26 -18 -66 q8 -50 56 -50Z" fill="#fff"/><path d="M100 50 q34 0 48 30 q-22 14 -48 6 q-10 -2 -16 4 q4 -40 16 -40Z" fill="#8B6B4E"/><ellipse cx="124" cy="92" rx="20" ry="24" fill="#8B6B4E" stroke="none"/><circle cx="80" cy="106" r="9" fill="#3A2A20" stroke="none"/><circle cx="120" cy="106" r="9" fill="#3A2A20" stroke="none"/><ellipse cx="100" cy="138" rx="11" ry="8" fill="#2E211A" stroke="none"/></g></svg>'
   }
 };
