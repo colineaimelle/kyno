@@ -1,7 +1,8 @@
-// api/generate.js — v4
+// api/generate.js — v5
 // Aligné avec le nouveau quiz 22 questions (jour d'envoi ajouté)
 // Champs quiz → Supabase → espace client
 
+const { waitUntil } = require('@vercel/functions');
 const { besoinKcalJour } = require('./lib/energie');
 
 const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
@@ -250,6 +251,79 @@ function getEmailFromJwt(authHeader) {
   }
 }
 
+// ── GÉNÉRATION + ENVOI ─────────────────────────────────────
+async function generateAndSend(data) {
+  const t0 = Date.now();
+  const saison = getSaison();
+  const pm = data.poids ? Math.pow(parseFloat(data.poids), 0.75).toFixed(2) : 'à calculer';
+  const besoin = besoinKcalJour({
+    poids:      data.poids,
+    age:        data.age,
+    sexe:       data.sexe,
+    activite:   data.activite,
+    objectifs:  mergeAutre(data.objectif, data.objectifAutre),
+    poids_ideal: null,
+  });
+
+  const rapportResponse = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4000,
+      system: buildRapportPrompt(data, saison, pm, besoin),
+      messages: [{ role: 'user', content: 'Génère le rapport nutritionnel.' }]
+    })
+  });
+
+  if (!rapportResponse.ok) {
+    const err = await rapportResponse.json();
+    throw new Error(err.error?.message || 'Erreur API Anthropic');
+  }
+
+  const rapportResult = await rapportResponse.json();
+  const rapport = rapportResult.content[0].text;
+
+  const prenomChien = data.prenom;
+  const statut = data.plan === 'beta' ? 'beta' : 'waitlist';
+  const ajoutChien = data.ajoutChien === true;
+
+  const ordre = data.email ? await getNextOrdreForEmail(data.email) : 1;
+
+  await Promise.all([
+    data.email ? sendEmailRapport(data.email, prenomChien, rapport, data) : Promise.resolve(),
+    data.email ? saveChienToSupabase(data.email, data, ordre) : Promise.resolve(),
+    (!ajoutChien && data.email) ? saveFoyerToSupabase(data, statut) : Promise.resolve(),
+  ]);
+
+  console.log('[generate] durée totale:', Date.now() - t0, 'ms — prenom:', data.prenom, '— race:', data.race);
+}
+
+// ── ALERTE EMAIL EN CAS D'ÉCHEC BACKGROUND ────────────────
+async function sendAlertEmail(prenom, race) {
+  const alertRes = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': process.env.BREVO_API_KEY
+    },
+    body: JSON.stringify({
+      sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
+      to: [{ email: 'colinemngl@gmail.com', name: 'Coline' }],
+      subject: `Kyno — génération échouée : ${prenom}`,
+      htmlContent: `<p>La génération du rapport pour <strong>${prenom}</strong> (${race}) a échoué côté serveur.</p><p>Le profil n’a pas reçu son rapport. Consulte les logs Vercel pour le détail, puis relance manuellement si nécessaire.</p>`
+    })
+  }).catch(e => { console.error('[generate] alerte send exception:', e.message); return null; });
+  if (alertRes && !alertRes.ok) {
+    const body = await alertRes.text().catch(() => '');
+    console.error('[generate] alerte send erreur:', alertRes.status, body.slice(0, 100));
+  }
+}
+
 // ── HANDLER PRINCIPAL ──────────────────────────────────────
 module.exports = async function handler(req, res) {
 
@@ -260,73 +334,42 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
 
-  try {
-    const data = req.body;
-    if (!data.prenom || !data.race) {
-      return res.status(400).json({ error: 'Données incomplètes — prénom et race requis' });
-    }
+  const data = req.body;
 
-    // Pour ajoutChien, l'email doit venir du JWT — jamais du corps de la requête.
-    if (data.ajoutChien === true) {
-      const jwtEmail = getEmailFromJwt(req.headers['authorization']);
-      if (!jwtEmail) return res.status(401).json({ error: 'Authentification requise pour ajouter un chien' });
-      data.email = jwtEmail;
-    }
-
-    const saison = getSaison();
-    const pm = data.poids ? Math.pow(parseFloat(data.poids), 0.75).toFixed(2) : 'à calculer';
-    const besoin = besoinKcalJour({
-      poids:      data.poids,
-      age:        data.age,
-      sexe:       data.sexe,
-      activite:   data.activite,
-      objectifs:  mergeAutre(data.objectif, data.objectifAutre),
-      poids_ideal: null,
-    });
-
-    // ── Génération du rapport ──────────────────────────────
-    const rapportResponse = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 4000,
-        system: buildRapportPrompt(data, saison, pm, besoin),
-        messages: [{ role: 'user', content: 'Génère le rapport nutritionnel.' }]
-      })
-    });
-
-    if (!rapportResponse.ok) {
-      const err = await rapportResponse.json();
-      throw new Error(err.error?.message || 'Erreur API Anthropic');
-    }
-
-    const rapportResult = await rapportResponse.json();
-    const rapport = rapportResult.content[0].text;
-
-    const prenomChien = data.prenom;
-    const statut = data.plan === 'beta' ? 'beta' : 'waitlist';
-    const ajoutChien = data.ajoutChien === true;
-
-    // ── Ordre du nouveau chien + sauvegarde en parallèle ──
-    const ordre = data.email ? await getNextOrdreForEmail(data.email) : 1;
-
-    await Promise.all([
-      data.email ? sendEmailRapport(data.email, prenomChien, rapport, data) : Promise.resolve(),
-      data.email ? saveChienToSupabase(data.email, data, ordre) : Promise.resolve(),
-      (!ajoutChien && data.email) ? saveFoyerToSupabase(data, statut) : Promise.resolve(),
-    ]);
-
-    return res.status(200).json({ success: true, prenom: prenomChien });
-
-  } catch (error) {
-    console.error('Erreur generate.js:', error);
-    return res.status(500).json({ error: 'Erreur serveur', message: error.message });
+  // Validation — retourne l'erreur immédiatement (pas de waitUntil)
+  if (!data.prenom || !data.race) {
+    return res.status(400).json({ error: 'Données incomplètes — prénom et race requis' });
   }
+
+  // Pour ajoutChien, l'email doit venir du JWT — jamais du corps de la requête.
+  if (data.ajoutChien === true) {
+    const jwtEmail = getEmailFromJwt(req.headers['authorization']);
+    if (!jwtEmail) return res.status(401).json({ error: 'Authentification requise pour ajouter un chien' });
+    data.email = jwtEmail;
+
+    // Flux ajout chien : synchrone — le front attend la fin avant de rediriger vers l'espace client
+    try {
+      await generateAndSend(data);
+      return res.status(200).json({ success: true, prenom: data.prenom });
+    } catch (error) {
+      console.error('Erreur generate.js (ajoutChien):', error);
+      return res.status(500).json({ error: 'Erreur serveur', message: error.message });
+    }
+  }
+
+  // Flux quiz principal : répondre immédiatement, générer en arrière-plan
+  res.status(200).json({ success: true, prenom: data.prenom });
+
+  waitUntil(
+    generateAndSend(data).catch(async (error) => {
+      console.error('[generate] échec waitUntil:', {
+        profil: `${data.prenom}/${data.race}`,
+        err: error.message,
+        stack: error.stack ? error.stack.slice(0, 400) : null
+      });
+      await sendAlertEmail(data.prenom, data.race);
+    })
+  );
 };
 
 // ── EMAIL RAPPORT ──────────────────────────────────────────

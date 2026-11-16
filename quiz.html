@@ -1558,6 +1558,7 @@ async function submitQuiz() {
   window.scrollTo({top:0,behavior:'smooth'});
 
   var successShown = false;
+  var startTime = Date.now();
 
   function doShowSuccess() {
     if (successShown) return;
@@ -1565,8 +1566,8 @@ async function submitQuiz() {
     _doShowSuccess(nom);
   }
 
-  // Affiche le succès après 10 s max (≈ 2 boucles vidéo), sans attendre l'API
-  var timer = setTimeout(doShowSuccess, 10000);
+  // Fallback : affiche « en route » après 2 boucles vidéo si l'API ne répond pas
+  var maxTimer = setTimeout(doShowSuccess, 10000);
 
   try {
     const res = await fetch('/api/generate', {
@@ -1574,14 +1575,23 @@ async function submitQuiz() {
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(quizData)
     });
-    clearTimeout(timer);
-    if (!res.ok) throw new Error('Erreur serveur');
+    if (!res.ok) {
+      // Erreur de validation — afficher l'erreur immédiatement sans délai
+      clearTimeout(maxTimer);
+      const result = await res.json().catch(function(){ return {}; });
+      throw new Error(result.error || 'Erreur serveur');
+    }
     const result = await res.json();
     if (result.success) {
-      doShowSuccess();
-    } else throw new Error(result.error || 'Erreur inconnue');
+      // Attendre au moins 1 boucle vidéo (≈ 5 s) avant d'afficher « en route »
+      clearTimeout(maxTimer);
+      var elapsed = Date.now() - startTime;
+      setTimeout(doShowSuccess, Math.max(0, 5000 - elapsed));
+    } else {
+      throw new Error(result.error || 'Erreur inconnue');
+    }
   } catch(err) {
-    clearTimeout(timer);
+    clearTimeout(maxTimer);
     console.error(err);
     if (successShown) {
       _showSuccessError();
