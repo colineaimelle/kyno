@@ -300,11 +300,16 @@ async function generateAndSend(data) {
     (!ajoutChien && data.email) ? saveFoyerToSupabase(data, statut) : Promise.resolve(),
   ]);
 
-  console.log('[generate] durée totale:', Date.now() - t0, 'ms — prenom:', data.prenom, '— race:', data.race);
+  console.log('[generate] durée totale:', Date.now() - t0, 'ms — prenom:', data.prenom, ' —  race:', data.race);
 }
 
 // ── ALERTE EMAIL EN CAS D'ÉCHEC BACKGROUND ────────────────
 async function sendAlertEmail(prenom, race) {
+  const alertDest = process.env.ALERT_EMAIL;
+  if (!alertDest) {
+    console.warn('[generate] ALERT_EMAIL non défini — alerte email non envoyée');
+    return;
+  }
   const alertRes = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
@@ -312,10 +317,10 @@ async function sendAlertEmail(prenom, race) {
       'api-key': process.env.BREVO_API_KEY
     },
     body: JSON.stringify({
-      sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
-      to: [{ email: 'colinemngl@gmail.com', name: 'Coline' }],
+      sender: { name: 'Kyno', email: alertDest },
+      to: [{ email: alertDest, name: 'Coline' }],
       subject: `Kyno — génération échouée : ${prenom}`,
-      htmlContent: `<p>La génération du rapport pour <strong>${prenom}</strong> (${race}) a échoué côté serveur.</p><p>Le profil n’a pas reçu son rapport. Consulte les logs Vercel pour le détail, puis relance manuellement si nécessaire.</p>`
+      htmlContent: `<p>La génération du rapport pour <strong>${prenom}</strong> (${race}) a échoué côté serveur.</p><p>Le profil n'a pas reçu son rapport. Consulte les logs Vercel pour le détail, puis relance manuellement si nécessaire.</p>`
     })
   }).catch(e => { console.error('[generate] alerte send exception:', e.message); return null; });
   if (alertRes && !alertRes.ok) {
