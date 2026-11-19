@@ -95,10 +95,8 @@
 
 
 /* ─── Multi-chiens ─── */
-.dog-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border:2px solid #451A36;border-radius:100px;background:#FFF4E0;cursor:pointer;font:700 14px/1 var(--font-texte),sans-serif;color:#451A36;transition:background .15s;white-space:nowrap;flex-shrink:0;}
-.dog-chip.active{border-width:3px;background:#DDF3F1;}
-.dog-chip-av{width:28px;height:28px;border-radius:50%;background:#DDF3F1;border:1.5px solid #451A36;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none;}
-.dog-chip-av svg{width:130%;height:130%;margin-bottom:-4px;}
+.dog-chip{display:inline-flex;align-items:center;padding:7px 16px;border:3px solid #451A36;border-radius:999px;background:#FFFFFF;cursor:pointer;font:700 16px/1 var(--font-texte),sans-serif;color:#451A36;transition:background .15s;white-space:nowrap;flex-shrink:0;}
+.dog-chip.active{background:#F27A9B;}
 .btn-add-dog{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:2px dashed #451A36;border-radius:100px;background:#FFFFFF;cursor:pointer;font:700 14px/1 var(--font-texte),sans-serif;color:#451A36;transition:border-color .15s,color .15s;white-space:nowrap;flex-shrink:0;}
 .btn-add-dog:hover{border-color:#17706C;color:#17706C;}
 .remove-modal{display:none;position:fixed;inset:0;background:rgba(69,26,54,.45);z-index:200;align-items:center;justify-content:center;}
@@ -126,7 +124,7 @@ body{font-family:var(--font-texte),system-ui,sans-serif;background:#FFF4E0;color
 
 /* ─── HEADER ─── */
 header{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(255,244,224,0.94);backdrop-filter:saturate(150%) blur(14px);-webkit-backdrop-filter:saturate(150%) blur(14px);border-bottom:3px solid #451A36;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:20px;padding:0 36px;min-height:68px;}
-.logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0;}
+.logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0;padding-left:4px;}
 .header-chips{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;overflow:hidden;}
 .header-chips>div:first-child{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;}
 .header-right{display:flex;align-items:center;gap:14px;flex-shrink:0;}
@@ -156,8 +154,8 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 /* Case 1 : turquoise */
 .case-turquoise{background:#2BB3AE;padding:28px 30px;display:flex;align-items:center;gap:24px;}
 .case-turquoise-rayons{position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 100%,#2BB3AE 0deg 8deg,#3FC0BB 8deg 16deg);pointer-events:none;}
-.case-portrait{position:relative;flex:none;width:160px;height:160px;border-radius:50%;background:#F2B630;border:4px solid #451A36;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
-.case-portrait svg{width:140px;height:auto;margin-bottom:-8px;}
+.case-portrait{position:relative;flex:none;width:160px;height:160px;border-radius:50%;background:#F2B630;border:4px solid #451A36;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.case-portrait svg{width:100%;height:100%;}
 .case-info{position:relative;display:flex;flex-direction:column;gap:10px;}
 .case-prenom{font-family:var(--font-titre);font-weight:400;font-size:clamp(32px,4vw,52px);line-height:1;}
 .case-prenom-sticker{display:inline-block;background:#F2B630;border:3px solid #451A36;border-radius:12px;box-shadow:4px 4px 0 #451A36;padding:0 10px 3px;transform:rotate(-2deg);}
@@ -185,7 +183,6 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
   .case-rose{display:none;}
   .case-turquoise{padding:20px;gap:16px;}
   .case-portrait{width:120px;height:120px;}
-  .case-portrait svg{width:105px;}
   .case-score-num{font-size:54px;}
 }
 
@@ -455,7 +452,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 .chat-panel-head::before{content:'';position:absolute;inset:-60px;background:repeating-conic-gradient(rgba(255,255,255,.12) 0deg 10deg,transparent 10deg 20deg);pointer-events:none;}
 .chat-head-left{display:flex;align-items:center;gap:12px;position:relative;z-index:1;}
 .chat-head-av{width:48px;height:48px;border-radius:50%;border:3px solid #451A36;background:#DDF3F1;display:flex;align-items:flex-end;justify-content:center;flex:none;overflow:hidden;}
-.chat-head-av svg{width:130%;height:130%;margin-bottom:-7px;}
+.chat-head-av svg{width:100%;height:100%;}
 .chat-head-titles{display:flex;flex-direction:column;gap:1px;}
 .chat-head-name{font-family:var(--font-titre),cursive;font-size:17px;color:#451A36;}
 .chat-head-sub{font:400 11px/1.4 var(--font-texte),sans-serif;color:#6E4A63;}
@@ -487,7 +484,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 #sendBtn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 .chat-toggle{position:relative;width:96px;height:96px;border-radius:50%;border:4px solid #451A36;background:#F2B630;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;box-shadow:4px 4px 0 #451A36;transition:transform .18s;overflow:hidden;flex-shrink:0;}
 .chat-toggle:hover{transform:translateY(-2px);}
-.chat-toggle svg.viva-mini{width:118%;height:118%;margin-bottom:-6px;}
+.chat-toggle svg.viva-mini{width:100%;height:100%;}
 .chat-toggle .chat-x{position:absolute;inset:0;display:none;align-items:center;justify-content:center;}
 .chat-toggle.is-open .viva-mini{display:none;}
 .chat-toggle.is-open .chat-x{display:flex;}
@@ -586,7 +583,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 
 <header>
   <a href="index.html" class="logo">
-    <img src="kyno-logo.svg" alt="Kyno" height="32">
+    <img src="kyno-logo.svg" alt="Kyno" height="38" style="display:block;">
   </a>
   <div class="header-chips" id="dogSelectorWrap">
     <div id="dogChips"></div>
@@ -627,7 +624,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
       <div class="planche-case case-turquoise">
         <div class="case-turquoise-rayons" aria-hidden="true"></div>
         <div class="case-portrait">
-          <svg viewBox="0 0 460 500" id="planchePortrait" data-viva-full="" style="width:140px;height:auto;margin-bottom:-8px;"></svg>
+          <svg viewBox="0 0 460 500" id="planchePortrait" data-viva-full="" preserveAspectRatio="xMidYMax meet" style="width:100%;height:100%;display:block;"></svg>
         </div>
         <div class="case-info">
           <h1 class="case-prenom"><span class="case-prenom-sticker" id="planchePrenom">…</span></h1>
@@ -649,10 +646,10 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
           <svg class="case-bulle-svg" viewBox="0 0 420 210" preserveAspectRatio="none">
             <path d="M210 12 C320 12 404 50 404 100 C404 150 320 186 210 186 C182 186 156 184 132 178 L74 204 L92 166 C42 150 16 126 16 100 C16 50 100 12 210 12 Z" fill="#FFF4E0" stroke="#451A36" stroke-width="6" stroke-linejoin="round"/>
           </svg>
-          <p class="case-bulle-txt">Mon menu de la semaine est pret !</p>
+          <p class="case-bulle-txt">Mon menu de la semaine est prêt !</p>
         </div>
         <button class="case-voir-menu" onclick="document.getElementById('sectionMenu').scrollIntoView({behavior:'smooth'})">Voir son menu</button>
-        <svg data-viva-full="" viewBox="0 0 460 500" style="position:absolute;right:10px;bottom:-12px;width:100px;height:auto;" aria-hidden="true"></svg>
+        <svg data-viva-full="" viewBox="0 0 460 500" preserveAspectRatio="xMidYMax meet" style="position:absolute;right:10px;bottom:-12px;width:100px;height:109px;" aria-hidden="true"></svg>
       </div>
     </div>
   </section>
@@ -839,7 +836,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
             <button class="accordion-head" onclick="toggleAccordion('batch')">
               <div class="accordion-head-left">
                 <span class="accordion-title">Batch cooking</span>
-                <span class="accordion-sub">Tout preparer en une session</span>
+                <span class="accordion-sub">Tout préparer en une session</span>
               </div>
               <span class="accordion-toggle" id="batchPlus">−</span>
             </button>
@@ -902,9 +899,9 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
       <!-- Carte Ses apports -->
       <div class="sante-card">
         <p class="sante-card-title">Ses apports cette semaine</p>
-        <p class="sante-card-sub" id="apportsSub">Compares a ses besoins calcules (NRC, FEDIAF). Le trait marque la cible de 80 %.</p>
+        <p class="sante-card-sub" id="apportsSub">Comparés à ses besoins calculés (NRC, FEDIAF). Le trait marque la cible de 80 %.</p>
         <div class="macro-list" id="macroList2"></div>
-        <p class="sante-note">Le trait vertical indique 80 % = la cible ideale.</p>
+        <p class="sante-note">Le trait vertical indique 80 % = la cible idéale.</p>
       </div>
       <!-- Carte Son poids -->
       <div class="sante-card">
@@ -934,13 +931,13 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
   <!-- ═══ KYNO+ ═══ -->
   <section class="kynoplus-section">
     <h2>Avec <span class="ky-sticker-turquoise">Kyno+</span></h2>
-    <p>Ces fonctions arrivent bientot dans ton espace.</p>
+    <p>Ces fonctions arrivent bientôt dans ton espace.</p>
     <div class="kynoplus-grid">
 
       <!-- Frigo de Viva -->
       <div class="kp-card">
         <span class="kp-card-icon">🧊</span>
-        <span class="kp-soon">Bientot disponible</span>
+        <span class="kp-soon">Bientôt disponible</span>
         <p class="kp-card-title" id="kpFrigoTitle">Le frigo de ton chien</p>
         <p class="kp-card-txt">Dis-moi ce qu'il reste dans ton frigo : Kyno compose son repas avec, sans gaspiller.</p>
         <input class="kp-field" type="text" placeholder="Ex. : poulet, courgette, riz..." disabled>
@@ -950,11 +947,11 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
       <!-- Guides -->
       <div class="kp-card">
         <span class="kp-card-icon">📖</span>
-        <span class="kp-soon">Bientot disponible</span>
+        <span class="kp-soon">Bientôt disponible</span>
         <p class="kp-card-title">Les guides Kyno</p>
         <p class="kp-card-txt">Des guides pratiques pour cuisiner pour ton chien, a lire quand tu veux.</p>
         <ul class="kp-guides">
-          <li>Bien demarrer la ration menagere</li>
+          <li>Bien démarrer la ration ménagère</li>
           <li>Conserver et congeler ses repas</li>
           <li>Partir en vacances avec son menu</li>
         </ul>
@@ -964,10 +961,10 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
       <!-- Suivi sante -->
       <div class="kp-card">
         <span class="kp-card-icon">📊</span>
-        <span class="kp-soon">Bientot disponible</span>
-        <p class="kp-card-title">Son suivi sante renforce</p>
-        <p class="kp-card-txt">Sa courbe de poids detaillee et un rapport a montrer a ton veterinaire.</p>
-        <button class="kp-btn" disabled>Telecharger le rapport</button>
+        <span class="kp-soon">Bientôt disponible</span>
+        <p class="kp-card-title">Son suivi santé renforcé</p>
+        <p class="kp-card-txt">Sa courbe de poids détaillée et un rapport à montrer à ton vétérinaire.</p>
+        <button class="kp-btn" disabled>Télécharger le rapport</button>
       </div>
     </div>
 
@@ -979,8 +976,8 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
         <p class="kp-abo-note">Tarif garanti tant que ton abonnement reste actif.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end">
-        <span class="kp-soon">Bientot disponible</span>
-        <button class="kp-btn" disabled>Gerer mon abonnement</button>
+        <span class="kp-soon">Bientôt disponible</span>
+        <button class="kp-btn" disabled>Gérer mon abonnement</button>
       </div>
     </div>
   </section>
@@ -1011,7 +1008,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
   <div class="chat-panel" id="chatPanel">
     <div class="chat-panel-head">
       <div class="chat-head-left">
-        <div class="chat-head-av"><svg viewBox="96 78 248 226" data-viva-head=""><g stroke="#3A2A20" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+        <div class="chat-head-av"><svg viewBox="96 78 248 226" preserveAspectRatio="xMidYMax meet" data-viva-head=""><g stroke="#3A2A20" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
 <path d="M118 150 q-58 8 -64 88 q-4 64 40 104 q40 18 58 -16 q16 -64 6 -132 q-6 -36 -40 -44 Z" fill="#BE6B41"></path>
 <path d="M320 150 q58 8 64 88 q4 64 -40 104 q-40 18 -58 -16 q-16 -64 -6 -132 q6 -36 40 -44 Z" fill="#BE6B41"></path>
 <path d="M220 86 q104 0 120 92 q12 74 -36 122 q-38 36 -84 36 q-46 0 -84 -36 q-48 -48 -36 -122 q16 -92 120 -92 Z" fill="#FFFFFF"></path>
@@ -1030,7 +1027,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 <path d="M212 234 q8 18 18 18 q10 0 14 -13 q-16 6 -32 -5 Z" fill="#D98E80"></path>
 </g></svg></div>
         <div class="chat-head-titles">
-          <div class="chat-head-name">Dis-moi ce qui a change</div>
+          <div class="chat-head-name">Dis-moi ce qui a changé</div>
           <div class="chat-head-sub" id="chatSub">Le chat de Kyno</div>
         </div>
       </div>
@@ -1046,9 +1043,9 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
       </button>
     </div>
   </div>
-  <div class="chat-hint" id="chatHint">Dis-moi ce qui a change !</div>
+  <div class="chat-hint" id="chatHint">Dis-moi ce qui a changé !</div>
   <button class="chat-toggle" id="chatToggleBtn" onclick="toggleChat()" aria-label="Ouvrir le chat">
-    <svg class="viva-mini" viewBox="96 78 248 226" data-viva-head=""><g stroke="#3A2A20" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <svg class="viva-mini" viewBox="96 78 248 226" preserveAspectRatio="xMidYMax meet" data-viva-head=""><g stroke="#3A2A20" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
 <path d="M118 150 q-58 8 -64 88 q-4 64 40 104 q40 18 58 -16 q16 -64 6 -132 q-6 -36 -40 -44 Z" fill="#BE6B41"></path>
 <path d="M320 150 q58 8 64 88 q4 64 -40 104 q-40 18 -58 -16 q-16 -64 -6 -132 q6 -36 40 -44 Z" fill="#BE6B41"></path>
 <path d="M220 86 q104 0 120 92 q12 74 -36 122 q-38 36 -84 36 q-46 0 -84 -36 q-48 -48 -36 -122 q16 -92 120 -92 Z" fill="#FFFFFF"></path>
@@ -1713,13 +1710,13 @@ function renderMenuCard(p) {
   if (weekLabel) weekLabel.textContent = saison ? 'Semaine en cours · ' + saison : 'Semaine en cours';
 
   const menuName = document.getElementById('menuName');
-  if (menuName) menuName.textContent = recipe ? (recipe.titre || 'Menu en cours') : 'Menu en preparation';
+  if (menuName) menuName.textContent = recipe ? (recipe.titre || 'Menu en cours') : 'Menu en préparation';
 
   const tags = document.getElementById('menuCardTags');
   if (tags) {
     const items = [
-      p.temps_prep ? 'Temps de prepa : ' + p.temps_prep : null,
-      p.cout_semaine ? 'Cout : ' + p.cout_semaine : null
+      p.temps_prep ? 'Temps de prépa : ' + p.temps_prep : null,
+      p.cout_semaine ? 'Coût : ' + p.cout_semaine : null
     ].filter(Boolean);
     tags.innerHTML = items.map(t => `<span class="pastille">${esc(t)}</span>`).join('');
   }
@@ -1751,7 +1748,7 @@ function renderRecipes(p) {
   const recipes = Array.isArray(p.recettes) && p.recettes.length ? p.recettes.slice(0, 1) : null;
   const c = document.getElementById('recipesContainer');
   if (!recipes) {
-    const nom = p.prenom_chien || 'ton chien';
+    const nom = cap(p.prenom_chien || '') || 'ton chien';
     c.innerHTML = `<div class="menu-pending">
       <div class="menu-pending-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#17706C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"></path><path d="M5 10a7 7 0 0 1 14 0v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"></path><path d="M5 16h14"></path></svg></div>
       <div class="menu-pending-title">Le menu de ${esc(nom)} est en préparation</div>
@@ -1901,7 +1898,7 @@ function buildDogSelector() {
     chiens.forEach(c => {
       const btn = document.createElement('button');
       btn.className = 'dog-chip' + (c.id === currentChienId ? ' active' : '');
-      btn.innerHTML = '<span class="dog-chip-av"><svg viewBox="96 78 248 226" data-viva-head=""></svg></span>' + esc(cap(c.prenom_chien || 'Chien'));
+      btn.textContent = cap(c.prenom_chien || 'Chien');
       btn.onclick = function() { selectChien(c.id); };
       chips.appendChild(btn);
     });
@@ -1911,10 +1908,6 @@ function buildDogSelector() {
   addBtn.textContent = '+ Ajouter un chien';
   addBtn.onclick = addDogRedirect;
   chips.appendChild(addBtn);
-  chips.querySelectorAll('[data-viva-head]').forEach(el => {
-    const h = document.getElementById('vivaHeadTpl');
-    if (h) el.innerHTML = h.innerHTML;
-  });
 }
 
 function addDogRedirect() {
@@ -1935,7 +1928,7 @@ function selectChien(id) {
 }
 
 function showRemoveDogModal() {
-  const nom = (currentChien && currentChien.prenom_chien) || 'ce chien';
+  const nom = cap((currentChien && currentChien.prenom_chien) || '') || 'ce chien';
   document.getElementById('removeDogModalTitle').textContent = 'Retirer ' + nom + ' ?';
   document.getElementById('removeDogModal').classList.add('open');
 }
