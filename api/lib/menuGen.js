@@ -423,7 +423,7 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
   const hasExtras = dogExtrasHtml.trim().length > 0;
 
   // ── Btn Outlook-safe ──────────────────────────────────────────────────────
-  const btnLabel = pluriel ? 'Voir leurs menus' : `Voir son menu`;
+  const btnLabel = pluriel ? 'Ouvrir leurs menus' : 'Ouvrir son menu';
   const btnHtml = `<table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
           <tr>
             <td bgcolor="#E5432F" style="border-radius:999px;border:3px solid #451A36;">
@@ -472,14 +472,12 @@ function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
           Le menu de la semaine de ${nomStickers}
         </h1>
         <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
-          Bonjour&nbsp;! Voici ${pluriel ? 'leurs menus' : 'son menu'} de la semaine, avec les quantit&eacute;s pr&eacute;cises, le batch cooking et la liste de courses.
+          ${pluriel ? 'Leurs menus' : 'Son menu'} de la semaine ${pluriel ? 'sont pr&ecirc;ts' : 'est pr&ecirc;t'}.
         </p>
         ${recapTableHtml}
         ${hasExtras ? `<div style="margin:0 0 20px;font-size:14px;line-height:1.75;color:#451A36;">${dogExtrasHtml}</div>` : ''}
-        ${stepsHtml ? `<h2 style="margin:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:#451A36;">Les &eacute;tapes</h2><p style="margin:0 0 20px;font-size:15px;line-height:1.9;color:#451A36;font-family:Arial,Helvetica,sans-serif;">${stepsHtml}</p>` : ''}
-        ${coursesHtml ? `<h2 style="margin:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:#451A36;">Liste de courses (7&nbsp;jours)</h2><p style="margin:0 0 20px;font-size:15px;line-height:1.9;color:#451A36;font-family:Arial,Helvetica,sans-serif;">${coursesHtml}</p>` : ''}
         <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
-          Retrouve ${pluriel ? 'ces menus' : 'ce menu'} dans ton espace Kyno, o&ugrave; tu peux me raconter comment &ccedil;a s&apos;est pass&eacute;.
+          Ta liste de courses et ton batch cooking t&apos;attendent dans ton espace Kyno.
         </p>
         ${btnHtml}
         ${footerHtml}

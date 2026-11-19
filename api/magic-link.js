@@ -221,7 +221,7 @@ async function generateMenuInBackground(email) {
     }
   }
 
-  await sendEmailMenu(email, prenomChien, menuData.email_html || '');
+  await sendEmailMenu(email, prenomChien, menuData);
 
   console.log(`Menu généré et envoyé avec succès pour ${prenomChien} (${email})`);
 }
@@ -339,14 +339,7 @@ function getSaison() {
 }
 
 // ── EMAIL MENU ────────────────────────────────────────────
-async function sendEmailMenu(email, prenom, menu) {
-  const htmlMenu = menu
-    .replace(/\n\n/g, '</p><p style="margin:0 0 16px;">')
-    .replace(/\n/g, '<br>')
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#451A36;font-weight:600;">$1</strong>')
-    .replace(/^/, '<p style="margin:0 0 16px;">')
-    .replace(/$/, '</p>');
-
+async function sendEmailMenu(email, prenom, menuData) {
   await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
@@ -357,13 +350,13 @@ async function sendEmailMenu(email, prenom, menu) {
       sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
       to: [{ email, name: prenom }],
       subject: `Le menu de la semaine de ${prenom}`,
-      htmlContent: buildEmailMenuHtml(prenom, htmlMenu, menuData)
+      htmlContent: buildEmailMenuHtml(prenom, menuData)
     })
   });
 }
 
 // ── TEMPLATE EMAIL MENU ───────────────────────────────────
-function buildEmailMenuHtml(prenom, htmlContent, data = {}) {
+function buildEmailMenuHtml(prenom, data = {}) {
   const titre = data.recette && data.recette.titre ? data.recette.titre : null;
   const ration = data.recette && data.recette.ration ? data.recette.ration + ' g' : null;
   const batchTime = data.batch_time || null;
@@ -401,14 +394,11 @@ function buildEmailMenuHtml(prenom, htmlContent, data = {}) {
           Le menu de la semaine de <span style="display:inline-block;background:#F27A9B;border:3px solid #451A36;border-radius:10px;padding:0 8px 2px;">${prenom}</span>
         </h1>
         <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
-          Bonjour&nbsp;! Voici son menu de la semaine, avec les quantit&eacute;s pr&eacute;cises, le batch cooking et la liste de courses.
+          Son menu de la semaine est pr&ecirc;t.
         </p>
         ${recapTable}
-        <div style="font-size:14px;line-height:1.85;color:#451A36;margin:0 0 20px;">
-          ${htmlContent}
-        </div>
         <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
-          Tu le retrouves aussi dans ton espace Kyno, o&ugrave; tu peux me raconter comment il s&apos;est pass&eacute;.
+          Ta liste de courses et ton batch cooking t&apos;attendent dans ton espace Kyno.
         </p>
         <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
           <tr>
