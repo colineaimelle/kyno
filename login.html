@@ -156,6 +156,7 @@
       <h1>Accède à l'espace de <em>ton chien</em></h1>
       <p class="subtitle">On t'envoie un lien de connexion par email. Pas de mot de passe à retenir : un clic et c'est ouvert.</p>
 
+      <form onsubmit="handleLogin(event)">
       <div class="field">
         <label for="loginEmail">Ton email</label>
         <div class="input-wrap">
@@ -167,7 +168,7 @@
         </div>
       </div>
 
-      <button class="btn-main" id="loginSubmitBtn" onclick="handleLogin()">
+      <button class="btn-main" id="loginSubmitBtn" type="submit">
         <span>Recevoir mon lien de connexion</span>
         <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
           <path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>
@@ -182,6 +183,7 @@
       </div>
 
       <p class="footnote">En continuant, tu acceptes nos <strong>conditions</strong> et notre <strong>politique de confidentialité</strong>.</p>
+      </form>
     </div>
 
     <!-- État 2 : Confirmation -->
@@ -227,7 +229,8 @@
     });
 
     // ── Envoi du lien magique ──────────────────────────────────
-    async function handleLogin() {
+    async function handleLogin(e) {
+      if (e) e.preventDefault();
       hideError();
 
       const email = document.getElementById('loginEmail').value.trim();

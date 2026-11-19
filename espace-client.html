@@ -97,11 +97,10 @@
 /* ─── Multi-chiens ─── */
 .dog-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border:2px solid #451A36;border-radius:100px;background:#FFF4E0;cursor:pointer;font:700 14px/1 var(--font-texte),sans-serif;color:#451A36;transition:background .15s;white-space:nowrap;flex-shrink:0;}
 .dog-chip.active{border-width:3px;background:#DDF3F1;}
-.dog-chip-av{width:26px;height:26px;border-radius:50%;background:#DDF3F1;border:1.5px solid #451A36;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none;}
+.dog-chip-av{width:28px;height:28px;border-radius:50%;background:#DDF3F1;border:1.5px solid #451A36;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none;}
 .dog-chip-av svg{width:130%;height:130%;margin-bottom:-4px;}
 .btn-add-dog{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:2px dashed #451A36;border-radius:100px;background:#FFFFFF;cursor:pointer;font:700 14px/1 var(--font-texte),sans-serif;color:#451A36;transition:border-color .15s,color .15s;white-space:nowrap;flex-shrink:0;}
 .btn-add-dog:hover{border-color:#17706C;color:#17706C;}
-.btn-remove-dog{background:none;border:none;padding:2px 0;font:400 11px/1 var(--font-texte),sans-serif;color:#B8301D;cursor:pointer;text-decoration:underline;display:block;}
 .remove-modal{display:none;position:fixed;inset:0;background:rgba(69,26,54,.45);z-index:200;align-items:center;justify-content:center;}
 .remove-modal.open{display:flex;}
 .remove-modal-box{background:#FFF4E0;border:4px solid #451A36;border-radius:24px;box-shadow:6px 6px 0 #451A36;padding:28px 24px;max-width:340px;width:calc(100% - 40px);text-align:center;}
@@ -162,7 +161,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 .case-info{position:relative;display:flex;flex-direction:column;gap:10px;}
 .case-prenom{font-family:var(--font-titre);font-weight:400;font-size:clamp(32px,4vw,52px);line-height:1;}
 .case-prenom-sticker{display:inline-block;background:#F2B630;border:3px solid #451A36;border-radius:12px;box-shadow:4px 4px 0 #451A36;padding:0 10px 3px;transform:rotate(-2deg);}
-.case-race{font:700 15px/1.4 var(--font-texte),sans-serif;color:#FFF4E0;}
+.case-race{font:700 15px/1.4 var(--font-texte),sans-serif;color:#451A36;}
 .case-pastilles{display:flex;gap:7px;flex-wrap:wrap;}
 /* Case 2 : papier */
 .case-papier{background:#FFF4E0;padding:24px 26px;display:flex;flex-direction:column;justify-content:center;gap:10px;}
@@ -512,6 +511,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 .fiche-know-item:last-child{border-bottom:none;}
 .fiche-know-item span{color:#6E4A63;}
 .fiche-know-item b{text-align:right;}
+.fiche-remove-link{display:block;margin-top:14px;font:400 14px/1.4 var(--font-texte),sans-serif;color:#6E4A63;text-decoration:underline;text-underline-offset:3px;}
 .poids-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
 .weight-now-row{display:flex;align-items:baseline;gap:8px;}
 .weight-now-row b{font-family:var(--font-titre);font-weight:400;font-size:24px;}
@@ -554,7 +554,6 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
   .header-chips{grid-column:1/-1;grid-row:2;flex-direction:row;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none;justify-content:flex-start;align-items:center;gap:8px;min-width:0;}
   .header-chips::-webkit-scrollbar{display:none;}
   .header-chips>div:first-child{flex-shrink:0;}
-  .header-chips>.btn-remove-dog{flex-shrink:0;}
   .header-right{grid-column:2;grid-row:1;padding:12px 16px;gap:8px;}
   .hdr-link{display:none;}
   .hdr-logout{display:none;}
@@ -591,7 +590,6 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
   </a>
   <div class="header-chips" id="dogSelectorWrap">
     <div id="dogChips"></div>
-    <button class="btn-remove-dog" id="removeDogBtn" onclick="showRemoveDogModal()" style="display:none">Retirer ce chien</button>
   </div>
   <div class="header-right">
     <button class="hdr-link" onclick="void(0)">Aide et contact</button>
@@ -1290,7 +1288,7 @@ const DEMO_PROFILE = {
 //  RENDER PRINCIPAL
 // ═══════════════════════════════════════════════════════════
 function renderAll(p) {
-  const nom = p.prenom_chien || 'ton chien';
+  const nom = cap(p.prenom_chien || '') || 'ton chien';
   document.getElementById('chatSub').textContent = `Le chat de Kyno, pour ${nom}`;
   const frigoTitle = document.getElementById('kpFrigoTitle');
   if (frigoTitle) frigoTitle.textContent = `Le frigo de ${nom}`;
@@ -1344,7 +1342,7 @@ async function setJourEnvoi(val, el) {
 }
 
 function renderSlide1(p) {
-  document.getElementById('s1Name').textContent = p.prenom_chien || '…';
+  document.getElementById('s1Name').textContent = cap(p.prenom_chien || '') || '…';
   document.getElementById('s1Since').textContent = `Membre depuis ${formatMonth(p.created_at)}`;
   renderScore(p.score_sante);
 
@@ -1408,26 +1406,32 @@ s1ex.innerHTML = extras.map(s =>
 }
 
 function renderPlanche(p) {
-  const nom = p.prenom_chien || '…';
+  const nom = cap(p.prenom_chien || '');
   const prenomEl = document.getElementById('planchePrenom');
-  if (prenomEl) prenomEl.textContent = nom;
+  if (prenomEl) prenomEl.textContent = nom || '…';
 
   const raceEl = document.getElementById('plancheRaceSince');
   if (raceEl) {
     const sexe = p.sexe || '';
     const depuis = formatMonth(p.created_at);
-    raceEl.textContent = [p.race, sexe, 'membre depuis ' + depuis].filter(Boolean).join(' · ');
+    const race = cap(p.race || '');
+    raceEl.textContent = [race, sexe, 'membre depuis ' + depuis].filter(Boolean).join(' · ');
   }
 
   const pastEl = document.getElementById('planchePastilles');
   if (pastEl) {
+    const SKIP = /^(je ne sais pas|non|aucun|aucune|jamais|)$/i;
     const tags = [
       p.activite,
       p.mode_alimentaire || p.modeAlimentaire,
       p.jour_envoi ? 'Menu le ' + ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'][(p.jour_envoi - 1)] : null
-    ].filter(Boolean);
+    ].filter(t => t && !SKIP.test(String(t).trim()));
     pastEl.innerHTML = tags.map(t => `<span class="pastille">${esc(t)}</span>`).join('');
   }
+
+  // Portrait : injecter l'avatar Viva dans le disque
+  const portrait = document.getElementById('planchePortrait');
+  if (portrait && !portrait.innerHTML.trim()) injectViva();
 
   renderScore(p.score_sante);
 }
@@ -1606,9 +1610,13 @@ function renderFicheSante(p) {
       { label: 'Traitements', val: toArr(p.traitements).join(', ') || 'Aucun traitement en cours' },
       { label: 'Digestion', val: toArr(p.digestion).join(', ') || (toArr(p.sensibilites).join(', ')) || 'RAS' }
     ];
+    const nom = cap(p.prenom_chien || 'ce chien');
+    const removeLink = chiens.length > 0
+      ? `<a class="fiche-remove-link" href="#" onclick="showRemoveDogModal();return false;">Retirer ${esc(nom)} de mon espace</a>`
+      : '';
     know.innerHTML = `<ul class="fiche-know-list">${rows.map(r =>
       `<li class="fiche-know-item"><span>${esc(r.label)}</span><b>${esc(r.val)}</b></li>`
-    ).join('')}</ul>`;
+    ).join('')}</ul>${removeLink}`;
   }
   const vet = document.getElementById('ficheVetAlert');
   if (vet) vet.innerHTML = document.getElementById('s1VetAlert') ? document.getElementById('s1VetAlert').innerHTML : '';
@@ -1886,7 +1894,6 @@ function reviewWeek(label) { toggleChat(true); addMessage('user', `Je veux revoi
 function buildDogSelector() {
   const wrap = document.getElementById('dogSelectorWrap');
   const chips = document.getElementById('dogChips');
-  const removeBtn = document.getElementById('removeDogBtn');
   if (!wrap || !chips) return;
   wrap.style.display = 'block';
   chips.innerHTML = '';
@@ -1894,7 +1901,7 @@ function buildDogSelector() {
     chiens.forEach(c => {
       const btn = document.createElement('button');
       btn.className = 'dog-chip' + (c.id === currentChienId ? ' active' : '');
-      btn.innerHTML = '<span class="dog-chip-av"><svg viewBox="96 78 248 226" data-viva-head=""></svg></span>' + esc(c.prenom_chien || 'Chien');
+      btn.innerHTML = '<span class="dog-chip-av"><svg viewBox="96 78 248 226" data-viva-head=""></svg></span>' + esc(cap(c.prenom_chien || 'Chien'));
       btn.onclick = function() { selectChien(c.id); };
       chips.appendChild(btn);
     });
@@ -1904,7 +1911,6 @@ function buildDogSelector() {
   addBtn.textContent = '+ Ajouter un chien';
   addBtn.onclick = addDogRedirect;
   chips.appendChild(addBtn);
-  if (removeBtn) removeBtn.style.display = chiens.length > 0 ? 'block' : 'none';
   chips.querySelectorAll('[data-viva-head]').forEach(el => {
     const h = document.getElementById('vivaHeadTpl');
     if (h) el.innerHTML = h.innerHTML;
@@ -2262,6 +2268,8 @@ const ICON_TAG = {
   list: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#451A36" stroke-width="2.2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path></svg>',
   scale: '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#17706C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7h14M7 7l-3 7h6ZM17 7l3 7h-6Z"></path></svg>'
 };
+
+document.addEventListener('DOMContentLoaded', injectViva);
 
 function toArr(val) {
   if (Array.isArray(val)) return val.filter(Boolean);
