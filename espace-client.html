@@ -331,15 +331,38 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 .menu-pending-title{font-family:var(--font-texte);font-weight:700;font-size:18px;color:#451A36;}
 .menu-pending-sub{font-family:var(--font-texte);font-size:13px;color:#6E4A63;line-height:1.6;max-width:340px;}
 
+/* ─── SECTION MENU ─── */
+.menu-card{background:#FFFFFF;border:3px solid #451A36;border-radius:24px;box-shadow:6px 6px 0 #451A36;overflow:hidden;}
+.menu-card-head{background:#2BB3AE;border-bottom:3px solid #451A36;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+.menu-card-head-left{display:flex;flex-direction:column;gap:4px;}
+.menu-week-label{font:700 14px/1 var(--font-texte),sans-serif;color:#451A36;}
+.menu-name{font-family:var(--font-titre);font-weight:400;font-size:clamp(18px,2.5vw,28px);color:#451A36;margin:0;line-height:1.1;}
+.menu-card-tags{display:flex;gap:8px;flex-wrap:wrap;}
+.menu-card-body{display:grid;grid-template-columns:1fr 1.2fr;gap:0;}
+.menu-portion{padding:22px 24px;border-right:3px solid #451A36;}
+.menu-portion-title{font:700 16px/1 var(--font-texte),sans-serif;color:#451A36;margin-bottom:4px;}
+.menu-portion-sub{font:400 13px/1 var(--font-texte),sans-serif;color:#6E4A63;margin-bottom:12px;}
+.menu-portion-list{list-style:none;margin:0;padding:0;}
+.menu-portion-list li{display:flex;justify-content:space-between;padding:9px 0;border-bottom:2px solid #E8DCC6;font-size:15px;color:#451A36;}
+.menu-portion-list li:last-child{border-bottom:none;}
+.menu-portion-list li b{font-weight:700;}
+.menu-accordions{padding:22px 24px;display:flex;flex-direction:column;gap:12px;}
 /* ─── ACCORDÉONS ─── */
-.accordions{display:flex;flex-direction:column;gap:12px;margin-top:18px;}
-.accordion{background:#fff;border:1.5px solid #E8DCC6;border-radius:16px;overflow:hidden;}
-.accordion-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 20px;border:none;background:transparent;cursor:pointer;text-align:left;}
-.accordion-head-left{display:flex;align-items:center;gap:12px;}
-.accordion-title{font-family:var(--font-titre);font-weight:600;font-size:15.5px;color:#451A36;}
-.accordion-plus{font-family:var(--font-titre);font-weight:600;font-size:22px;color:#E5432F;transition:transform .25s;line-height:1;}
-.accordion-body{padding:0 20px 20px;display:none;flex-direction:column;gap:16px;}
+.accordion{background:#FFFFFF;border:3px solid #451A36;border-radius:18px;overflow:hidden;}
+.accordion.is-open{background:#FCEBC4;}
+.accordion-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border:none;background:transparent;cursor:pointer;text-align:left;}
+.accordion-head-left{display:flex;flex-direction:column;gap:2px;}
+.accordion-title{font:700 16px/1 var(--font-texte),sans-serif;color:#451A36;}
+.accordion-sub{font:400 13px/1 var(--font-texte),sans-serif;color:#6E4A63;}
+.accordion-toggle{flex:none;width:32px;height:32px;border-radius:50%;background:#E5432F;color:#FFF4E0;border:3px solid #451A36;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;line-height:1;transition:transform .25s;}
+.accordion-body{padding:0 18px 18px;display:none;flex-direction:column;gap:14px;}
 .accordion-body.open{display:flex;}
+.btn-copy-courses{display:inline-flex;align-items:center;justify-content:center;background:#F2B630;color:#451A36;border:3px solid #451A36;border-radius:999px;padding:12px 22px;font:700 15px/1 var(--font-texte),sans-serif;cursor:pointer;align-self:flex-start;}
+@media(max-width:768px){
+  .menu-card-body{grid-template-columns:1fr;}
+  .menu-portion{border-right:none;border-bottom:3px solid #451A36;}
+  .menu-card-head{flex-direction:column;align-items:flex-start;}
+}
 
 /* batch */
 .batch-tags{display:flex;flex-wrap:wrap;gap:9px;}
@@ -732,77 +755,82 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
       </div>
     </div><!-- /carousel caché -->
 
-  <!-- ═══ SECTION 2 — ALIMENTATION ═══ -->
-  <section>
-    <div class="section-label">
-      <span>02 · Son alimentation</span>
-      <div class="section-label-line"></div>
-    </div>
-    <h2>Le menu de la semaine</h2>
+  <!-- ═══ SECTION MENU DE LA SEMAINE ═══ -->
+  <section id="sectionMenu">
+    <h2>Son menu de <span class="ky-sticker">la semaine</span></h2>
 
-    <div id="recipesContainer"></div>
-
-    <div class="cook-row" id="cookRow"></div>
-
-    <div class="accordions">
-
-      <!-- BATCH COOKING -->
-      <div class="accordion">
-        <button class="accordion-head" onclick="toggleAccordion('batch')">
-          <span class="accordion-head-left">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#E5432F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"></path><path d="M5 10a7 7 0 0 1 14 0v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"></path><path d="M5 16h14"></path></svg>
-            <span class="accordion-title">Batch cooking · prépare tout en une session</span>
-          </span>
-          <span class="accordion-plus" id="batchPlus">+</span>
-        </button>
-        <div class="accordion-body" id="batchBody">
-          <div class="batch-tags" id="batchTags"></div>
-          <div class="batch-steps" id="batchSteps"></div>
-          <div id="batchSpecial"></div>
-          <div class="batch-conserv" id="batchConserv"></div>
+    <div class="menu-card" id="menuCard">
+      <!-- En-tete turquoise : rempli par renderMenuCard() -->
+      <div class="menu-card-head" id="menuCardHead">
+        <div class="menu-card-head-left">
+          <span class="menu-week-label" id="menuWeekLabel">Semaine en cours</span>
+          <p class="menu-name" id="menuName">Menu en preparation</p>
         </div>
+        <div class="menu-card-tags" id="menuCardTags"></div>
       </div>
-
-      <!-- LISTE DE COURSES -->
-      <div class="accordion">
-        <button class="accordion-head" onclick="toggleAccordion('courses')">
-          <span class="accordion-head-left">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#17706C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="16" x="3" y="6" rx="2"></rect><path d="M3 10h18"></path><path d="m8 14 2 2 4-4"></path></svg>
-            <span class="accordion-title">Liste de courses de la semaine</span>
-          </span>
-          <span class="accordion-plus" id="coursesPlus">+</span>
-        </button>
-        <div class="accordion-body" id="coursesBody">
-          <div id="coursesGrid"></div>
-          <div class="savings-block" id="savingsBlock"></div>
-          <div class="courses-footer">
-            <button class="copy-btn" onclick="copyList()">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
-              <span id="copyLabel">Copier la liste</span>
+      <!-- Corps 2 colonnes -->
+      <div class="menu-card-body" id="menuCardBody">
+        <!-- Gauche : portion du jour -->
+        <div class="menu-portion" id="menuPortion">
+          <p class="menu-portion-title">Sa portion du jour</p>
+          <p class="menu-portion-sub" id="menuPortionSub"></p>
+          <ul class="menu-portion-list" id="menuIngList"></ul>
+        </div>
+        <!-- Droite : accordéons + bouton copier -->
+        <div class="menu-accordions">
+          <!-- BATCH COOKING -->
+          <div class="accordion is-open" id="accordionBatch">
+            <button class="accordion-head" onclick="toggleAccordion('batch')">
+              <div class="accordion-head-left">
+                <span class="accordion-title">Batch cooking</span>
+                <span class="accordion-sub">Tout preparer en une session</span>
+              </div>
+              <span class="accordion-toggle" id="batchPlus">−</span>
             </button>
-            <div>
-              <div class="cout-label">Coût de la semaine</div>
-              <div class="cout-val" id="coutSemaine">—</div>
+            <div class="accordion-body open" id="batchBody">
+              <div class="batch-tags" id="batchTags"></div>
+              <div class="batch-steps" id="batchSteps"></div>
+              <div id="batchSpecial"></div>
+              <div class="batch-conserv" id="batchConserv"></div>
             </div>
           </div>
+          <!-- LISTE DE COURSES -->
+          <div class="accordion" id="accordionCourses">
+            <button class="accordion-head" onclick="toggleAccordion('courses')">
+              <div class="accordion-head-left">
+                <span class="accordion-title">Liste de courses de la semaine</span>
+                <span class="accordion-sub" id="coursesSubLabel"></span>
+              </div>
+              <span class="accordion-toggle" id="coursesPlus">+</span>
+            </button>
+            <div class="accordion-body" id="coursesBody">
+              <div id="coursesGrid"></div>
+              <div class="savings-block" id="savingsBlock"></div>
+            </div>
+          </div>
+          <!-- MENUS PRÉCÉDENTS -->
+          <div class="accordion" id="accordionMenus">
+            <button class="accordion-head" onclick="toggleAccordion('menus')">
+              <div class="accordion-head-left">
+                <span class="accordion-title">Menus precedents</span>
+                <span class="accordion-sub" id="menusSubLabel"></span>
+              </div>
+              <span class="accordion-toggle" id="menusPlus">+</span>
+            </button>
+            <div class="accordion-body" id="menusBody">
+              <div class="past-weeks" id="pastWeeksContainer"></div>
+            </div>
+          </div>
+          <!-- Bouton copier -->
+          <button class="btn-copy-courses" onclick="copyList()">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#451A36" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px"><rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+            <span id="copyLabel">Copier la liste de courses</span>
+          </button>
         </div>
       </div>
-
-      <!-- MENUS PRÉCÉDENTS -->
-      <div class="accordion">
-        <button class="accordion-head" onclick="toggleAccordion('menus')">
-          <span class="accordion-head-left">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#17706C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
-            <span class="accordion-title">Menus précédents</span>
-          </span>
-          <span class="accordion-plus" id="menusPlus">+</span>
-        </button>
-        <div class="accordion-body" id="menusBody">
-          <div class="past-weeks" id="pastWeeksContainer"></div>
-        </div>
-      </div>
-
     </div>
+    <!-- Anciens conteneurs cachés conservés pour compatibilité JS -->
+    <div style="display:none"><div class="cook-row" id="cookRow"></div><div id="recipesContainer"></div><div class="cout-val" id="coutSemaine">—</div></div>
   </section>
 
 </main>
@@ -1110,6 +1138,7 @@ function renderAll(p) {
   document.getElementById('chatSub').textContent = `Le suivi de ${nom}`;
 
   renderPlanche(p);
+  renderMenuCard(p);
   renderSlide1(p);
   renderSlide2(p);
   renderSlide3(p);
@@ -1406,6 +1435,49 @@ function renderSlide4(p) {
 
 }
 
+// ─── MENU CARD ───
+function renderMenuCard(p) {
+  const recipe = Array.isArray(p.recettes) && p.recettes[0] ? p.recettes[0] : null;
+
+  // En-tete
+  const saison = p.saison || '';
+  const weekLabel = document.getElementById('menuWeekLabel');
+  if (weekLabel) weekLabel.textContent = saison ? 'Semaine en cours · ' + saison : 'Semaine en cours';
+
+  const menuName = document.getElementById('menuName');
+  if (menuName) menuName.textContent = recipe ? (recipe.titre || 'Menu en cours') : 'Menu en preparation';
+
+  const tags = document.getElementById('menuCardTags');
+  if (tags) {
+    const items = [
+      p.temps_prep ? 'Temps de prepa : ' + p.temps_prep : null,
+      p.cout_semaine ? 'Cout : ' + p.cout_semaine : null
+    ].filter(Boolean);
+    tags.innerHTML = items.map(t => `<span class="pastille">${esc(t)}</span>`).join('');
+  }
+
+  // Portion du jour
+  if (recipe) {
+    const sub = document.getElementById('menuPortionSub');
+    if (sub && recipe.ration) sub.textContent = '2 repas par jour, ' + recipe.ration + ' g au total.';
+    const ing = document.getElementById('menuIngList');
+    if (ing && Array.isArray(recipe.ingredients)) {
+      ing.innerHTML = recipe.ingredients.map(i =>
+        `<li><span>${esc(i.name || '')}</span><b>${esc(i.qty || '')}</b></li>`
+      ).join('');
+    }
+  }
+
+  // Sous-labels accordeons
+  const nCourses = (p.courses || []).flatMap(c => c.items || []).length;
+  const courseSub = document.getElementById('coursesSubLabel');
+  if (courseSub && nCourses) courseSub.textContent = nCourses + ' produits, a copier en un clic';
+
+  const nMenus = Array.isArray(p.historique_menus) ? p.historique_menus.length : 0;
+  const menusSub = document.getElementById('menusSubLabel');
+  if (menusSub && nMenus) menusSub.textContent = nMenus + ' semaine' + (nMenus > 1 ? 's' : '');
+}
+
 // ─── RECETTES ───
 function renderRecipes(p) {
   const recipes = Array.isArray(p.recettes) && p.recettes.length ? p.recettes.slice(0, 1) : null;
@@ -1694,9 +1766,11 @@ document.addEventListener('keydown', e => {
 // ═══════════════════════════════════════════════════════════
 function toggleAccordion(name) {
   const body = document.getElementById(name + 'Body');
-  const plus = document.getElementById(name + 'Plus');
+  const toggle = document.getElementById(name + 'Plus');
+  const accordion = document.getElementById('accordion' + name.charAt(0).toUpperCase() + name.slice(1));
   const open = body.classList.toggle('open');
-  plus.style.transform = open ? 'rotate(45deg)' : 'rotate(0deg)';
+  if (toggle) toggle.textContent = open ? '−' : '+';
+  if (accordion) accordion.classList.toggle('is-open', open);
 }
 
 // ═══════════════════════════════════════════════════════════
