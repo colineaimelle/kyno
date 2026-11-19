@@ -123,7 +123,7 @@ body{font-family:var(--font-texte),system-ui,sans-serif;background:#FFF4E0;color
 @keyframes kring{from{transform:scale(.9);opacity:.6;}to{transform:scale(1.6);opacity:0;}}
 
 /* ─── HEADER ─── */
-header{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(255,244,224,0.94);backdrop-filter:saturate(150%) blur(14px);-webkit-backdrop-filter:saturate(150%) blur(14px);border-bottom:3px solid #451A36;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:20px;padding:0 36px;min-height:68px;}
+header{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(255,244,224,0.94);backdrop-filter:saturate(150%) blur(14px);-webkit-backdrop-filter:saturate(150%) blur(14px);border-bottom:3px solid #451A36;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:20px;padding:0 48px;min-height:68px;}
 .logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0;padding-left:4px;}
 .header-chips{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;overflow:hidden;}
 .header-chips>div:first-child{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;}
@@ -141,7 +141,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(255,244,22
 .user-menu .btn-logout:hover{background:#FDE3EA;}
 
 /* ─── LAYOUT ─── */
-main{max-width:1080px;margin:0 auto;padding:88px 18px 110px;display:flex;flex-direction:column;gap:52px;}
+main{max-width:1280px;margin:0 auto;padding:88px 48px 110px;display:flex;flex-direction:column;gap:52px;}
 h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:clamp(28px,3.4vw,36px);margin:0 0 20px;line-height:1.05;}
 .ky-sticker{display:inline-block;background:#F2B630;border:3px solid #451A36;border-radius:12px;box-shadow:4px 4px 0 #451A36;padding:0 10px 3px;transform:rotate(-2deg);}
 .ky-sticker-rose{display:inline-block;background:#F27A9B;border:3px solid #451A36;border-radius:12px;box-shadow:4px 4px 0 #451A36;padding:0 10px 3px;transform:rotate(-2deg);}
@@ -170,7 +170,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 .case-score-fill{height:100%;background:#17706C;transition:width 1s cubic-bezier(.22,.61,.36,1);}
 .case-score-etat{display:inline-flex;align-items:center;background:#DDF3F1;border:2px solid #451A36;border-radius:999px;padding:5px 13px;font:700 13px/1 var(--font-texte),sans-serif;color:#451A36;align-self:flex-start;}
 /* Case 3 : rose */
-.case-rose{background:#F27A9B;padding:20px 20px 0;display:flex;flex-direction:column;gap:12px;}
+.case-rose{background:#F27A9B;padding:28px 20px;display:flex;flex-direction:column;justify-content:center;gap:12px;}
 .case-rose-points{position:absolute;right:0;top:0;width:45%;height:80px;background-image:radial-gradient(#E5432F 3px,transparent 3.5px);background-size:18px 18px;opacity:.45;pointer-events:none;}
 .case-bulle-wrap{position:relative;width:240px;height:115px;}
 .case-bulle-svg{position:absolute;inset:0;width:100%;height:100%;}
@@ -179,6 +179,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 .case-viva-bas{position:absolute;right:10px;bottom:-12px;width:100px;height:auto;}
 /* Sur mobile */
 @media(max-width:768px){
+  main{padding-left:16px;padding-right:16px;}
   .planche{grid-template-columns:1fr;padding:8px;gap:8px;}
   .case-rose{display:none;}
   .case-turquoise{padding:20px;gap:16px;}
@@ -482,7 +483,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 #sendBtn{width:44px;height:44px;flex-shrink:0;border:3px solid #451A36;background:#F2B630;border-radius:999px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s;box-shadow:3px 3px 0 #451A36;}
 #sendBtn:hover{transform:translateY(-2px);}
 #sendBtn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-.chat-toggle{position:relative;width:96px;height:96px;border-radius:50%;border:4px solid #451A36;background:#F2B630;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;box-shadow:4px 4px 0 #451A36;transition:transform .18s;overflow:hidden;flex-shrink:0;}
+.chat-toggle{position:relative;width:96px;height:96px;border-radius:50%;border:4px solid #451A36;background:#F2B630;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:4px 4px 0 #451A36;transition:transform .18s;overflow:hidden;flex-shrink:0;}
 .chat-toggle:hover{transform:translateY(-2px);}
 .chat-toggle svg.viva-mini{width:100%;height:100%;}
 .chat-toggle .chat-x{position:absolute;inset:0;display:none;align-items:center;justify-content:center;}
@@ -697,7 +698,6 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
           <p class="case-bulle-txt">Mon menu de la semaine est prêt !</p>
         </div>
         <button class="case-voir-menu" onclick="document.getElementById('sectionMenu').scrollIntoView({behavior:'smooth'})">Voir son menu</button>
-        <svg viewBox="0 0 460 500" preserveAspectRatio="xMidYMax meet" style="position:absolute;right:10px;bottom:-12px;width:100px;height:109px;" aria-hidden="true"><use href="#viva-full"/></svg>
       </div>
     </div>
   </section>
@@ -1053,7 +1053,24 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
   </div>
   <div class="chat-hint" id="chatHint">Dis-moi ce qui a changé !</div>
   <button class="chat-toggle" id="chatToggleBtn" onclick="toggleChat()" aria-label="Ouvrir le chat">
-    <svg class="viva-mini" viewBox="96 78 248 226" preserveAspectRatio="xMidYMax meet"><use href="#viva-head"/></svg>
+    <svg class="viva-mini" viewBox="54 0 330 330" preserveAspectRatio="xMidYMid meet"><g stroke="#3A2A20" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+<path d="M118 150 q-58 8 -64 88 q-4 64 40 104 q40 18 58 -16 q16 -64 6 -132 q-6 -36 -40 -44 Z" fill="#BE6B41"></path>
+<path d="M320 150 q58 8 64 88 q4 64 -40 104 q-40 18 -58 -16 q-16 -64 -6 -132 q6 -36 40 -44 Z" fill="#BE6B41"></path>
+<path d="M220 86 q104 0 120 92 q12 74 -36 122 q-38 36 -84 36 q-46 0 -84 -36 q-48 -48 -36 -122 q16 -92 120 -92 Z" fill="#FFFFFF"></path>
+<path d="M220 86 q70 0 102 56 q-30 22 -70 18 q-44 -6 -70 8 q-22 -16 -28 -26 q22 -56 66 -56 Z" fill="#BE6B41"></path>
+<path d="M256 150 q40 -6 54 22 q10 30 -10 50 q-30 14 -50 -8 q-16 -34 6 -64 Z" fill="#BE6B41"></path>
+<path d="M220 196 q40 0 48 38 q4 34 -48 44 q-52 -10 -48 -44 q8 -38 48 -38 Z" fill="#FFFFFF"></path>
+<g stroke="none"><ellipse cx="160" cy="210" rx="13" ry="8" fill="#EFB7A6" opacity="0.75"></ellipse><ellipse cx="286" cy="210" rx="13" ry="8" fill="#EFB7A6" opacity="0.75"></ellipse></g>
+<g stroke="none" fill="#3A2A20"><ellipse cx="178" cy="168" rx="12" ry="15"></ellipse><ellipse cx="262" cy="168" rx="12" ry="15"></ellipse></g>
+<g stroke="none" fill="#FFFFFF"><circle cx="183" cy="162" r="4"></circle><circle cx="267" cy="162" r="4"></circle></g>
+<path d="M163 147 q15 -9 30 -2" stroke-width="4.5"></path>
+<path d="M247 145 q15 -8 30 2" stroke-width="4.5"></path>
+<path d="M220 196 q17 0 17 13 q0 11 -17 13 q-17 -2 -17 -13 q0 -13 17 -13 Z" fill="#2E211A" stroke="none"></path>
+<path d="M220 222 v8" stroke-width="4.5"></path>
+<path d="M220 230 q-20 13 -38 4" stroke-width="4.5"></path>
+<path d="M220 230 q20 14 38 3" stroke-width="4.5"></path>
+<path d="M212 234 q8 18 18 18 q10 0 14 -13 q-16 6 -32 -5 Z" fill="#D98E80"></path>
+</g></svg>
     <span class="chat-x"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></span>
     <span class="chat-unread" id="chatUnread" style="display:none;">1</span>
   </button>
@@ -1785,9 +1802,12 @@ function renderSavings(p) {
   const coutDay = coutWeek / 7;
   const ecoDogChef = Math.max(0, Math.round((7 - coutDay) * days));
   const ecoCroq = Math.max(0, Math.round((3.5 - coutDay) * days));
+  const noms = (chiens.length >= 1 ? chiens : (p.prenom_chien ? [p] : []))
+    .map(c => cap(c.prenom_chien || '')).filter(Boolean);
+  const pour = noms.length ? ' pour ' + noms.join(' et ') : '';
   block.style.display = 'block';
   block.innerHTML = `
-    <div class="savings-title">Tes économies depuis le début avec Kyno</div>
+    <div class="savings-title">Tes économies${pour} depuis le début avec Kyno</div>
     <div class="savings-row">
       <div class="saving-line">
         <div class="saving-vs">vs livraison type Dog Chef <small>~ 7 € / jour</small></div>
