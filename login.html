@@ -7,290 +7,422 @@
 <link rel="icon" href="kyno-favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="charte-kyno.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;}
+*{margin:0;padding:0;box-sizing:border-box;}
 
-  body{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:32px 20px;
-    background:var(--turquoise-pale);
-    position:relative;
-    overflow:hidden;
-    -webkit-font-smoothing:antialiased;
+body{
+  min-height:100vh;
+  background:var(--papier);
+  -webkit-font-smoothing:antialiased;
+  font-family:var(--font-texte);
+  color:var(--aubergine);
+}
+
+.nav-top{padding:22px 48px;border-bottom:3px solid var(--trait);}
+.nav-logo{display:inline-block;text-decoration:none;}
+.nav-logo img{height:38px;width:auto;}
+
+.planche{
+  margin:40px auto 48px;
+  width:calc(100% - 96px);
+  max-width:1064px;
+  background:var(--aubergine);
+  padding:12px;
+  border-radius:10px;
+  display:grid;
+  grid-template-columns:440px 1fr;
+  gap:12px;
+  min-height:580px;
+}
+
+.case-gauche{
+  position:relative;
+  background:var(--rose);
+  border-radius:var(--radius-case);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+}
+
+.trame{
+  position:absolute;
+  right:0;top:0;width:50%;height:130px;
+  background-image:radial-gradient(#E5432F 3px, transparent 3.5px);
+  background-size:18px 18px;
+  opacity:.45;
+  pointer-events:none;
+}
+
+.bulle-wrap{
+  position:relative;
+  width:300px;height:150px;
+  margin-bottom:-6px;
+  margin-left:-40px;
+  flex-shrink:0;
+}
+.bulle-wrap svg{position:absolute;inset:0;width:100%;height:100%;}
+.bulle-texte{
+  position:absolute;
+  left:8%;right:8%;top:30px;
+  text-align:center;
+  font-family:var(--font-titre);
+  font-size:27px;
+  line-height:1.08;
+  color:var(--aubergine);
+}
+
+.viva-disk{
+  position:relative;
+  width:260px;height:260px;
+  border-radius:var(--radius-rond);
+  background:var(--moutarde);
+  border:4px solid var(--aubergine);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  margin-bottom:-60px;
+  flex-shrink:0;
+}
+.viva-disk svg{width:200px;height:auto;margin-top:-10px;}
+
+.case-droite{
+  background:var(--papier);
+  border-radius:var(--radius-case);
+  padding:56px 60px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  justify-content:center;
+}
+
+.encart-narrateur{
+  align-self:flex-start;
+  background:var(--moutarde-pale);
+  border:3px solid var(--aubergine);
+  padding:6px 14px;
+  font-size:16px;font-weight:700;
+  box-shadow:3px 3px 0 var(--aubergine);
+}
+
+.titre-planche{
+  font-family:var(--font-titre);
+  font-weight:400;
+  line-height:1.05;
+  font-size:46px;
+  margin:0;
+}
+.sticker-rouge{
+  display:inline-block;
+  background:var(--rouge);color:var(--papier);
+  border:3px solid var(--aubergine);border-radius:12px;
+  box-shadow:4px 4px 0 var(--aubergine);
+  padding:0 10px 3px;
+  transform:rotate(-2deg);
+}
+
+.sous-titre{font-size:17px;line-height:1.5;color:var(--aubergine-doux);margin:0;}
+
+.field{display:flex;flex-direction:column;gap:8px;}
+.field label{font-size:15px;font-weight:700;}
+
+input[type="email"]{
+  width:100%;
+  font-family:var(--font-texte);font-size:17px;font-weight:400;
+  color:var(--aubergine);background:var(--blanc);
+  border:3px solid var(--aubergine);border-radius:16px;
+  padding:14px 16px;outline:none;
+  transition:border-color .2s;
+}
+input[type="email"]::placeholder{color:var(--aubergine-doux);opacity:0.6;}
+input[type="email"]:focus{border-color:var(--canard);}
+input[type="email"]:focus-visible{outline:3px solid var(--canard);outline-offset:3px;}
+
+.btn-main{
+  font-family:var(--font-texte);
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--moutarde);color:var(--aubergine);
+  border:3px solid var(--aubergine);border-radius:var(--radius-pill);
+  padding:14px 30px;font-size:18px;font-weight:700;
+  cursor:pointer;
+  transition:transform .16s cubic-bezier(.22,.61,.36,1),background .16s;
+}
+.btn-main:hover,.btn-main:active{background:#E5A51F;}
+.btn-main:hover{transform:translate(-2px,-2px);}
+.btn-main:active{transform:translate(2px,2px);}
+.btn-main:disabled{background:var(--trait);color:var(--aubergine-doux);border-color:var(--trait);cursor:not-allowed;transform:none;}
+.btn-main:focus-visible{outline:3px solid var(--canard);outline-offset:3px;}
+
+.error{
+  display:none;align-items:center;gap:9px;
+  background:var(--rose-pale);border:2px solid var(--rouge);
+  border-radius:12px;padding:11px 14px;margin-top:16px;
+  font-size:13.5px;font-weight:500;color:var(--rouge-fonce);
+}
+.error svg{flex-shrink:0;}
+
+.mention{font-size:13px;line-height:1.5;color:var(--aubergine-doux);margin-top:16px;}
+.mention u{cursor:pointer;}
+
+.confirm{display:none;flex-direction:column;gap:16px;justify-content:center;}
+
+.pastille-ok{
+  align-self:flex-start;
+  background:var(--turquoise-pale);
+  border:3px solid var(--aubergine);border-radius:var(--radius-pill);
+  padding:5px 14px;font-size:14px;font-weight:700;
+}
+
+.encart-spam{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--moutarde-pale);
+  border:3px solid var(--aubergine);border-radius:16px;
+  padding:14px 16px;
+  box-shadow:4px 4px 0 var(--aubergine);
+  font-size:15px;line-height:1.5;
+}
+
+.pas-recu{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.pas-recu span{font-size:15px;color:var(--aubergine-doux);}
+
+.btn-renvoyer{
+  font-family:var(--font-texte);
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--blanc);color:var(--aubergine);
+  border:3px solid var(--aubergine);border-radius:var(--radius-pill);
+  padding:10px 20px;font-size:16px;font-weight:700;
+  cursor:pointer;
+  transition:transform .16s;
+}
+.btn-renvoyer:hover{transform:translate(-2px,-2px);}
+.btn-renvoyer:active{transform:translate(2px,2px);}
+.btn-renvoyer:focus-visible{outline:3px solid var(--canard);outline-offset:3px;}
+
+.d-none{display:none !important;}
+
+@media(max-width:768px){
+  .nav-top{padding:16px 20px;}
+
+  .planche{
+    width:calc(100% - 32px);
+    margin:16px auto 32px;
+    grid-template-columns:1fr;
+    grid-template-rows:120px auto;
+    padding:8px;gap:8px;
+    min-height:auto;
   }
 
-  .deco{position:fixed;border-radius:50%;z-index:0;pointer-events:none;}
-  .deco-1{width:420px;height:420px;background:var(--turquoise);opacity:0.45;top:-150px;right:-130px;}
-  .deco-2{width:300px;height:300px;background:var(--moutarde-pale);opacity:0.6;bottom:-110px;left:-90px;}
-  .deco-3{width:170px;height:170px;background:var(--rose-pale);opacity:0.5;bottom:60px;right:7%;}
-  .deco-4{width:110px;height:110px;background:var(--blanc);opacity:0.5;top:11%;left:9%;}
-
-  .card{
-    position:relative;
-    z-index:1;
-    width:100%;
-    max-width:452px;
-    background:var(--blanc);
-    border:4px solid var(--aubergine);
-    border-radius:24px;
-    box-shadow:var(--ombre-bd);
-    padding:44px 42px 40px;
-    text-align:center;
-    animation:fadeUp 0.8s cubic-bezier(.22,.61,.36,1) both;
+  .case-gauche{
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:flex-end;
+    padding:0 16px 0 12px;
+    overflow:visible;
   }
-  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+  .trame{width:40%;height:100%;}
 
-  .nav-logo{display:inline-block;text-decoration:none;margin-bottom:30px;}
-  .nav-logo img{height:34px;width:auto;}
-
-  .eyebrow{font-size:13px;color:var(--aubergine-doux);display:inline-block;font-weight:700;margin-bottom:18px;}
-
-  h1{font-family:var(--font-titre);font-weight:400;font-size:34px;line-height:1.08;color:var(--aubergine);margin-bottom:14px;text-wrap:balance;}
-  h1 em{font-style:normal;color:var(--canard);}
-  .subtitle{font-size:15px;line-height:1.7;color:var(--aubergine-doux);font-weight:400;max-width:340px;margin:0 auto 30px;}
-
-  .field{text-align:left;margin-bottom:16px;}
-  .field label{display:block;font-size:13px;font-weight:700;color:var(--aubergine-doux);margin-bottom:8px;}
-  .input-wrap{position:relative;}
-  .input-wrap svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);pointer-events:none;}
-  input[type="email"]{
-    width:100%;font-family:var(--font-texte);font-size:15px;font-weight:400;
-    color:var(--aubergine);background:var(--blanc);
-    border:4px solid var(--aubergine);border-radius:16px;
-    padding:13px 16px 13px 46px;outline:none;
-    transition:border-color .2s;
+  .bulle-wrap{
+    margin:0 0 8px 0;
+    width:160px;height:76px;
+    flex-shrink:0;
   }
-  input[type="email"]::placeholder{color:var(--aubergine-doux);opacity:0.6;}
-  input[type="email"]:focus{border-color:var(--canard);}
-  input[type="email"]:focus-visible{outline:3px solid var(--canard);outline-offset:3px;}
+  .bulle-texte{font-size:14px;top:14px;}
 
-  .btn-main{
-    font-family:var(--font-texte);width:100%;
-    background:var(--moutarde);color:var(--aubergine);
-    padding:16px 26px;border-radius:var(--radius-pill);
-    font-size:17px;font-weight:700;
-    border:3px solid var(--aubergine);
-    cursor:pointer;margin-top:8px;
-    display:flex;align-items:center;justify-content:center;gap:9px;
-    transition:transform .16s cubic-bezier(.22,.61,.36,1),background .16s;
+  .viva-disk{
+    width:96px;height:96px;
+    margin-bottom:-8px;
+    flex-shrink:0;
   }
-  .btn-main:hover,.btn-main:active{background:#E5A51F;}
-  .btn-main:hover{transform:translate(-2px,-2px);}
-  .btn-main:active{transform:translate(2px,2px);}
-  .btn-main:disabled{background:var(--trait);color:var(--aubergine-doux);border-color:var(--trait);cursor:not-allowed;transform:none;}
-  .btn-main:focus-visible{outline:3px solid var(--canard);outline-offset:3px;}
-  .btn-main .arrow{transition:transform .2s cubic-bezier(.22,.61,.36,1);}
-  .btn-main:hover .arrow{transform:translateX(3px);}
+  .viva-disk svg{width:72px;margin-top:-6px;}
 
-  .error{
-    display:none;align-items:center;gap:9px;text-align:left;
-    background:var(--rose-pale);border:2px solid var(--rouge);
-    border-radius:12px;padding:11px 14px;margin-top:16px;
-    font-size:13.5px;font-weight:500;color:var(--rouge-fonce);
-  }
-  .error svg{flex-shrink:0;}
-
-  .footnote{margin-top:26px;font-size:12px;color:var(--aubergine-doux);line-height:1.6;}
-  .footnote strong{color:var(--aubergine);font-weight:700;}
-
-  .confirm{display:none;text-align:center;animation:fadeUp 0.6s cubic-bezier(.22,.61,.36,1) both;}
-  .confirm-icon{
-    width:92px;height:92px;margin:4px auto 28px;
-    border-radius:50%;background:var(--turquoise-pale);
-    border:4px solid var(--aubergine);
-    display:flex;align-items:center;justify-content:center;position:relative;
-  }
-  .confirm-check{
-    position:absolute;width:34px;height:34px;right:-2px;bottom:-2px;
-    border-radius:50%;background:var(--canard);border:3px solid var(--blanc);
-    display:flex;align-items:center;justify-content:center;
-    animation:popIn 0.4s 0.25s cubic-bezier(.22,.61,.36,1) both;
-  }
-  @keyframes popIn{from{transform:scale(0);}to{transform:scale(1);}}
-  .confirm h2{font-family:var(--font-titre);font-weight:400;font-size:30px;line-height:1.1;color:var(--aubergine);margin-bottom:14px;text-wrap:balance;}
-  .confirm h2 em{font-style:normal;color:var(--canard);}
-  .confirm p{font-size:15px;line-height:1.7;color:var(--aubergine-doux);max-width:330px;margin:0 auto;}
-  .confirm p .email-hl{color:var(--canard);font-weight:700;}
-  .spam-note{
-    display:flex;align-items:flex-start;gap:11px;text-align:left;
-    background:var(--turquoise-pale);border:2px solid var(--trait);
-    border-radius:12px;padding:13px 15px;margin-top:28px;
-    font-size:13px;line-height:1.5;color:var(--aubergine);
-  }
-  .spam-note svg{flex-shrink:0;margin-top:1px;}
-  .spam-note strong{font-weight:700;}
-  .resend{margin-top:24px;font-size:13px;color:var(--aubergine-doux);}
-  .resend button{
-    font-family:var(--font-texte);font-weight:700;font-size:13px;
-    color:var(--canard);background:none;border:none;padding:0;
-    cursor:pointer;text-decoration:underline;text-underline-offset:2px;
-  }
-  .resend button:focus-visible{outline:3px solid var(--canard);outline-offset:3px;}
-
-  @media(max-width:480px){
-    .card{padding:36px 26px 32px;}
-    h1{font-size:28px;}
-    .deco-3,.deco-4{display:none;}
-  }
+  .case-droite{padding:28px 20px;gap:14px;}
+  .titre-planche{font-size:30px;}
+  .btn-main{align-self:stretch;width:100%;}
+  .btn-renvoyer{width:100%;}
+}
 </style>
 </head>
 <body>
-  <div class="deco deco-1"></div>
-  <div class="deco deco-2"></div>
-  <div class="deco deco-3"></div>
-  <div class="deco deco-4"></div>
 
-  <main class="card">
-    <a href="index.html" class="nav-logo">
-      <img src="kyno-logo.svg" alt="Kyno">
-    </a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="viva-full" viewBox="0 0 460 500">
+    <g stroke="#3A2A20" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+<path d="M336 326 q56 -4 72 -50 q10 -28 -16 -36 q-26 -8 -34 22 q-8 30 -38 34 q-4 16 16 30 Z" fill="#BE6B41"></path>
+<path d="M120 470 q-26 -150 28 -208 q40 -42 132 -34 q70 8 86 78 q16 70 -10 164 Z" fill="#FFFFFF"></path>
+<path d="M250 252 q66 0 84 64 q12 44 4 96 q-44 14 -86 6 q14 -90 -22 -150 q9 -12 16 -16 Z" fill="#BE6B41"></path>
+<path d="M150 470 q-8 -64 8 -104 q24 -22 46 -2 q14 40 8 106 Z" fill="#FFFFFF"></path>
+<path d="M232 470 q-6 -62 10 -100 q24 -20 44 0 q12 40 8 100 Z" fill="#FFFFFF"></path>
+<g stroke-width="3.5"><path d="M150 470 h54" stroke="#CFC8BB"></path><path d="M168 452 v18 M186 452 v18" stroke="#CFC8BB"></path><path d="M236 470 h54" stroke="#CFC8BB"></path><path d="M254 452 v18 M272 452 v18" stroke="#CFC8BB"></path></g>
+<path d="M118 150 q-58 8 -64 88 q-4 64 40 104 q40 18 58 -16 q16 -64 6 -132 q-6 -36 -40 -44 Z" fill="#BE6B41"></path>
+<path d="M320 150 q58 8 64 88 q4 64 -40 104 q-40 18 -58 -16 q-16 -64 -6 -132 q6 -36 40 -44 Z" fill="#BE6B41"></path>
+<path d="M220 86 q104 0 120 92 q12 74 -36 122 q-38 36 -84 36 q-46 0 -84 -36 q-48 -48 -36 -122 q16 -92 120 -92 Z" fill="#FFFFFF"></path>
+<path d="M220 86 q70 0 102 56 q-30 22 -70 18 q-44 -6 -70 8 q-22 -16 -28 -26 q22 -56 66 -56 Z" fill="#BE6B41"></path>
+<path d="M256 150 q40 -6 54 22 q10 30 -10 50 q-30 14 -50 -8 q-16 -34 6 -64 Z" fill="#BE6B41"></path>
+<path d="M220 196 q40 0 48 38 q4 34 -48 44 q-52 -10 -48 -44 q8 -38 48 -38 Z" fill="#FFFFFF"></path>
+<g stroke="none"><ellipse cx="160" cy="210" rx="13" ry="8" fill="#EFB7A6" opacity="0.75"></ellipse><ellipse cx="286" cy="210" rx="13" ry="8" fill="#EFB7A6" opacity="0.75"></ellipse></g>
+<g stroke="none" fill="#3A2A20"><ellipse cx="178" cy="168" rx="12" ry="15"></ellipse><ellipse cx="262" cy="168" rx="12" ry="15"></ellipse></g>
+<g stroke="none" fill="#FFFFFF"><circle cx="183" cy="162" r="4"></circle><circle cx="267" cy="162" r="4"></circle></g>
+<path d="M163 147 q15 -9 30 -2" stroke-width="4.5"></path>
+<path d="M247 145 q15 -8 30 2" stroke-width="4.5"></path>
+<path d="M220 196 q17 0 17 13 q0 11 -17 13 q-17 -2 -17 -13 q0 -13 17 -13 Z" fill="#2E211A" stroke="none"></path>
+<path d="M220 222 v8" stroke-width="4.5"></path>
+<path d="M220 230 q-20 13 -38 4" stroke-width="4.5"></path>
+<path d="M220 230 q20 14 38 3" stroke-width="4.5"></path>
+<path d="M212 234 q8 18 18 18 q10 0 14 -13 q-16 6 -32 -5 Z" fill="#D98E80"></path>
+    </g>
+  </symbol>
+</svg>
 
-    <!-- État 1 : Formulaire -->
+<header class="nav-top">
+  <a href="index.html" class="nav-logo">
+    <img src="kyno-logo.svg" alt="Kyno">
+  </a>
+</header>
+
+<div class="planche">
+
+  <section class="case-gauche" aria-hidden="true">
+    <div class="trame"></div>
+
+    <div class="bulle-wrap" id="bulleForm">
+      <svg viewBox="0 0 420 210" preserveAspectRatio="none">
+        <path d="M210 12 C320 12 404 50 404 100 C404 150 320 186 210 186 C182 186 156 184 132 178 L74 204 L92 166 C42 150 16 126 16 100 C16 50 100 12 210 12 Z" fill="#FFF4E0" stroke="#451A36" stroke-width="6" stroke-linejoin="round"/>
+      </svg>
+      <p class="bulle-texte">Coucou ! Tu viens<br>voir mon menu ?</p>
+    </div>
+
+    <div class="bulle-wrap d-none" id="bulleConfirm">
+      <svg viewBox="0 0 420 210" preserveAspectRatio="none">
+        <path d="M210 12 C320 12 404 50 404 100 C404 150 320 186 210 186 C182 186 156 184 132 178 L74 204 L92 166 C42 150 16 126 16 100 C16 50 100 12 210 12 Z" fill="#FFF4E0" stroke="#451A36" stroke-width="6" stroke-linejoin="round"/>
+      </svg>
+      <p class="bulle-texte">Va vite voir<br>tes emails !</p>
+    </div>
+
+    <div class="viva-disk">
+      <svg viewBox="0 0 460 500" role="img" aria-label="Viva, mascotte de Kyno"><use href="#viva-full"/></svg>
+    </div>
+  </section>
+
+  <section class="case-droite">
+
     <div id="loginForm">
-      <div class="eyebrow">Espace personnel</div>
-      <h1>Accède à l'espace de <em>ton chien</em></h1>
-      <p class="subtitle">On t'envoie un lien de connexion par email. Pas de mot de passe à retenir : un clic et c'est ouvert.</p>
+      <span class="encart-narrateur">Ton espace Kyno</span>
+      <h1 class="titre-planche" style="margin-top:14px;">Retrouve l'espace de <span class="sticker-rouge">ton chien.</span></h1>
+      <p class="sous-titre" style="margin-top:4px;">On t'envoie un lien de connexion par email. Pas de mot de passe à retenir : un clic et c'est ouvert.</p>
 
-      <form onsubmit="handleLogin(event)">
-      <div class="field">
-        <label for="loginEmail">Ton email</label>
-        <div class="input-wrap">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6E4A63" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-          </svg>
-          <input type="email" id="loginEmail" placeholder="ton@email.com" autocomplete="email" inputmode="email">
+      <form onsubmit="handleLogin(event)" style="margin-top:4px;">
+        <div class="field">
+          <label for="loginEmail">Ton email</label>
+          <input type="email" id="loginEmail" placeholder="prenom@email.fr" autocomplete="email" inputmode="email">
         </div>
-      </div>
-
-      <button class="btn-main" id="loginSubmitBtn" type="submit">
-        <span>Recevoir mon lien de connexion</span>
-        <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>
-        </svg>
-      </button>
-
-      <div class="error" id="loginError">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B8301D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path>
-        </svg>
-        <span id="loginErrorText">Oups, cette adresse email n'est pas valide.</span>
-      </div>
-
-      <p class="footnote">En continuant, tu acceptes nos <strong>conditions</strong> et notre <strong>politique de confidentialité</strong>.</p>
+        <button class="btn-main" id="loginSubmitBtn" type="submit" style="margin-top:16px;width:100%;">
+          <span>Recevoir mon lien de connexion</span>
+        </button>
+        <div class="error" id="loginError">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B8301D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path>
+          </svg>
+          <span id="loginErrorText">Entre une adresse email valide.</span>
+        </div>
+        <p class="mention">En continuant, tu acceptes nos <u>conditions</u> et notre <u>politique de confidentialit&#233;</u>.</p>
       </form>
     </div>
 
-    <!-- État 2 : Confirmation -->
     <div class="confirm" id="loginConfirm">
-      <div class="confirm-icon">
-        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#451A36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-        </svg>
-        <div class="confirm-check">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 6 9 17l-5-5"></path>
-          </svg>
-        </div>
+      <span class="pastille-ok">&#10003; Lien envoy&#233;</span>
+      <h2 class="titre-planche">C&#8217;est envoy&#233; !</h2>
+      <p class="sous-titre">Un lien de connexion vient de partir vers <strong><span id="confirmEmail">ton adresse</span></strong>. Clique dessus pour ouvrir l&#8217;espace de ton chien.</p>
+      <div class="encart-spam">
+        <span>Tu ne le vois pas ? Pense &#224; regarder tes spams ou l&#8217;onglet promotions.</span>
       </div>
-      <h2>C'est <em>envoyé</em></h2>
-      <p>Un lien de connexion vient de partir vers <span class="email-hl" id="confirmEmail">ton adresse</span>. Clique dessus pour accéder à l'espace de ton chien.</p>
-      <div class="spam-note">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#451A36" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 9v4"></path><path d="M12 17h.01"></path>
-          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-        </svg>
-        <span>Tu ne le vois pas ? Pense à vérifier tes <strong>spams</strong> ou ton onglet promotions.</span>
+      <div class="pas-recu">
+        <span>Pas re&#231;u ?</span>
+        <button class="btn-renvoyer" type="button" onclick="showFormState()">Renvoyer le lien</button>
       </div>
-      <p class="resend">Pas reçu ? <button type="button" onclick="showFormState()">Renvoyer le lien</button></p>
     </div>
-  </main>
 
-  <script>
-    // ── Config Supabase ──────────────────────────────────────
-    const SUPABASE_URL = 'https://peexewhsnewjkpyhzuen.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_diGOGSUwIR3dHuLUcsni0g_XbfDdbo9';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </section>
 
-    // ── Gestion du lien magique au chargement ─────────────────
-    // Quand le client clique sur le lien reçu par email, Supabase
-    // redirige vers cette page avec un token dans l'URL. On le
-    // détecte ici et on redirige vers l'espace client.
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        window.location.href = 'espace-client.html';
-      }
-    });
+</div>
 
-    // ── Envoi du lien magique ──────────────────────────────────
-    async function handleLogin(e) {
-      if (e) e.preventDefault();
-      hideError();
+<script>
+  const SUPABASE_URL = 'https://peexewhsnewjkpyhzuen.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_diGOGSUwIR3dHuLUcsni0g_XbfDdbo9';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      const email = document.getElementById('loginEmail').value.trim();
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      window.location.href = 'espace-client.html';
+    }
+  });
 
-      if (!email || !email.includes('@') || !email.includes('.')) {
-        showError('Entre une adresse email valide.');
-        return;
-      }
+  async function handleLogin(e) {
+    if (e) e.preventDefault();
+    hideError();
 
-      const btn = document.getElementById('loginSubmitBtn');
-      btn.disabled = true;
-      btn.querySelector('span').textContent = 'Envoi en cours…';
+    const email = document.getElementById('loginEmail').value.trim();
 
-      try {
-        const { error } = await supabaseClient.auth.signInWithOtp({
-          email: email,
-          options: {
-            // window.location.origin fonctionne sur prod et sur les previews Vercel.
-            // Supabase rejette toute URL absente de sa whitelist Redirect URLs.
-            emailRedirectTo: window.location.origin + '/login.html'
-          }
-        });
-
-        if (error) throw error;
-
-        showConfirmState();
-
-      } catch (err) {
-        console.error('Erreur connexion:', err);
-        showError('Une erreur est survenue. Réessaie dans quelques instants.');
-        btn.disabled = false;
-        btn.querySelector('span').textContent = 'Recevoir mon lien de connexion';
-      }
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      showError('Entre une adresse email valide.');
+      return;
     }
 
-    // ── Helpers UI ────────────────────────────────────────────
-    function showConfirmState() {
-      const email = document.getElementById('loginEmail').value.trim();
-      if (email) document.getElementById('confirmEmail').textContent = email;
-      document.getElementById('loginForm').style.display = 'none';
-      document.getElementById('loginConfirm').style.display = 'block';
-    }
+    const btn = document.getElementById('loginSubmitBtn');
+    btn.disabled = true;
+    btn.querySelector('span').textContent = 'Envoi en cours…';
 
-    function showFormState() {
-      document.getElementById('loginConfirm').style.display = 'none';
-      document.getElementById('loginForm').style.display = 'block';
-      const btn = document.getElementById('loginSubmitBtn');
+    try {
+      const { error } = await supabaseClient.auth.signInWithOtp({
+        email: email,
+        options: {
+          emailRedirectTo: window.location.origin + '/login.html'
+        }
+      });
+
+      if (error) throw error;
+
+      showConfirmState();
+
+    } catch (err) {
+      console.error('Erreur connexion:', err);
+      showError('Une erreur est survenue. Réessaie dans quelques instants.');
       btn.disabled = false;
       btn.querySelector('span').textContent = 'Recevoir mon lien de connexion';
     }
+  }
 
-    function showError(message) {
-      const box = document.getElementById('loginError');
-      if (message) document.getElementById('loginErrorText').textContent = message;
-      box.style.display = 'flex';
-    }
+  function showConfirmState() {
+    const email = document.getElementById('loginEmail').value.trim();
+    if (email) document.getElementById('confirmEmail').textContent = email;
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('loginConfirm').style.display = 'flex';
+    document.getElementById('bulleForm').classList.add('d-none');
+    document.getElementById('bulleConfirm').classList.remove('d-none');
+  }
 
-    function hideError() {
-      document.getElementById('loginError').style.display = 'none';
-    }
-  </script>
+  function showFormState() {
+    document.getElementById('loginConfirm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('bulleConfirm').classList.add('d-none');
+    document.getElementById('bulleForm').classList.remove('d-none');
+    const btn = document.getElementById('loginSubmitBtn');
+    btn.disabled = false;
+    btn.querySelector('span').textContent = 'Recevoir mon lien de connexion';
+  }
+
+  function showError(message) {
+    const box = document.getElementById('loginError');
+    if (message) document.getElementById('loginErrorText').textContent = message;
+    box.style.display = 'flex';
+  }
+
+  function hideError() {
+    document.getElementById('loginError').style.display = 'none';
+  }
+</script>
 </body>
 </html>
