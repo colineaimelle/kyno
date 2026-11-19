@@ -6,6 +6,7 @@ const { waitUntil } = require('@vercel/functions');
 const { besoinKcalJour } = require('./lib/energie');
 
 const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'colinemngl@gmail.com';
 
 // ── HELPER : fusionner tableau + champ "autre" ─────────────
 function mergeAutre(arr, autre, excludeVals = []) {
@@ -400,8 +401,8 @@ async function sendEmailRapport(email, prenom, rapport, data) {
     body: JSON.stringify({
       sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
       to: [{ email, name: prenom }],
-      subject: `Le rapport nutritionnel de ${prenom} est prêt ✦`,
-      htmlContent: buildEmailHtml(prenom, htmlRapport, accessUrl, data, saison)
+      subject: `Le rapport nutritionnel de ${prenom} est prêt`,
+      htmlContent: buildEmailHtml(prenom, htmlRapport, accessUrl, data)
     })
   });
   if (!emailRes.ok) {
@@ -411,94 +412,73 @@ async function sendEmailRapport(email, prenom, rapport, data) {
 }
 
 // ── TEMPLATE EMAIL ─────────────────────────────────────────
-function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}, saison = '') {
-  const race = data.race || 'non renseigné';
-  const age = data.age || '';
-  const poids = data.poids ? data.poids + ' kg' : '';
-  const sousTitre = [race, age, poids].filter(Boolean).join(' · ');
+function buildEmailHtml(prenom, htmlContent, accessUrl, data = {}) {
+  const scoreMatch = (htmlContent || '').match(/score\s*sant[ée]\s*[:=]\s*(\d+)/i)
+    || (htmlContent || '').match(/(\d{2,3})\s*\/\s*100/);
+  const scoreSante = scoreMatch ? scoreMatch[1] + '/100' : null;
+
+  const scoreRow = scoreSante
+    ? `<tr><td style="padding:11px 16px;background:#DDF3F1;font-weight:700;font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">Score sant&eacute;&nbsp;&nbsp;&nbsp;<b>${scoreSante}</b></td></tr>`
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#FFF4E0;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFF4E0;padding:48px 20px;">
-    <tr><td align="center">
-    <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFF4E0;padding:32px 16px;">
+  <tr><td align="center">
+  <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#FFFFFF;border:3px solid #451A36;border-radius:20px;overflow:hidden;">
 
-      <tr>
-        <td style="padding:0 8px 28px;text-align:center;">
-          <img src="${SITE_URL}/kyno-logo.png" alt="Kyno" height="40" style="display:block;margin:0 auto;">
-        </td>
-      </tr>
+    <tr>
+      <td style="padding:0;line-height:0;font-size:0;border-bottom:4px solid #451A36;">
+        <img src="${SITE_URL}/email-entete-rapport.png" width="600" height="150" alt="Kyno" style="display:block;width:100%;max-width:600px;">
+      </td>
+    </tr>
 
-      <tr>
-        <td style="background:#FFFFFF;border-radius:20px 20px 0 0;padding:28px 32px;border:1px solid #DDF3F1;border-bottom:none;">
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td width="56" valign="top">
-                <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="26" cy="26" r="26" fill="#FDE3EA"/>
-                  <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-                  <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-                  <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#E5432F"/>
-                  <circle cx="22" cy="27" r="1.4" fill="#451A36"/>
-                  <circle cx="30" cy="27" r="1.4" fill="#451A36"/>
-                  <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#451A36" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-                  <ellipse cx="26" cy="30.5" rx="1.4" ry="1" fill="#451A36"/>
-                </svg>
-              </td>
-              <td valign="middle" style="padding-left:12px;">
-                <p style="margin:0;font-size:17px;font-weight:700;color:#451A36;">${prenom}</p>
-                <p style="margin:2px 0 0;font-size:12px;color:#6E4A63;">${sousTitre}</p>
-              </td>
-              <td align="right" valign="middle">
-                <span style="display:inline-block;background:#FDE3EA;color:#B8301D;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:20px;">${saison}</span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
+    <tr>
+      <td style="padding:30px 32px 26px;">
+        <h1 style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:28px;line-height:1.25;font-weight:700;color:#451A36;">
+          Le rapport nutritionnel de <span style="display:inline-block;background:#F27A9B;border:3px solid #451A36;border-radius:10px;padding:0 8px 2px;">${prenom}</span> est pr&ecirc;t
+        </h1>
+        <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
+          Son profil complet t&apos;attend&nbsp;: ses besoins, son score sant&eacute;, ses menus de la semaine et ses compl&eacute;ments cibl&eacute;s.
+        </p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:3px solid #451A36;border-radius:16px;overflow:hidden;margin:0 0 20px;">
+          ${scoreRow}
+          <tr><td style="padding:11px 16px;${scoreSante ? 'border-top:2px solid #E8DCC6;' : 'background:#DDF3F1;font-weight:700;'}font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
+            Besoins calcul&eacute;s&nbsp;&nbsp;&nbsp;<b>NRC 2006 et FEDIAF 2023</b>
+          </td></tr>
+          <tr><td style="padding:11px 16px;border-top:2px solid #E8DCC6;font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
+            M&eacute;thode&nbsp;&nbsp;&nbsp;<b>Ration m&eacute;nag&egrave;re individuelle</b>
+          </td></tr>
+        </table>
+        <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
+          <tr>
+            <td bgcolor="#E5432F" style="border-radius:999px;border:3px solid #451A36;">
+              <a href="${accessUrl}" style="display:inline-block;padding:14px 26px;color:#FFF4E0;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;">Voir le rapport de ${prenom}</a>
+            </td>
+          </tr>
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="background:#FCEBC4;border:2px solid #451A36;border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.5;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
+              Kyno est un outil &eacute;ducatif et ne remplace pas un avis v&eacute;t&eacute;rinaire. En cas de pathologie ou de traitement en cours, consulte ton v&eacute;t&eacute;rinaire avant tout changement alimentaire.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
 
-      <tr>
-        <td style="background:#451A36;padding:24px 32px;">
-          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#2BB3AE;font-weight:700;">Rapport nutritionnel</p>
-          <p style="margin:0;font-size:21px;font-weight:700;color:#FFF4E0;line-height:1.3;">Le profil complet de ${prenom} est prêt</p>
-        </td>
-      </tr>
+    <tr>
+      <td style="background:#FFF4E0;border-top:3px solid #E8DCC6;padding:16px 32px;font-size:13px;line-height:1.6;color:#6E4A63;font-family:Arial,Helvetica,sans-serif;">
+        Kyno &middot; nutrition canine individualis&eacute;e &middot; Lyon, France<br>
+        Une question&nbsp;? &Eacute;cris-nous &agrave; <a href="mailto:${CONTACT_EMAIL}" style="color:#451A36;text-decoration:none;">${CONTACT_EMAIL}</a>.
+      </td>
+    </tr>
 
-      <tr>
-        <td style="background:#FFFFFF;padding:32px 32px 8px;border:1px solid #DDF3F1;border-top:none;">
-          <div style="font-size:14.5px;color:#451A36;line-height:1.9;">
-            ${htmlContent}
-          </div>
-        </td>
-      </tr>
-
-      <tr>
-        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #DDF3F1;border-top:none;border-radius:0 0 20px 20px;">
-          <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #E8DCC6;">
-            <tr><td style="padding-top:28px;text-align:center;">
-              <a href="${accessUrl}" style="display:inline-block;background:#451A36;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Accéder à l'espace de ${prenom} →</a>
-            </td></tr>
-          </table>
-        </td>
-      </tr>
-
-      <tr>
-        <td style="padding:24px 32px 0;">
-          <p style="margin:0 0 12px;font-size:11px;color:#6E4A63;line-height:1.7;">⚠ Ce rapport est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consulte ton vétérinaire avant tout changement alimentaire.</p>
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td><span style="font-size:12px;font-weight:700;color:#5B6B5D;">kyno</span> <span style="font-size:11px;color:#6E4A63;">· Lyon, France</span></td>
-              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:#6E4A63;text-decoration:none;">colinemngl@gmail.com</a></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-    </table>
-    </td></tr>
   </table>
+  </td></tr>
+</table>
 </body>
 </html>`;
 }
