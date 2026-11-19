@@ -496,6 +496,33 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 .loading-spinner{width:34px;height:34px;border:3px solid #DDF3F1;border-top-color:#17706C;border-radius:50%;animation:kspin .8s linear infinite;}
 .loading-txt{font-family:var(--font-texte);font-weight:700;font-size:15px;color:#6E4A63;}
 
+/* ─── FICHE SANTE ─── */
+.sante-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.sante-card{background:#FFFFFF;border:3px solid #451A36;border-radius:24px;box-shadow:6px 6px 0 #451A36;padding:22px 24px;display:flex;flex-direction:column;gap:12px;}
+.sante-card-title{font-family:var(--font-titre);font-weight:400;font-size:22px;color:#451A36;margin:0 0 4px;}
+.sante-card-sub{font:400 13px/1.5 var(--font-texte),sans-serif;color:#6E4A63;margin:0;}
+.sante-note{font:400 12px/1.5 var(--font-texte),sans-serif;color:#6E4A63;font-style:italic;margin:0;}
+.fiche-know-list{list-style:none;margin:0;padding:0;}
+.fiche-know-item{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:2px solid #E8DCC6;font-size:14px;}
+.fiche-know-item:last-child{border-bottom:none;}
+.fiche-know-item span{color:#6E4A63;}
+.fiche-know-item b{text-align:right;}
+.poids-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
+.weight-now-row{display:flex;align-items:baseline;gap:8px;}
+.weight-now-row b{font-family:var(--font-titre);font-weight:400;font-size:24px;}
+.sante-card-objectifs{}
+.obj-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+.obj-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;font:700 13px/1 var(--font-texte),sans-serif;background:#DDF3F1;border:2px solid #451A36;color:#451A36;}
+.obj-progress-list2{display:flex;flex-direction:column;gap:14px;}
+.obj-foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-top:2px solid #E8DCC6;padding-top:16px;margin-top:4px;}
+.obj-foot-note{font:400 12px/1.5 var(--font-texte),sans-serif;color:#451A36;flex:1;min-width:200px;margin:0;}
+.btn-change-obj{display:inline-flex;align-items:center;gap:8px;background:#FFFFFF;border:3px solid #451A36;border-radius:999px;padding:11px 18px;cursor:pointer;font:700 13px/1 var(--font-texte),sans-serif;color:#451A36;box-shadow:3px 3px 0 #451A36;transition:transform .15s;white-space:nowrap;}
+.btn-change-obj:hover{transform:translateY(-2px);}
+
+@media(max-width:768px){
+  .sante-grid{grid-template-columns:1fr;}
+}
+
 @media(max-width:768px){
   header{grid-template-columns:1fr auto;grid-template-rows:auto;padding:0;min-height:auto;}
   .logo{padding:12px 16px;grid-column:1;grid-row:1;}
@@ -833,6 +860,48 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
     <div style="display:none"><div class="cook-row" id="cookRow"></div><div id="recipesContainer"></div><div class="cout-val" id="coutSemaine">—</div></div>
   </section>
 
+  <!-- ═══ SECTION FICHE SANTE ═══ -->
+  <section id="sectionSante">
+    <h2>Sa fiche <span class="ky-sticker-rose">sante</span></h2>
+    <div class="sante-grid">
+      <!-- Carte Ce que l'on sait -->
+      <div class="sante-card">
+        <p class="sante-card-title">Ce que l'on sait</p>
+        <div id="ficheKnowList"></div>
+        <div id="ficheVetAlert"></div>
+      </div>
+      <!-- Carte Ses apports -->
+      <div class="sante-card">
+        <p class="sante-card-title">Ses apports cette semaine</p>
+        <p class="sante-card-sub" id="apportsSub">Compares a ses besoins calcules (NRC, FEDIAF). Le trait marque la cible de 80 %.</p>
+        <div class="macro-list" id="macroList2"></div>
+        <p class="sante-note">Le trait vertical indique 80 % = la cible ideale.</p>
+      </div>
+      <!-- Carte Son poids -->
+      <div class="sante-card">
+        <div class="poids-head">
+          <p class="sante-card-title" style="margin:0">Son poids</p>
+          <div class="weight-now-row">
+            <b id="weightNow2">—</b>
+            <span class="weight-delta" id="weightDelta2"></span>
+          </div>
+        </div>
+        <div class="weight-svg-wrap" id="weightSvgWrap2"></div>
+        <p class="sante-note">La courbe est mise a jour chaque semaine grace au chat.</p>
+      </div>
+    </div>
+    <!-- Carte Ce qu'on vise ensemble -->
+    <div class="sante-card sante-card-objectifs" style="margin-top:20px">
+      <p class="sante-card-title">Ce qu'on vise ensemble</p>
+      <div class="obj-row" id="objBadgesRow"></div>
+      <div class="obj-progress-list2" id="objProgress2"></div>
+      <div class="obj-foot">
+        <p class="obj-foot-note">Le chat fait le point tous les <b>15 jours</b> et ajuste les objectifs en fonction des progres.</p>
+        <button class="btn-change-obj" onclick="openObjModal()">Changer d'objectif</button>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <!-- ═══ MODALE OBJECTIFS ═══ -->
@@ -1139,6 +1208,7 @@ function renderAll(p) {
 
   renderPlanche(p);
   renderMenuCard(p);
+  renderFicheSante(p);
   renderSlide1(p);
   renderSlide2(p);
   renderSlide3(p);
@@ -1435,6 +1505,107 @@ function renderSlide4(p) {
 
 }
 
+// ─── FICHE SANTE ───
+function renderFicheSante(p) {
+  // Ce que l'on sait
+  const know = document.getElementById('ficheKnowList');
+  if (know) {
+    const rows = [
+      { label: 'Maladies', val: toArr(p.maladies).join(', ') || 'Aucune' },
+      { label: 'Allergies', val: toArr(p.allergies).join(', ') || 'Aucune allergie connue' },
+      { label: 'Intolerances', val: toArr(p.intolerances).join(', ') || 'Aucune' },
+      { label: 'Traitements', val: toArr(p.traitements).join(', ') || 'Aucun traitement en cours' },
+      { label: 'Digestion', val: toArr(p.digestion).join(', ') || (toArr(p.sensibilites).join(', ')) || 'RAS' }
+    ];
+    know.innerHTML = `<ul class="fiche-know-list">${rows.map(r =>
+      `<li class="fiche-know-item"><span>${esc(r.label)}</span><b>${esc(r.val)}</b></li>`
+    ).join('')}</ul>`;
+  }
+  const vet = document.getElementById('ficheVetAlert');
+  if (vet) vet.innerHTML = document.getElementById('s1VetAlert') ? document.getElementById('s1VetAlert').innerHTML : '';
+
+  // Apports (reprend renderSlide2 sur les nouveaux IDs)
+  const macros = Array.isArray(p.apports) ? p.apports : [];
+  const ml = document.getElementById('macroList2');
+  if (ml) {
+    if (!macros.length) {
+      ml.innerHTML = '<span class="sante-note">Les apports s\'afficheront des le premier menu.</span>';
+    } else {
+      ml.innerHTML = macros.map(m => {
+        const pct = m.pct != null ? m.pct : (m.cible ? Math.round((m.valeur / m.cible) * 80) : 0);
+        return `<div class="macro">
+          <div class="macro-head"><span class="macro-name">${esc(m.nom)}</span><span class="macro-val"><b style="color:${m.color}">${m.valeur}</b> / ${m.cible} ${esc(m.unite||'')}</span></div>
+          <div class="macro-track"><div class="macro-fill" data-w="${Math.min(100,pct)}" style="width:0;background:${m.color}"></div><div class="macro-target"></div></div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // Poids (reprend renderWeight sur les nouveaux IDs)
+  const hist = Array.isArray(p.poids_historique) ? p.poids_historique : [];
+  const wrap = document.getElementById('weightSvgWrap2');
+  const nowEl = document.getElementById('weightNow2');
+  const dEl = document.getElementById('weightDelta2');
+  if (wrap) {
+    if (hist.length < 2) {
+      wrap.innerHTML = '<span class="sante-note">La courbe apparaitra apres quelques semaines de suivi.</span>';
+      if (nowEl) nowEl.textContent = p.poids ? p.poids + ' kg' : '—';
+    } else {
+      const W=600,H=150,padX=30,padY=24;
+      const vals=hist.map(h=>h.poids);
+      const min=Math.min(...vals),max=Math.max(...vals),range=(max-min)||1;
+      const stepX=(W-padX*2)/(hist.length-1);
+      const pts=hist.map((h,i)=>({x:padX+i*stepX,y:padY+(H-padY*2)*(1-(h.poids-min)/range),h}));
+      const poly=pts.map(pt=>`${pt.x.toFixed(1)},${pt.y.toFixed(1)}`).join(' ');
+      const area=`${padX},${H-padY} `+poly+` ${W-padX},${H-padY}`;
+      const poidsF = p.poids_forme;
+      const formeLine = poidsF ? (() => {
+        const fy = padY+(H-padY*2)*(1-(poidsF-min)/range);
+        return `<line x1="${padX}" y1="${fy.toFixed(1)}" x2="${W-padX}" y2="${fy.toFixed(1)}" stroke="#F2B630" stroke-width="2" stroke-dasharray="6,4"/>`;
+      })() : '';
+      wrap.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;">
+        <defs><linearGradient id="wGrad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#17706C" stop-opacity="0.18"/><stop offset="100%" stop-color="#17706C" stop-opacity="0"/></linearGradient></defs>
+        <polygon points="${area}" fill="url(#wGrad2)"/>
+        ${formeLine}
+        <polyline points="${poly}" fill="none" stroke="#17706C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        ${pts.map(pt=>`<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="5" fill="#fff" stroke="#17706C" stroke-width="2.5"/>
+        <text x="${pt.x.toFixed(1)}" y="${H-6}" text-anchor="middle" font-family="var(--font-texte)" font-size="11" font-weight="600" fill="#6E4A63">${esc(pt.h.label)}</text>`).join('')}
+      </svg>`;
+      const first=vals[0],last=vals[vals.length-1],delta=+(last-first).toFixed(1);
+      if (nowEl) nowEl.textContent = last+' kg';
+      if (dEl) {
+        dEl.style.display='inline-block';
+        const up=delta>0,flat=delta===0;
+        dEl.textContent=(up?'+ ':flat?'':'- ')+Math.abs(delta)+' kg';
+        dEl.style.background=flat?'#E8DCC6':'#DDF3F1';
+        dEl.style.color=flat?'#6E4A63':'#17706C';
+      }
+    }
+  }
+
+  // Objectifs
+  const objs = normObjectives(p.objectifs);
+  const badgesRow = document.getElementById('objBadgesRow');
+  if (badgesRow) badgesRow.innerHTML = objs.map(o => {
+    const m = OBJ_META[o.nom] || {icon:'•',label:cap(o.nom)};
+    return `<span class="obj-badge">${m.icon} ${esc(m.label)}</span>`;
+  }).join('');
+
+  const prog2 = document.getElementById('objProgress2');
+  if (prog2) {
+    if (!objs.length) {
+      prog2.innerHTML = '<span class="sante-note">Aucun objectif. Clique sur Changer d\'objectif.</span>';
+    } else {
+      prog2.innerHTML = objs.map(o => {
+        const m=OBJ_META[o.nom]||{icon:'•',label:cap(o.nom)};
+        const pct=o.progress!=null?o.progress:0;
+        return `<div class="obj-prog"><div class="obj-prog-head"><span class="obj-prog-name">${m.icon} ${esc(m.label)}</span><span class="obj-prog-pct">${pct}%</span></div>
+          <div class="obj-prog-track"><div class="obj-prog-fill" data-w="${pct}" style="width:0"></div></div></div>`;
+      }).join('');
+    }
+  }
+}
+
 // ─── MENU CARD ───
 function renderMenuCard(p) {
   const recipe = Array.isArray(p.recettes) && p.recettes[0] ? p.recettes[0] : null;
@@ -1691,7 +1862,6 @@ async function confirmRemoveDog() {
       buildDogSelector();
       renderAll(userProfile);
       loadChatHistory();
-      setTimeout(updateCarouselHeight, 80);
     }
   } catch (e) { console.warn('remove chien', e); }
 }
