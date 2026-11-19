@@ -1,9 +1,11 @@
 // api/magic-link.js
+
 // Reçoit l'email depuis acces.html, envoie le lien magique Supabase
 // et génère le menu (synchrone — Vercel peut tuer le process avant la fin
 // d'un traitement fire-and-forget lancé après la réponse HTTP, donc on attend).
 
 const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'colinemngl@gmail.com';
 
 module.exports = async function handler(req, res) {
 
@@ -354,90 +356,87 @@ async function sendEmailMenu(email, prenom, menu) {
     body: JSON.stringify({
       sender: { name: 'Kyno', email: 'colinemngl@gmail.com' },
       to: [{ email, name: prenom }],
-      subject: `Le menu de la semaine de ${prenom} ✦`,
-      htmlContent: buildEmailMenuHtml(prenom, htmlMenu)
+      subject: `Le menu de la semaine de ${prenom}`,
+      htmlContent: buildEmailMenuHtml(prenom, htmlMenu, menuData)
     })
   });
 }
 
 // ── TEMPLATE EMAIL MENU ───────────────────────────────────
-function buildEmailMenuHtml(prenom, htmlContent) {
+function buildEmailMenuHtml(prenom, htmlContent, data = {}) {
+  const titre = data.recette && data.recette.titre ? data.recette.titre : null;
+  const ration = data.recette && data.recette.ration ? data.recette.ration + ' g' : null;
+  const batchTime = data.batch_time || null;
+  const cout = data.cout_semaine || null;
+  const accessUrl = `${SITE_URL}/espace-client.html`;
+
+  const recapRows = [
+    titre ? `<tr><td style="padding:11px 16px;background:#DDF3F1;font-weight:700;font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">${titre}</td></tr>` : '',
+    ration ? `<tr><td style="padding:11px 16px;${titre ? 'border-top:2px solid #E8DCC6;' : 'background:#DDF3F1;font-weight:700;'}font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">Sa portion du jour&nbsp;&nbsp;&nbsp;<b>${ration}</b></td></tr>` : '',
+    batchTime ? `<tr><td style="padding:11px 16px;border-top:2px solid #E8DCC6;font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">Temps de pr&eacute;pa&nbsp;&nbsp;&nbsp;<b>${batchTime}</b></td></tr>` : '',
+    cout ? `<tr><td style="padding:11px 16px;border-top:2px solid #E8DCC6;font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">Co&ucirc;t de la semaine&nbsp;&nbsp;&nbsp;<b>${cout}</b></td></tr>` : '',
+  ].filter(Boolean).join('');
+
+  const recapTable = recapRows
+    ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:3px solid #451A36;border-radius:16px;overflow:hidden;margin:0 0 20px;">${recapRows}</table>`
+    : '';
+
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#DDF3F1;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#DDF3F1;padding:40px 20px;">
-    <tr><td align="center">
-    <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+<body style="margin:0;padding:0;background:#FFF4E0;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFF4E0;padding:32px 16px;">
+  <tr><td align="center">
+  <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#FFFFFF;border:3px solid #451A36;border-radius:20px;overflow:hidden;">
 
-      <tr>
-        <td style="background:#451A36;border-radius:16px 16px 0 0;padding:36px 48px;text-align:center;border-bottom:3px solid #B8301D;">
-          <img src="${SITE_URL}/kyno-logo-clair.png" alt="Kyno" height="40" style="display:block;margin:0 auto 8px;">
-          <p style="margin:0;font-size:10px;color:rgba(245,240,232,0.35);">Nutrition canine individualisée</p>
-        </td>
-      </tr>
+    <tr>
+      <td style="padding:0;line-height:0;font-size:0;border-bottom:4px solid #451A36;">
+        <img src="${SITE_URL}/email-entete-menu.png" width="600" height="150" alt="Kyno" style="display:block;width:100%;max-width:600px;">
+      </td>
+    </tr>
 
-      <tr>
-        <td style="background:#451A36;padding:20px 48px;border-bottom:3px solid #E5432F;">
-          <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.7);font-weight:600;">Menu personnalisé, semaine 1</p>
-          <p style="margin:4px 0 0;font-size:26px;font-weight:700;color:#FFF4E0;">Le menu de la semaine de <em style="font-style:normal;color:#F2B630;">${prenom}</em></p>
-        </td>
-      </tr>
+    <tr>
+      <td style="padding:30px 32px 26px;">
+        <h1 style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:28px;line-height:1.25;font-weight:700;color:#451A36;">
+          Le menu de la semaine de <span style="display:inline-block;background:#F27A9B;border:3px solid #451A36;border-radius:10px;padding:0 8px 2px;">${prenom}</span>
+        </h1>
+        <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
+          Bonjour&nbsp;! Voici son menu de la semaine, avec les quantit&eacute;s pr&eacute;cises, le batch cooking et la liste de courses.
+        </p>
+        ${recapTable}
+        <div style="font-size:14px;line-height:1.85;color:#451A36;margin:0 0 20px;">
+          ${htmlContent}
+        </div>
+        <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
+          Tu le retrouves aussi dans ton espace Kyno, o&ugrave; tu peux me raconter comment il s&apos;est pass&eacute;.
+        </p>
+        <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
+          <tr>
+            <td bgcolor="#E5432F" style="border-radius:999px;border:3px solid #451A36;">
+              <a href="${accessUrl}" style="display:inline-block;padding:14px 26px;color:#FFF4E0;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;">Ouvrir son menu</a>
+            </td>
+          </tr>
+        </table>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="background:#FCEBC4;border:2px solid #451A36;border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.5;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
+              Kyno est un outil &eacute;ducatif et ne remplace pas un avis v&eacute;t&eacute;rinaire. En cas de pathologie ou de traitement en cours, consulte ton v&eacute;t&eacute;rinaire avant tout changement alimentaire.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
 
-      <tr>
-        <td style="background:#FFF4E0;padding:40px 48px 0;">
-          <p style="margin:0 0 8px;font-size:15px;color:#451A36;">Bonjour !</p>
-          <p style="margin:0 0 32px;font-size:14px;color:#6E4A63;line-height:1.8;">Voici le menu détaillé de la première semaine pour <strong style="color:#451A36;">${prenom}</strong>. Quantités précises, batch cooking et liste de courses inclus. Tu le retrouves aussi dans ton espace Kyno.</p>
-          <div style="height:3px;background:linear-gradient(to right,#17706C,#B8301D,#F2B630);margin-bottom:32px;border-radius:2px;"></div>
-        </td>
-      </tr>
+    <tr>
+      <td style="background:#FFF4E0;border-top:3px solid #E8DCC6;padding:16px 32px;font-size:13px;line-height:1.6;color:#6E4A63;font-family:Arial,Helvetica,sans-serif;">
+        Kyno &middot; nutrition canine individualis&eacute;e &middot; Lyon, France<br>
+        Une question&nbsp;? &Eacute;cris-nous &agrave; <a href="mailto:${CONTACT_EMAIL}" style="color:#451A36;text-decoration:none;">${CONTACT_EMAIL}</a>.
+      </td>
+    </tr>
 
-      <tr>
-        <td style="background:#FFF4E0;padding:0 48px;">
-          <div style="background:white;border-radius:12px;padding:36px;border:1px solid #E8DCC6;border-left:4px solid #B8301D;font-size:14px;line-height:1.85;color:#451A36;">
-            ${htmlContent}
-          </div>
-        </td>
-      </tr>
-
-      <tr>
-        <td style="background:#FFF4E0;padding:32px 48px 40px;">
-          <div style="background:#451A36;border-radius:14px;padding:36px;text-align:center;border:3px solid #E5432F;">
-            <p style="margin:0 0 6px;font-size:10px;color:rgba(245,240,232,0.4);">Ton espace Kyno</p>
-            <p style="margin:0 0 16px;font-size:20px;font-weight:700;color:#FFF4E0;line-height:1.3;">Retrouve ce menu<br><span style="font-size:14px;font-weight:400;color:rgba(245,240,232,0.5);">et discute des évolutions de ${prenom} avec Kyno</span></p>
-            <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:#FFF4E0;padding:16px 32px;border-radius:999px;text-decoration:none;font-size:13px;font-weight:700;border:2px solid #E5432F;">Accéder à mon espace →</a>
-          </div>
-        </td>
-      </tr>
-
-      <tr>
-        <td style="background:#FFF4E0;padding:0 48px 32px;">
-          <div style="border-top:1px solid #E8DCC6;padding-top:24px;">
-            <p style="margin:0;font-size:11px;color:#6E4A63;line-height:1.7;">⚠ Ce menu est éducatif et ne remplace pas un avis vétérinaire. En cas de pathologie ou traitement en cours, consulte ton vétérinaire avant tout changement alimentaire.</p>
-          </div>
-        </td>
-      </tr>
-
-      <tr>
-        <td style="background:#451A36;border-radius:0 0 16px 16px;padding:28px 48px;border-top:3px solid #B8301D;">
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td>
-                <p style="margin:0;font-size:13px;font-weight:700;color:#FFF4E0;">kyno</p>
-                <p style="margin:4px 0 0;font-size:10px;color:rgba(245,240,232,0.25);">Lyon, France</p>
-              </td>
-              <td align="right">
-                <a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:rgba(245,240,232,0.35);text-decoration:none;">colinemngl@gmail.com</a>
-                <p style="margin:4px 0 0;font-size:10px;color:rgba(245,240,232,0.2);">© 2026 Kyno</p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-    </table>
-    </td></tr>
   </table>
+  </td></tr>
+</table>
 </body>
 </html>`;
 }
