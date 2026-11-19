@@ -5,6 +5,7 @@
 const { getTermesExclus, getAlimentsProches, detecterTermeInterdit } = require('./allergenes');
 
 const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'colinemngl@gmail.com';
 const { kcalPour100g, kcalTotale } = require('./calories');
 
 function normaliser(s) {
@@ -360,253 +361,141 @@ function _rebuildCourses(chiens) {
 // chiens     : lignes `chien` dans l'ordre du menu
 // menuData   : JSON parsé retourné par Claude (format multi-chiens)
 // saison     : string
-// ciblesKcal : { [chien_id]: number } — optionnel, pour afficher le besoin estimé
+// ciblesKcal : { [chien_id]: number } — optionnel
 function buildEmailMenuHtml(foyer, chiens, menuData, saison, ciblesKcal = {}) {
   const menuChiens = Array.isArray(menuData.chiens) ? menuData.chiens : [];
   const courses_commune = menuData.courses_commune || [];
   const batch_cooking_commun = menuData.batch_cooking_commun || [];
-  const batch_time = menuData.batch_time || '—';
-  const weekLabel = getLabelSemaine();
+  const batch_time = menuData.batch_time || '';
+  const cout_semaine = menuData.cout_semaine || '';
+  const accessUrl = `${SITE_URL}/espace-client.html`;
 
   const chienMap = {};
   chiens.forEach(c => { chienMap[c.id] = c; });
 
   const pluriel = menuChiens.length > 1;
-
-  const logoBar = `
-      <tr>
-        <td style="padding:0 8px 28px;text-align:center;">
-          <img src="${SITE_URL}/kyno-logo.png" alt="Kyno" height="40" style="display:block;margin:0 auto;">
-        </td>
-      </tr>`;
-
-  const dogSvg = `<svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="26" cy="26" r="26" fill="#FBE4D8"/>
-                  <path d="M16 20c0-2 1.5-4 3.2-4 1.2 0 2.2 1 2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-                  <path d="M36 20c0-2-1.5-4-3.2-4-1.2 0-2.2 1-2.6 2.4" stroke="#451A36" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-                  <ellipse cx="26" cy="29" rx="10" ry="8.5" fill="#FF5A3C"/>
-                  <circle cx="22" cy="27" r="1.4" fill="#451A36"/>
-                  <circle cx="30" cy="27" r="1.4" fill="#451A36"/>
-                  <path d="M24 32c0.8 1 2.2 1 3 0" stroke="#451A36" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-                  <ellipse cx="26" cy="30.5" rx="1.4" ry="1" fill="#451A36"/>
-                </svg>`;
+  const noms = menuChiens.map(mc => (chienMap[mc.chien_id]?.prenom_chien || 'Chien')).join(' &amp; ');
+  const nomsDisplay = menuChiens.map(mc => (chienMap[mc.chien_id]?.prenom_chien || 'Chien')).join(' & ');
 
   const stepsHtml = batch_cooking_commun.map(s => `${s.n}. ${s.text}`).join('<br>');
   const coursesHtml = courses_commune
-    .map(cat => `${cat.cat} : ` + (cat.items || []).map(i => `${i.name} ${i.qty}`).join(', '))
-    .join('<br>');
+    .map(cat => `<strong>${cat.cat}</strong> : ` + (cat.items || []).map(i => `${i.name} ${i.qty}`).join(', '))
+    .join('<br><br>');
 
-  // ── Cas 1 chien ──────────────────────────────────────────────────────────────
-  if (!pluriel) {
-    const mc = menuChiens[0] || {};
-    const chien = chienMap[mc.chien_id] || chiens[0] || {};
-    const prenom = chien.prenom_chien || 'ton chien';
-    const race = chien.race || '';
-    const poids = chien.poids ? chien.poids + ' kg' : '';
-    const sousTitre = [race, poids].filter(Boolean).join(' · ');
+  // ── Recap table ──────────────────────────────────────────────────────────────
+  const recapRowsSingle = (mc) => {
     const recette = mc.recette || {};
-    const cible = ciblesKcal[mc.chien_id];
+    const rows = [];
+    if (recette.titre) rows.push(`<tr><td style="padding:11px 16px;background:#DDF3F1;font-weight:700;font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">${recette.titre}</td></tr>`);
+    if (recette.ration) rows.push(`<tr><td style="padding:11px 16px;border-top:2px solid #E8DCC6;font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">Sa ration&nbsp;&nbsp;&nbsp;<b>${recette.ration}&nbsp;g/repas</b></td></tr>`);
+    if (batch_time) rows.push(`<tr><td style="padding:11px 16px;border-top:2px solid #E8DCC6;font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">Temps de pr&eacute;pa&nbsp;&nbsp;&nbsp;<b>${batch_time}</b></td></tr>`);
+    if (cout_semaine) rows.push(`<tr><td style="padding:11px 16px;border-top:2px solid #E8DCC6;font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">Co&ucirc;t de la semaine&nbsp;&nbsp;&nbsp;<b>${cout_semaine}</b></td></tr>`);
+    return rows.join('');
+  };
 
-    const prochesAlert = buildProchesAlert(chien, recette);
-
-
-    return `<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#F3F7F1;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F3F7F1;padding:48px 20px;">
-    <tr><td align="center">
-    <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
-      ${logoBar}
-      <tr>
-        <td style="background:#FFFFFF;border-radius:20px 20px 0 0;padding:28px 32px;border:1px solid #F6E7F3;border-bottom:none;">
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td width="56" valign="top">${dogSvg}</td>
-              <td valign="middle" style="padding-left:12px;">
-                <p style="margin:0;font-size:17px;font-weight:700;color:#451A36;">${prenom}</p>
-                <p style="margin:2px 0 0;font-size:12px;color:#8A978A;">${sousTitre}</p>
-              </td>
-              <td align="right" valign="middle">
-                <span style="display:inline-block;background:#F6E7F3;color:#8A3A7C;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:20px;">${weekLabel}</span>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#451A36;padding:24px 32px;">
-          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#7FBE98;font-weight:700;">Menu de la semaine</p>
-          <p style="margin:0;font-size:22px;font-weight:700;color:#FFF9F2;line-height:1.3;">${recette.titre || 'Le menu de ' + prenom}</p>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FFFFFF;padding:32px 32px 4px;border:1px solid #F6E7F3;border-top:none;">
-          <p style="margin:0 0 24px;font-size:14.5px;color:#3C473D;line-height:1.9;">${recette.note || ''}</p>
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
-            <tr>
-              <td width="50%" style="background:#F3F7F1;border-radius:10px;padding:16px 20px;">
-                <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Besoin estimé</p>
-                <p style="margin:0;font-size:20px;font-weight:700;color:#451A36;">${cible ? cible + ' kcal/j' : '—'}</p>
-              </td>
-              <td width="12"></td>
-              <td width="50%" style="background:#F3F7F1;border-radius:10px;padding:16px 20px;">
-                <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Temps de prépa</p>
-                <p style="margin:0;font-size:20px;font-weight:700;color:#451A36;">${batch_time}</p>
-              </td>
-            </tr>
-          </table>
-          <p style="margin:0 0 24px;font-size:12px;color:#8A978A;"><strong>Portionnage :</strong> divise la préparation cuite en 14 boîtes égales (matin et soir, 7 jours).${recette.ration ? ` Ration crue totale : ≈ ${recette.ration} g/j.` : ''}</p>
-          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#451A36;border-top:1px solid #EBD9E6;padding-top:22px;">Les étapes</h2>
-          <p style="margin:0 0 24px;font-size:14.5px;color:#3C473D;line-height:1.9;">${stepsHtml}</p>
-          ${mc.batch_special ? `
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
-            <tr>
-              <td style="background:#FBE4D8;border-radius:10px;padding:16px 18px;">
-                <p style="margin:0;font-size:13px;color:#8A4420;line-height:1.7;"><strong>Au moment du repas seulement :</strong> ${mc.batch_special}</p>
-              </td>
-            </tr>
-          </table>` : ''}
-          ${prochesAlert}
-          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#451A36;">Liste de courses (7 jours)</h2>
-          <p style="margin:0 0 28px;font-size:14.5px;color:#3C473D;line-height:1.9;">${coursesHtml}</p>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #F6E7F3;border-top:none;border-radius:0 0 20px 20px;">
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="text-align:center;padding-top:8px;">
-              <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Voir le menu complet →</a>
-            </td></tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:24px 32px 0;">
-          <p style="margin:0 0 12px;font-size:11px;color:#9AA69B;line-height:1.7;">⚠ Ce menu est éducatif et ne remplace pas un avis vétérinaire.</p>
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td><span style="font-size:12px;font-weight:700;color:#5B6B5D;">kyno</span> <span style="font-size:11px;color:#9AA69B;">· Lyon, France</span></td>
-              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:#9AA69B;text-decoration:none;">colinemngl@gmail.com</a></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
-  }
-
-  // ── Cas N chiens ─────────────────────────────────────────────────────────────
-  const noms = menuChiens.map(mc => (chienMap[mc.chien_id]?.prenom_chien || 'Chien')).join(' & ');
-
-  const dogSectionsHtml = menuChiens.map(mc => {
+  const recapTableMulti = menuChiens.map(mc => {
     const chien = chienMap[mc.chien_id] || {};
     const nom = chien.prenom_chien || 'Chien';
-    const race = chien.race || '';
-    const poids = chien.poids ? chien.poids + ' kg' : '';
-    const sousTitre = [race, poids].filter(Boolean).join(' · ');
     const recette = mc.recette || {};
-    const cible = ciblesKcal[mc.chien_id];
-    const prochesAlertDog = buildProchesAlert(chien, recette);
+    const rows = [];
+    rows.push(`<tr><td style="padding:8px 16px 2px;font-size:11px;font-weight:700;letter-spacing:0.06em;color:#6E4A63;font-family:Arial,Helvetica,sans-serif;text-transform:uppercase;">${nom}</td></tr>`);
+    if (recette.titre) rows.push(`<tr><td style="padding:4px 16px 8px;font-weight:700;font-size:15px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">${recette.titre}</td></tr>`);
+    if (recette.ration) rows.push(`<tr><td style="padding:4px 16px 8px;border-top:2px solid #E8DCC6;font-size:14px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">Ration&nbsp;&nbsp;&nbsp;<b>${recette.ration}&nbsp;g/repas</b></td></tr>`);
+    return rows.join('');
+  }).join('<tr><td style="padding:0;border-top:3px solid #451A36;"></td></tr>');
 
+  const recapTableMultiRows = recapTableMulti +
+    (batch_time ? `<tr><td style="padding:8px 16px;border-top:3px solid #451A36;font-size:14px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">Temps de pr&eacute;pa&nbsp;&nbsp;&nbsp;<b>${batch_time}</b></td></tr>` : '') +
+    (cout_semaine ? `<tr><td style="padding:8px 16px;border-top:2px solid #E8DCC6;font-size:14px;color:#451A36;font-family:Arial,Helvetica,sans-serif;">Co&ucirc;t de la semaine&nbsp;&nbsp;&nbsp;<b>${cout_semaine}</b></td></tr>` : '');
+
+  // ── Sections par chien (batch_special + proches) ──────────────────────────
+  const dogExtrasHtml = menuChiens.map(mc => {
+    const chien = chienMap[mc.chien_id] || {};
+    const nom = chien.prenom_chien || 'Chien';
+    const recette = mc.recette || {};
+    const prochesAlert = buildProchesAlert(chien, recette);
+    if (!mc.batch_special && !prochesAlert) return '';
     return `
-      <tr>
-        <td style="background:#FFFFFF;padding:24px 32px 0;border:1px solid #F6E7F3;border-top:none;">
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td width="44" valign="top">${dogSvg}</td>
-              <td valign="middle" style="padding-left:10px;">
-                <p style="margin:0;font-size:16px;font-weight:700;color:#451A36;">${nom}</p>
-                <p style="margin:2px 0 0;font-size:11px;color:#8A978A;">${sousTitre}</p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FFFFFF;padding:12px 32px 20px;border:1px solid #F6E7F3;border-top:none;">
-          <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#451A36;">${recette.titre || 'Menu de la semaine'}</p>
-          <p style="margin:0 0 10px;font-size:13px;color:#5B6B5D;line-height:1.7;">${recette.note || ''}</p>
-          <table cellpadding="0" cellspacing="0" style="margin:0 0 8px;">
-            <tr>
-              <td style="background:#F3F7F1;border-radius:8px;padding:10px 16px;">
-                <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Besoin estimé</p>
-                <p style="margin:0;font-size:18px;font-weight:700;color:#451A36;">${cible ? cible + ' kcal/j' : '—'}</p>
-              </td>
-            </tr>
-          </table>
-          ${recette.ration ? `<p style="margin:0 0 10px;font-size:11px;color:#8A978A;">Ration crue : ≈ ${recette.ration} g/j</p>` : ''}
-          ${mc.batch_special ? `
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 10px;">
-            <tr>
-              <td style="background:#FBE4D8;border-radius:8px;padding:12px 16px;">
-                <p style="margin:0;font-size:13px;color:#8A4420;line-height:1.7;"><strong>Au moment du repas :</strong> ${mc.batch_special}</p>
-              </td>
-            </tr>
-          </table>` : ''}
-          ${prochesAlertDog}
-        </td>
-      </tr>`;
+      ${mc.batch_special ? `<p style="margin:0 0 10px;font-size:14px;color:#451A36;font-family:Arial,Helvetica,sans-serif;"><strong>${pluriel ? nom + ' — ' : ''}Au moment du repas&nbsp;:</strong> ${mc.batch_special}</p>` : ''}
+      ${prochesAlert}`;
   }).join('');
+
+  const hasExtras = dogExtrasHtml.trim().length > 0;
+
+  // ── Btn Outlook-safe ──────────────────────────────────────────────────────
+  const btnLabel = pluriel ? 'Voir leurs menus' : `Voir son menu`;
+  const btnHtml = `<table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
+          <tr>
+            <td bgcolor="#E5432F" style="border-radius:999px;border:3px solid #451A36;">
+              <a href="${accessUrl}" style="display:inline-block;padding:14px 26px;color:#FFF4E0;font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;text-decoration:none;white-space:nowrap;">${btnLabel}</a>
+            </td>
+          </tr>
+        </table>`;
+
+  const footerHtml = `<table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="background:#FCEBC4;border:2px solid #451A36;border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.5;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
+              Kyno est un outil &eacute;ducatif et ne remplace pas un avis v&eacute;t&eacute;rinaire. En cas de pathologie ou de traitement en cours, consulte ton v&eacute;t&eacute;rinaire avant tout changement alimentaire.
+            </td>
+          </tr>
+        </table>`;
+
+  // ── Recap table HTML ──────────────────────────────────────────────────────
+  const recapRows = pluriel ? recapTableMultiRows : recapRowsSingle(menuChiens[0] || {});
+  const recapTableHtml = recapRows
+    ? `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:3px solid #451A36;border-radius:16px;overflow:hidden;margin:0 0 20px;">${recapRows}</table>`
+    : '';
+
+  // ── Titre prénoms avec stickers ───────────────────────────────────────────
+  const nomStickers = menuChiens.map(mc => {
+    const nom = chienMap[mc.chien_id]?.prenom_chien || 'Chien';
+    return `<span style="display:inline-block;background:#F27A9B;border:3px solid #451A36;border-radius:10px;padding:0 8px 2px;">${nom}</span>`;
+  }).join(' &amp; ');
 
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#F3F7F1;font-family:Arial,Helvetica,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F3F7F1;padding:48px 20px;">
-    <tr><td align="center">
-    <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
-      ${logoBar}
-      <tr>
-        <td style="background:#451A36;border-radius:20px 20px 0 0;padding:24px 32px;">
-          <p style="margin:0 0 4px;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#7FBE98;font-weight:700;">Menu de la semaine</p>
-          <p style="margin:0;font-size:21px;font-weight:700;color:#FFF9F2;line-height:1.3;">${noms}</p>
-          <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,0.45);">${weekLabel}</p>
-        </td>
-      </tr>
-      ${dogSectionsHtml}
-      <tr>
-        <td style="background:#FFFFFF;padding:24px 32px 4px;border:1px solid #F6E7F3;border-top:none;">
-          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#451A36;border-top:1px solid #EBD9E6;padding-top:22px;">Batch cooking commun</h2>
-          <table cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
-            <tr>
-              <td style="background:#F3F7F1;border-radius:8px;padding:10px 16px;">
-                <p style="margin:0 0 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A978A;font-weight:700;">Temps de prépa</p>
-                <p style="margin:0;font-size:18px;font-weight:700;color:#451A36;">${batch_time}</p>
-              </td>
-            </tr>
-          </table>
-          <p style="margin:0 0 28px;font-size:14.5px;color:#3C473D;line-height:1.9;">${stepsHtml}</p>
-          <h2 style="margin:0 0 10px;font-size:15px;font-weight:700;color:#451A36;">Liste de courses du foyer (7 jours)</h2>
-          <p style="margin:0 0 28px;font-size:14.5px;color:#3C473D;line-height:1.9;">${coursesHtml}</p>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#FFFFFF;padding:8px 32px 36px;border:1px solid #F6E7F3;border-top:none;border-radius:0 0 20px 20px;">
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr><td style="text-align:center;padding-top:8px;">
-              <a href="https://project-jlc6z.vercel.app/espace-client.html" style="display:inline-block;background:#451A36;color:white;padding:14px 30px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;">Voir les menus complets →</a>
-            </td></tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:24px 32px 0;">
-          <p style="margin:0 0 12px;font-size:11px;color:#9AA69B;line-height:1.7;">⚠ Ce menu est éducatif et ne remplace pas un avis vétérinaire.</p>
-          <table width="100%" cellpadding="0" cellspacing="0">
-            <tr>
-              <td><span style="font-size:12px;font-weight:700;color:#5B6B5D;">kyno</span> <span style="font-size:11px;color:#9AA69B;">· Lyon, France</span></td>
-              <td align="right"><a href="mailto:colinemngl@gmail.com" style="font-size:11px;color:#9AA69B;text-decoration:none;">colinemngl@gmail.com</a></td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-    </td></tr>
+<body style="margin:0;padding:0;background:#FFF4E0;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFF4E0;padding:32px 16px;">
+  <tr><td align="center">
+  <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#FFFFFF;border:3px solid #451A36;border-radius:20px;overflow:hidden;">
+
+    <tr>
+      <td style="padding:0;line-height:0;font-size:0;border-bottom:4px solid #451A36;">
+        <img src="${SITE_URL}/email-entete-menu.png" width="600" height="150" alt="Kyno" style="display:block;width:100%;max-width:600px;">
+      </td>
+    </tr>
+
+    <tr>
+      <td style="padding:30px 32px 26px;">
+        <h1 style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:28px;line-height:1.25;font-weight:700;color:#451A36;">
+          Le menu de la semaine de ${nomStickers}
+        </h1>
+        <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
+          Bonjour&nbsp;! Voici ${pluriel ? 'leurs menus' : 'son menu'} de la semaine, avec les quantit&eacute;s pr&eacute;cises, le batch cooking et la liste de courses.
+        </p>
+        ${recapTableHtml}
+        ${hasExtras ? `<div style="margin:0 0 20px;font-size:14px;line-height:1.75;color:#451A36;">${dogExtrasHtml}</div>` : ''}
+        ${stepsHtml ? `<h2 style="margin:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:#451A36;">Les &eacute;tapes</h2><p style="margin:0 0 20px;font-size:15px;line-height:1.9;color:#451A36;font-family:Arial,Helvetica,sans-serif;">${stepsHtml}</p>` : ''}
+        ${coursesHtml ? `<h2 style="margin:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:#451A36;">Liste de courses (7&nbsp;jours)</h2><p style="margin:0 0 20px;font-size:15px;line-height:1.9;color:#451A36;font-family:Arial,Helvetica,sans-serif;">${coursesHtml}</p>` : ''}
+        <p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:#451A36;font-family:Arial,Helvetica,sans-serif;">
+          Retrouve ${pluriel ? 'ces menus' : 'ce menu'} dans ton espace Kyno, o&ugrave; tu peux me raconter comment &ccedil;a s&apos;est pass&eacute;.
+        </p>
+        ${btnHtml}
+        ${footerHtml}
+      </td>
+    </tr>
+
+    <tr>
+      <td style="background:#FFF4E0;border-top:3px solid #E8DCC6;padding:16px 32px;font-size:13px;line-height:1.6;color:#6E4A63;font-family:Arial,Helvetica,sans-serif;">
+        Kyno &middot; nutrition canine individualis&eacute;e &middot; Lyon, France<br>
+        Une question&nbsp;? &Eacute;cris-nous &agrave; <a href="mailto:${CONTACT_EMAIL}" style="color:#451A36;text-decoration:none;">${CONTACT_EMAIL}</a>.
+      </td>
+    </tr>
+
   </table>
+  </td></tr>
+</table>
 </body>
 </html>`;
 }
