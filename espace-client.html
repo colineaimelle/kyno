@@ -817,7 +817,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
       <div class="menu-card-head" id="menuCardHead">
         <div class="menu-card-head-left">
           <span class="menu-week-label" id="menuWeekLabel">Semaine en cours</span>
-          <p class="menu-name" id="menuName">Menu en preparation</p>
+          <p class="menu-name" id="menuName">Menu en préparation</p>
         </div>
         <div class="menu-card-tags" id="menuCardTags"></div>
       </div>
@@ -888,7 +888,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 
   <!-- ═══ SECTION FICHE SANTE ═══ -->
   <section id="sectionSante">
-    <h2>Sa fiche <span class="ky-sticker-rose">sante</span></h2>
+    <h2>Sa fiche <span class="ky-sticker-rose">santé</span></h2>
     <div class="sante-grid">
       <!-- Carte Ce que l'on sait -->
       <div class="sante-card">
@@ -1603,7 +1603,7 @@ function renderFicheSante(p) {
     const rows = [
       { label: 'Maladies', val: toArr(p.maladies).join(', ') || 'Aucune' },
       { label: 'Allergies', val: toArr(p.allergies).join(', ') || 'Aucune allergie connue' },
-      { label: 'Intolerances', val: toArr(p.intolerances).join(', ') || 'Aucune' },
+      { label: 'Intolérances', val: toArr(p.intolerances).join(', ') || 'Aucune' },
       { label: 'Traitements', val: toArr(p.traitements).join(', ') || 'Aucun traitement en cours' },
       { label: 'Digestion', val: toArr(p.digestion).join(', ') || (toArr(p.sensibilites).join(', ')) || 'RAS' }
     ];
@@ -1623,7 +1623,7 @@ function renderFicheSante(p) {
   const ml = document.getElementById('macroList2');
   if (ml) {
     if (!macros.length) {
-      ml.innerHTML = '<span class="sante-note">Les apports s\'afficheront des le premier menu.</span>';
+      ml.innerHTML = '<span class="sante-note">Les apports s\'afficheront dès le premier menu.</span>';
     } else {
       ml.innerHTML = macros.map(m => {
         const pct = m.pct != null ? m.pct : (m.cible ? Math.round((m.valeur / m.cible) * 80) : 0);
@@ -1642,7 +1642,7 @@ function renderFicheSante(p) {
   const dEl = document.getElementById('weightDelta2');
   if (wrap) {
     if (hist.length < 2) {
-      wrap.innerHTML = '<span class="sante-note">La courbe apparaitra apres quelques semaines de suivi.</span>';
+      wrap.innerHTML = '<span class="sante-note">La courbe apparaîtra après quelques semaines de suivi.</span>';
       if (nowEl) nowEl.textContent = p.poids ? p.poids + ' kg' : '—';
     } else {
       const W=600,H=150,padX=30,padY=24;
@@ -1736,7 +1736,7 @@ function renderMenuCard(p) {
   // Sous-labels accordeons
   const nCourses = (p.courses || []).flatMap(c => c.items || []).length;
   const courseSub = document.getElementById('coursesSubLabel');
-  if (courseSub && nCourses) courseSub.textContent = nCourses + ' produits, a copier en un clic';
+  if (courseSub && nCourses) courseSub.textContent = nCourses + ' produits, à copier en un clic';
 
   const nMenus = Array.isArray(p.historique_menus) ? p.historique_menus.length : 0;
   const menusSub = document.getElementById('menusSubLabel');
@@ -2047,7 +2047,7 @@ function copyList() {
 //  MODALE OBJECTIFS
 // ═══════════════════════════════════════════════════════════
 function openObjModal() {
-  const nom = userProfile?.prenom_chien || 'ton chien';
+  const nom = cap(userProfile?.prenom_chien || '') || 'ton chien';
   document.getElementById('objModalSub').textContent = `Sélectionne les objectifs de ${nom}. Le chat ajustera son plan au prochain point dans 15 jours.`;
   document.getElementById('objOptions').innerHTML = Object.entries(OBJ_META).map(([key, m]) => {
     const sel = selectedObjectives.includes(key);
@@ -2087,7 +2087,7 @@ async function saveObjectives() {
   } catch (e) { console.warn(e); }
   toggleChat(true);
   const labels = selectedObjectives.map(k => (OBJ_META[k] || {}).label || k).join(', ');
-  addMessage('ia', `C'est noté ✦ Nouveaux objectifs : ${labels}. J'ajuste le plan de ${userProfile.prenom_chien || 'ton chien'} dès le prochain menu.`);
+  addMessage('ia', `C'est noté ✦ Nouveaux objectifs : ${labels}. J'ajuste le plan de ${cap(userProfile.prenom_chien || '') || 'ton chien'} dès le prochain menu.`);
 }
 document.getElementById('objModal').addEventListener('click', e => { if (e.target.id === 'objModal') closeObjModal(); });
 
@@ -2095,7 +2095,7 @@ document.getElementById('objModal').addEventListener('click', e => { if (e.targe
 //  CHAT
 // ═══════════════════════════════════════════════════════════
 async function loadChatHistory() {
-  const nom = (userProfile && userProfile.prenom_chien) || 'ton chien';
+  const nom = cap((userProfile && userProfile.prenom_chien) || '') || 'ton chien';
   if (!userProfile || !Array.isArray(userProfile.chat_history) || !userProfile.chat_history.length) {
     addMessage('ia', `Bonjour ! Je suis Kyno, ton assistant nutrition. Pose-moi tes questions sur ${nom} !`, true);
     return;
@@ -2173,7 +2173,7 @@ async function handleSend() {
 }
 
 function localReply(msg) {
-  const nom = userProfile?.prenom_chien || 'ton chien';
+  const nom = cap(userProfile?.prenom_chien || '') || 'ton chien';
   const m = msg.toLowerCase();
   if (m.includes('selle') || m.includes('diarrh') || m.includes('molle')) return `Merci pour le retour. Je vais alléger un peu les fibres et privilégier des protéines très digestes sur le prochain menu de ${nom}. Si ça persiste plus de 48h, on en parle à ton vétérinaire.`;
   if (m.includes('appétit') || m.includes('mange') || m.includes('mange pas')) return `Compris. Je vais varier les protéines et ajuster les portions pour redonner de l'appétit à ${nom}. Tu as remarqué un changement de routine ou de température ces derniers jours ?`;
