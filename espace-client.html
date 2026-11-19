@@ -145,10 +145,50 @@ header{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(255,244,22
 
 /* ─── LAYOUT ─── */
 main{max-width:1080px;margin:0 auto;padding:88px 18px 110px;display:flex;flex-direction:column;gap:52px;}
-.section-label{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
-.section-label span:first-child{font-family:var(--font-texte);font-weight:700;font-size:11px;letter-spacing:.22em;color:#6E4A63;white-space:nowrap;}
-.section-label-line{height:1.5px;flex:1;background:#E8DCC6;}
-h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:clamp(22px,3.4vw,30px);margin:0 0 20px;}
+h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:clamp(28px,3.4vw,36px);margin:0 0 20px;line-height:1.05;}
+.ky-sticker{display:inline-block;background:#F2B630;border:3px solid #451A36;border-radius:12px;box-shadow:4px 4px 0 #451A36;padding:0 10px 3px;transform:rotate(-2deg);}
+.ky-sticker-rose{display:inline-block;background:#F27A9B;border:3px solid #451A36;border-radius:12px;box-shadow:4px 4px 0 #451A36;padding:0 10px 3px;transform:rotate(-2deg);}
+.ky-sticker-turquoise{display:inline-block;background:#DDF3F1;border:3px solid #451A36;border-radius:12px;box-shadow:4px 4px 0 #451A36;padding:0 10px 3px;transform:rotate(-2deg);}
+.pastille{display:inline-flex;align-items:center;background:#FFF4E0;border:2px solid #451A36;border-radius:999px;padding:4px 12px;font:700 13px/1 var(--font-texte),sans-serif;color:#451A36;}
+
+/* ─── PLANCHE DU HAUT ─── */
+.planche{background:#451A36;padding:12px;border-radius:14px;display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:12px;}
+.planche-case{border-radius:8px;overflow:hidden;position:relative;}
+/* Case 1 : turquoise */
+.case-turquoise{background:#2BB3AE;padding:28px 30px;display:flex;align-items:center;gap:24px;}
+.case-turquoise-rayons{position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 100%,#2BB3AE 0deg 8deg,#3FC0BB 8deg 16deg);pointer-events:none;}
+.case-portrait{position:relative;flex:none;width:160px;height:160px;border-radius:50%;background:#F2B630;border:4px solid #451A36;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;}
+.case-portrait svg{width:140px;height:auto;margin-bottom:-8px;}
+.case-info{position:relative;display:flex;flex-direction:column;gap:10px;}
+.case-prenom{font-family:var(--font-titre);font-weight:400;font-size:clamp(32px,4vw,52px);line-height:1;}
+.case-prenom-sticker{display:inline-block;background:#F2B630;border:3px solid #451A36;border-radius:12px;box-shadow:4px 4px 0 #451A36;padding:0 10px 3px;transform:rotate(-2deg);}
+.case-race{font:700 15px/1.4 var(--font-texte),sans-serif;color:#FFF4E0;}
+.case-pastilles{display:flex;gap:7px;flex-wrap:wrap;}
+/* Case 2 : papier */
+.case-papier{background:#FFF4E0;padding:24px 26px;display:flex;flex-direction:column;justify-content:center;gap:10px;}
+.case-score-label{font:700 14px/1 var(--font-texte),sans-serif;color:#451A36;}
+.case-score-num{font-family:var(--font-titre);font-weight:400;font-size:72px;line-height:1;color:#17706C;}
+.case-score-num span{font-size:24px;color:#451A36;}
+.case-score-bar{height:14px;border:2px solid #451A36;border-radius:999px;background:#FFFFFF;overflow:hidden;}
+.case-score-fill{height:100%;background:#17706C;transition:width 1s cubic-bezier(.22,.61,.36,1);}
+.case-score-etat{display:inline-flex;align-items:center;background:#DDF3F1;border:2px solid #451A36;border-radius:999px;padding:5px 13px;font:700 13px/1 var(--font-texte),sans-serif;color:#451A36;align-self:flex-start;}
+/* Case 3 : rose */
+.case-rose{background:#F27A9B;padding:20px 20px 0;display:flex;flex-direction:column;gap:12px;}
+.case-rose-points{position:absolute;right:0;top:0;width:45%;height:80px;background-image:radial-gradient(#E5432F 3px,transparent 3.5px);background-size:18px 18px;opacity:.45;pointer-events:none;}
+.case-bulle-wrap{position:relative;width:240px;height:115px;}
+.case-bulle-svg{position:absolute;inset:0;width:100%;height:100%;}
+.case-bulle-txt{position:absolute;left:8%;right:8%;top:22px;margin:0;text-align:center;font-family:var(--font-titre);font-weight:400;font-size:22px;line-height:1.1;color:#451A36;}
+.case-voir-menu{position:relative;display:inline-flex;align-items:center;justify-content:center;background:#F2B630;color:#451A36;border:3px solid #451A36;border-radius:999px;padding:11px 20px;font:700 15px/1 var(--font-texte),sans-serif;text-decoration:none;cursor:pointer;align-self:flex-start;}
+.case-viva-bas{position:absolute;right:10px;bottom:-12px;width:100px;height:auto;}
+/* Sur mobile */
+@media(max-width:768px){
+  .planche{grid-template-columns:1fr;padding:8px;gap:8px;}
+  .case-rose{display:none;}
+  .case-turquoise{padding:20px;gap:16px;}
+  .case-portrait{width:120px;height:120px;}
+  .case-portrait svg{width:105px;}
+  .case-score-num{font-size:54px;}
+}
 
 /* ─── CARROUSEL ─── */
 .carousel{position:relative;}
@@ -501,16 +541,63 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
     </div>
   </div>
 
-  <!-- ═══ SECTION 1 — CARROUSEL ═══ -->
+  <!-- ═══ PLANCHE DU HAUT ═══ -->
   <section>
-    <div class="section-label">
-      <span>01 · La fiche de ton chien</span>
-      <div class="section-label-line"></div>
+    <div class="planche">
+      <!-- Case 1 : turquoise avec rayons -->
+      <div class="planche-case case-turquoise">
+        <div class="case-turquoise-rayons" aria-hidden="true"></div>
+        <div class="case-portrait">
+          <svg viewBox="0 0 460 500" id="planchePortrait" data-viva-full="" style="width:140px;height:auto;margin-bottom:-8px;"></svg>
+        </div>
+        <div class="case-info">
+          <h1 class="case-prenom"><span class="case-prenom-sticker" id="planchePrenom">…</span></h1>
+          <p class="case-race" id="plancheRaceSince">…</p>
+          <div class="case-pastilles" id="planchePastilles"></div>
+        </div>
+      </div>
+      <!-- Case 2 : papier, score santé -->
+      <div class="planche-case case-papier">
+        <span class="case-score-label">Score santé actuel</span>
+        <span class="case-score-num" id="scoreNum">—<span id="scoreDenom" style="font-size:24px;color:#451A36">/100</span></span>
+        <div class="case-score-bar"><div class="case-score-fill" id="scoreFill" style="width:0"></div></div>
+        <span class="case-score-etat" id="scoreEtat">En attente</span>
+      </div>
+      <!-- Case 3 : rose, bulle Viva + bouton menu (masquée sur mobile) -->
+      <div class="planche-case case-rose">
+        <div class="case-rose-points" aria-hidden="true"></div>
+        <div class="case-bulle-wrap">
+          <svg class="case-bulle-svg" viewBox="0 0 420 210" preserveAspectRatio="none">
+            <path d="M210 12 C320 12 404 50 404 100 C404 150 320 186 210 186 C182 186 156 184 132 178 L74 204 L92 166 C42 150 16 126 16 100 C16 50 100 12 210 12 Z" fill="#FFF4E0" stroke="#451A36" stroke-width="6" stroke-linejoin="round"/>
+          </svg>
+          <p class="case-bulle-txt">Mon menu de la semaine est pret !</p>
+        </div>
+        <button class="case-voir-menu" onclick="document.getElementById('sectionMenu').scrollIntoView({behavior:'smooth'})">Voir son menu</button>
+        <svg data-viva-full="" viewBox="0 0 460 500" style="position:absolute;right:10px;bottom:-12px;width:100px;height:auto;" aria-hidden="true"></svg>
+      </div>
     </div>
+  </section>
 
-    <div class="carousel">
-      <div class="carousel-viewport">
-        <div class="carousel-track" id="carTrack">
+  <!-- Éléments fantômes pour les render functions (déplacés en section fiche santé à l'étape 4) -->
+  <div style="display:none">
+    <div id="s1Infos"></div>
+    <div id="s1BilanGrid"></div>
+    <div id="s1VetAlert"></div>
+    <div id="s1CuisineBlock"><span id="s1CuisineTag"></span></div>
+    <div id="s1JourBlock"><div id="s1JourOpts"></div><div id="s1JourConfirm"></div></div>
+    <div id="s1Extra"></div>
+    <div id="s1Name"></div>
+    <div id="s1Since"></div>
+    <div id="macroList"></div>
+    <div id="weightSvgWrap"></div>
+    <b id="weightNow"></b>
+    <span id="weightDelta"></span>
+    <div id="objProgress"></div>
+  </div>
+
+  <!-- SECTION CARROUSEL supprimée — les contenus migrent en fiche santé (étape 4) -->
+  <div style="display:none">
+    <div id="carTrack">
 
           <!-- Slide 1 · Fiche chien -->
           <div class="slide">
@@ -643,19 +730,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 
         </div>
       </div>
-      <div class="carousel-nav">
-        <div class="carousel-dots" id="carDots"></div>
-        <div class="carousel-arrows">
-          <button class="carr" onclick="moveSlide(-1)" aria-label="Précédent">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#451A36" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
-          </button>
-          <button class="carr" onclick="moveSlide(1)" aria-label="Suivant">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#451A36" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
+    </div><!-- /carousel caché -->
 
   <!-- ═══ SECTION 2 — ALIMENTATION ═══ -->
   <section>
@@ -995,8 +1070,6 @@ const DEMO_PROFILE = {
 //  INIT
 // ═══════════════════════════════════════════════════════════
 (async function init() {
-  buildCarousel();
-
   let profile = null;
   try {
     if (sb) {
@@ -1024,7 +1097,6 @@ const DEMO_PROFILE = {
   userProfile = profile;
   buildDogSelector();
   renderAll(profile);
-  setTimeout(updateCarouselHeight, 80);
   await loadChatHistory();
   if (sb && currentUser) { sb.from('user').update({ derniere_connexion: new Date().toISOString() }).eq('email', currentUser.email).then(() => {}).catch(() => {}); }
   document.getElementById('loadingScreen').style.display = 'none';
@@ -1037,6 +1109,7 @@ function renderAll(p) {
   const nom = p.prenom_chien || 'ton chien';
   document.getElementById('chatSub').textContent = `Le suivi de ${nom}`;
 
+  renderPlanche(p);
   renderSlide1(p);
   renderSlide2(p);
   renderSlide3(p);
@@ -1146,28 +1219,50 @@ s1ex.innerHTML = extras.map(s =>
   renderJourEnvoi(p);
 }
 
+function renderPlanche(p) {
+  const nom = p.prenom_chien || '…';
+  const prenomEl = document.getElementById('planchePrenom');
+  if (prenomEl) prenomEl.textContent = nom;
+
+  const raceEl = document.getElementById('plancheRaceSince');
+  if (raceEl) {
+    const sexe = p.sexe || '';
+    const depuis = formatMonth(p.created_at);
+    raceEl.textContent = [p.race, sexe, 'membre depuis ' + depuis].filter(Boolean).join(' · ');
+  }
+
+  const pastEl = document.getElementById('planchePastilles');
+  if (pastEl) {
+    const tags = [
+      p.activite,
+      p.mode_alimentaire || p.modeAlimentaire,
+      p.jour_envoi ? 'Menu le ' + ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'][(p.jour_envoi - 1)] : null
+    ].filter(Boolean);
+    pastEl.innerHTML = tags.map(t => `<span class="pastille">${esc(t)}</span>`).join('');
+  }
+
+  renderScore(p.score_sante);
+}
+
 function renderScore(score) {
-  const ring = document.getElementById('scoreRing');
   const numEl = document.getElementById('scoreNum');
-  const labelEl = document.getElementById('scoreLabel');
+  const fillEl = document.getElementById('scoreFill');
+  const etatEl = document.getElementById('scoreEtat');
+  if (!numEl) return;
   if (score == null) {
-    numEl.textContent = '—';
-    labelEl.textContent = 'En attente';
-    ring.style.strokeDashoffset = RING_DASH;
+    numEl.innerHTML = '—<span id="scoreDenom" style="font-size:24px;color:#451A36">/100</span>';
+    if (etatEl) etatEl.textContent = 'En attente';
     return;
   }
-  const color = score >= 85 ? '#17706C' : score >= 70 ? '#E5432F' : '#B8301D';
-  const label = score >= 85 ? 'Excellent' : score >= 70 ? 'Bonne forme' : score >= 55 ? 'À surveiller' : 'Vigilance';
-  ring.style.stroke = color;
-  labelEl.style.color = color;
-  labelEl.textContent = label;
+  const label = score >= 85 ? '✓ Bonne forme' : score >= 70 ? 'Forme correcte' : score >= 55 ? 'A surveiller' : 'Vigilance';
+  if (etatEl) etatEl.textContent = label;
   const dur = 1300, start = performance.now();
   const tick = now => {
     const t = Math.min(1, (now - start) / dur);
     const e = 1 - Math.pow(1 - t, 3);
     const cur = Math.round(score * e);
-    numEl.textContent = cur;
-    ring.style.strokeDashoffset = RING_DASH * (1 - cur / 100);
+    numEl.innerHTML = cur + '<span id="scoreDenom" style="font-size:24px;color:#451A36">/100</span>';
+    if (fillEl) fillEl.style.width = (cur) + '%';
     if (t < 1) requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
@@ -1499,7 +1594,6 @@ function selectChien(id) {
   buildDogSelector();
   renderAll(userProfile);
   loadChatHistory();
-  setTimeout(updateCarouselHeight, 80);
 }
 
 function showRemoveDogModal() {
