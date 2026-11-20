@@ -186,10 +186,11 @@ FORMAT DU TEXTE dans le champ "reply" : pas d'emoji, pas de tiret cadratin, pas 
 
       // poids_historique → reste sur user (backward compat)
       let userPatch = {};
-      if (updates.poids != null && updates.poids !== profile.poids) {
+      if (updates.poids != null) {
         const existingPoids = Array.isArray(profile.poids_historique) ? profile.poids_historique : [];
         const today = new Date().toISOString().split('T')[0];
-        userPatch.poids_historique = [...existingPoids, { label: today, poids: updates.poids }].slice(-6);
+        const without = existingPoids.filter(e => e.label !== today);
+        userPatch.poids_historique = [...without, { label: today, poids: updates.poids }].slice(-6);
       }
 
       // Champs chien → table chien
