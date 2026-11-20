@@ -892,7 +892,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
           <div class="accordion" id="accordionMenus">
             <button class="accordion-head" onclick="toggleAccordion('menus')">
               <div class="accordion-head-left">
-                <span class="accordion-title">Menus precedents</span>
+                <span class="accordion-title">Menus précédents</span>
                 <span class="accordion-sub" id="menusSubLabel"></span>
               </div>
               <span class="accordion-toggle" id="menusPlus">+</span>
@@ -1705,8 +1705,15 @@ function renderMenuCard(p) {
   // Sous-labels accordeons (depuis toutes les recettes des chiens actifs)
   const avecRecette = chiens.filter(function(c) { return c.recette; });
   const nCourses = avecRecette.reduce(function(s, c) { return s + (c.recette.ingredients || []).length; }, 0);
+  const nomsRecette = avecRecette.map(function(c) { return cap(c.prenom_chien || ''); }).filter(Boolean);
   const courseSub = document.getElementById('coursesSubLabel');
-  if (courseSub) courseSub.textContent = nCourses ? nCourses + ' produits, à copier en un clic' : '';
+  if (courseSub) {
+    if (nCourses) {
+      courseSub.textContent = nCourses + ' produits' + (nomsRecette.length ? ' · pour ' + nomsRecette.join(' et ') : '');
+    } else {
+      courseSub.textContent = '';
+    }
+  }
 
   const nMenus = Array.isArray(p.historique_menus) ? p.historique_menus.length : 0;
   const menusSub = document.getElementById('menusSubLabel');
@@ -1822,8 +1829,8 @@ function renderSavings(p) {
   const coutDay = coutWeek / 7;
   const ecoDogChef = Math.max(0, Math.round((7 - coutDay) * days));
   const ecoCroq = Math.max(0, Math.round((3.5 - coutDay) * days));
-  const noms = (chiens.length >= 1 ? chiens : (p.prenom_chien ? [p] : []))
-    .map(c => cap(c.prenom_chien || '')).filter(Boolean);
+  const nomsAvecRecette = chiens.filter(c => c.recette).map(c => cap(c.prenom_chien || '')).filter(Boolean);
+  const noms = nomsAvecRecette.length ? nomsAvecRecette : (p.prenom_chien ? [cap(p.prenom_chien)] : []);
   const pour = noms.length ? ' pour ' + noms.join(' et ') : '';
   block.style.display = 'block';
   block.innerHTML = `
@@ -1842,7 +1849,7 @@ function renderSavings(p) {
 }
 
 function renderPastWeeks(p) {
-  const weeks = Array.isArray(p.historique_menus) ? p.historique_menus : [];
+  const weeks = (Array.isArray(p.historique_menus) ? p.historique_menus : []).slice(-4);
   document.getElementById('pastWeeksContainer').innerHTML = weeks.length ? weeks.map(w => {
     const color = w.score >= 85 ? '#17706C' : w.score >= 70 ? '#E5432F' : '#B8301D';
     return `<div class="past-week">
