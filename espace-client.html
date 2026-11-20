@@ -1697,7 +1697,7 @@ function renderMenuCard(p) {
         '<div class="menu-pending">' +
         '<div class="menu-pending-title">Le premier menu de ' + esc(nom) + ' est en préparation.</div>' +
         '<div class="menu-pending-sub">Génère-le maintenant ou attends le prochain envoi automatique.</div>' +
-        '<button class="btn-prepare-menu" onclick="generateMenuPourChien(' + JSON.stringify(cid) + ')">Préparer son menu maintenant</button>' +
+        '<button class="btn-prepare-menu" onclick="generateMenuPourChien(' + JSON.stringify(cid).replace(/"/g, '&quot;') + ')">Préparer son menu maintenant</button>' +
         '</div>';
     }
   }
@@ -1891,7 +1891,14 @@ async function generateMenuPourChien(chienId, auto) {
     '</div>';
   try {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) return;
+    if (!session) {
+      if (prt) prt.innerHTML =
+        '<div class="menu-pending">' +
+        '<div class="menu-pending-title">Session expirée.</div>' +
+        '<div class="menu-pending-sub">Recharge la page et reconnecte-toi.</div>' +
+        '</div>';
+      return;
+    }
     const res = await fetch('/api/generate-menu-chien', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
