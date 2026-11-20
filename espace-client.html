@@ -1555,8 +1555,9 @@ function renderFicheSante(p) {
       { label: 'Allergies', val: toArr(p.allergies).join(', ') || 'Aucune allergie connue' },
       { label: 'Intolérances', val: toArr(p.intolerances).join(', ') || 'Aucune' },
       { label: 'Traitements', val: toArr(p.traitements).join(', ') || 'Aucun traitement en cours' },
-      { label: 'Digestion', val: toArr(p.digestion).join(', ') || (toArr(p.sensibilites).join(', ')) || 'RAS' }
-    ];
+      toArr(p.sensibilites).length ? { label: 'À surveiller', val: toArr(p.sensibilites).join(', ') } : null,
+      toArr(p.digestion).length   ? { label: 'Digestion',    val: toArr(p.digestion).join(', ') }     : null,
+    ].filter(Boolean);
     const nom = cap(p.prenom_chien || 'ce chien');
     const removeLink = chiens.length > 0
       ? `<a class="fiche-remove-link" href="#" onclick="showRemoveDogModal();return false;">Retirer ${esc(nom)} de mon espace</a>`
