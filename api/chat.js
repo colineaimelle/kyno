@@ -416,9 +416,12 @@ async function generateAndSaveMenu(email, chienId, profile, saison, pm) {
   // Sauvegarder par chien
   await Promise.all(menuData.chiens.map(async mc => {
     const patch = {};
-    if (mc.proteine_principale) patch.proteine_principale = mc.proteine_principale;
-    if (Array.isArray(mc.apports) && mc.apports.length) patch.apports = mc.apports;
-    if (mc.batch_special) patch.batch_special = mc.batch_special;
+    if (mc.recette)                                                 patch.recette       = mc.recette;
+    if (mc.score_sante != null)                                     patch.score_sante   = mc.score_sante;
+    if (Array.isArray(mc.score_bullets) && mc.score_bullets.length) patch.score_bullets = mc.score_bullets.slice(0, 3);
+    if (mc.proteine_principale)                                     patch.proteine_principale = mc.proteine_principale;
+    if (Array.isArray(mc.apports) && mc.apports.length)             patch.apports       = mc.apports;
+    if (mc.batch_special)                                           patch.batch_special = mc.batch_special;
     if (Object.keys(patch).length) await patchChien(mc.chien_id, patch);
   }));
 

@@ -341,9 +341,12 @@ async function generateMenuForFoyer(foyer, chiens, saison, todayParis) {
   // ── 5. Sauvegarder les données par chien dans la table `chien` ─────────────
   await Promise.all(menuData.chiens.map(async mc => {
     const chienPatch = {};
-    if (mc.proteine_principale) chienPatch.proteine_principale = mc.proteine_principale;
-    if (Array.isArray(mc.apports) && mc.apports.length) chienPatch.apports = mc.apports;
-    if (mc.batch_special) chienPatch.batch_special = mc.batch_special;
+    if (mc.recette)                                                      chienPatch.recette       = mc.recette;
+    if (mc.score_sante != null)                                          chienPatch.score_sante   = mc.score_sante;
+    if (Array.isArray(mc.score_bullets) && mc.score_bullets.length)      chienPatch.score_bullets = mc.score_bullets.slice(0, 3);
+    if (mc.proteine_principale)                                          chienPatch.proteine_principale = mc.proteine_principale;
+    if (Array.isArray(mc.apports) && mc.apports.length)                  chienPatch.apports       = mc.apports;
+    if (mc.batch_special)                                                chienPatch.batch_special = mc.batch_special;
     if (Object.keys(chienPatch).length) {
       await patchChien(mc.chien_id, chienPatch);
     }
