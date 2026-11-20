@@ -1235,6 +1235,16 @@ const DEMO_PROFILE = {
   await loadChatHistory();
   if (sb && currentUser) { sb.from('user').update({ derniere_connexion: new Date().toISOString() }).eq('email', currentUser.email).then(() => {}).catch(() => {}); }
   document.getElementById('loadingScreen').style.display = 'none';
+
+  // Auto-génération pour un chien ajouté sans recette (flag posé par quiz.html)
+  if (sessionStorage.getItem('kyno_new_chien') === 'true') {
+    sessionStorage.removeItem('kyno_new_chien');
+    const newDog = chiens.find(function(c) { return !c.recette; });
+    if (newDog) {
+      selectChien(newDog.id);
+      setTimeout(function() { generateMenuPourChien(newDog.id, true); }, 400);
+    }
+  }
 })();
 
 // ═══════════════════════════════════════════════════════════
@@ -1847,6 +1857,51 @@ function renderPastWeeks(p) {
 }
 function reviewWeek(label) { toggleChat(true); addMessage('user', `Je veux revoir le menu : ${label}`); setTimeout(() => addMessage('ia', `Bien sûr ! Je te renvoie le détail du menu « ${label} » par email tout de suite. Tu veux que je le réutilise cette semaine ?`), 700); }
 
+
+// ═══════════════════════════════════════════════════════════
+//  GÉNÉRATION MENU PAR CHIEN
+// ═══════════════════════════════════════════════════════════
+// auto=true : déclenché automatiquement à l'ajout, sans vérification de limite.
+async function generateMenuPourChien(chienId, auto) {
+  if (!chienId || !sb) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const rlKey = 'kyno_gen_' + chienId;
+  if (!auto && localStorage.getItem(rlKey) === today) {
+    alert('Le menu de ce chien a déjà été généré aujourd\'hui. Reviens demain ou demande une mise à jour via le chat.');
+    return;
+  }
+  const prt = document.getElementById('menuPortion');
+  if (prt) prt.innerHTML =
+    '<div class="menu-pending">' +
+    '<div class="menu-pending-title">Génération en cours…</div>' +
+    '<div class="menu-pending-sub">Environ 20 secondes.</div>' +
+    '</div>';
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const res = await fetch('/api/generate-menu-chien', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+      body: JSON.stringify({ chien_id: chienId })
+    });
+    if (!res.ok) throw new Error('Erreur ' + res.status);
+    const data = await res.json();
+    chiens = chiens.map(function(c) { return c.id === chienId ? Object.assign({}, c, data.chien) : c; });
+    if (currentChienId === chienId) {
+      currentChien = chiens.find(function(c) { return c.id === chienId; }) || currentChien;
+      userProfile = Object.assign({}, foyer || {}, currentChien);
+    }
+    localStorage.setItem(rlKey, today);
+    renderAll(userProfile);
+  } catch (e) {
+    console.error('generateMenuPourChien:', e);
+    if (prt) prt.innerHTML =
+      '<div class="menu-pending">' +
+      '<div class="menu-pending-title">Erreur lors de la génération.</div>' +
+      '<div class="menu-pending-sub">Réessaie dans quelques secondes.</div>' +
+      '</div>';
+  }
+}
 
 // ═══════════════════════════════════════════════════════════
 //  MULTI-CHIENS

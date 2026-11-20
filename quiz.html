@@ -1687,6 +1687,7 @@ async function submitQuizAjout() {
       sessionStorage.removeItem('kyno_ajout_email');
       document.getElementById('loadingScreen').style.display = 'none';
       document.getElementById('successScreen').style.display = 'block';
+      if (IS_AJOUT) sessionStorage.setItem('kyno_new_chien', 'true');
       setTimeout(() => { window.location.href = 'espace-client.html'; }, 2500);
     } else throw new Error(result.error || 'Erreur inconnue');
   } catch (err) {
