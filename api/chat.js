@@ -185,21 +185,21 @@ FORMAT DU TEXTE dans le champ "reply" : pas d'emoji, pas de tiret cadratin, pas 
         patch.allergies = [...new Set([...allergies, ...updates.allergies])];
       }
 
-      // poids_historique → reste sur user (backward compat)
-      let userPatch = {};
+      // poids_historique → calculé côté serveur et routé vers chien
       if (updates.poids != null) {
         const existingPoids = Array.isArray(profile.poids_historique) ? profile.poids_historique : [];
         const today = new Date().toISOString().split('T')[0];
         const without = existingPoids.filter(e => e.label !== today);
-        userPatch.poids_historique = [...without, { label: today, poids: updates.poids }].slice(-6);
+        patch.poids_historique = [...without, { label: today, poids: updates.poids }].slice(-6);
       }
 
       // Champs chien → table chien
-      const CHIEN_FIELDS = new Set(['poids', 'allergies', 'sensibilites', 'objectifs', 'activite', 'comportement',
-        'race', 'age', 'sexe', 'maladies', 'traitements', 'reactions_allergiques', 'reaction_statut',
-        'mode_alimentaire', 'alimentation_actuelle', 'observations', 'proteine_principale', 'apports', 'batch_special',
-        'digestion']);
+      const CHIEN_FIELDS = new Set(['poids', 'poids_historique', 'allergies', 'sensibilites', 'objectifs',
+        'activite', 'comportement', 'race', 'age', 'sexe', 'maladies', 'traitements',
+        'reactions_allergiques', 'reaction_statut', 'mode_alimentaire', 'alimentation_actuelle',
+        'observations', 'proteine_principale', 'apports', 'batch_special', 'digestion']);
       const chienPatch = {};
+      const userPatch = {};
       Object.entries(patch).forEach(([k, v]) => {
         if (CHIEN_FIELDS.has(k)) chienPatch[k] = v;
         else userPatch[k] = v;
