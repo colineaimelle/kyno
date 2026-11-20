@@ -32,6 +32,27 @@ function estSterilise(sexe) {
   return s.includes('castre') || s.includes('sterilise');
 }
 
+// Convertit la tranche d'âge du quiz en âge médian en années.
+// Fallback : extrait le premier nombre si le texte ne correspond à aucune tranche.
+function ageEnAns(ageNorm) {
+  if (ageNorm.includes('moins de 6 mois')) return 0;
+  if (ageNorm.includes('6 mois'))          return 0.5;   // "6 mois à 1 an"
+  if (ageNorm.includes('1 a 3'))           return 2;
+  if (ageNorm.includes('3 a 7'))           return 5;
+  if (ageNorm.includes('7 a 10'))          return 8.5;
+  if (ageNorm.includes('plus de 10'))      return 11;
+  const m = ageNorm.match(/(\d+)/);
+  return m ? parseInt(m[1]) : 0;
+}
+
+// Seuil senior selon le poids de référence du chien (en kg).
+// Règle Coline : petits < 10 kg → 10 ans, moyens 10–25 kg → 8 ans, grands > 25 kg → 7 ans.
+function seuilSenior(poidsRef) {
+  if (poidsRef < 10)  return 10;
+  if (poidsRef <= 25) return 8;
+  return 7;
+}
+
 // chien : { poids, poids_ideal?, age, sexe, activite, objectifs[] }
 // Retourne les kcal/jour arrondis, ou null si données insuffisantes.
 function besoinKcalJour(chien) {
@@ -52,8 +73,8 @@ function besoinKcalJour(chien) {
 
   if (estSterilise(chien.sexe)) coeff *= 0.85;
 
-  if (age.includes('7') && age.includes('10 ans'))    coeff *= 0.90;
-  else if (age.includes('plus de 10'))                coeff *= 0.85;
+  const poidsRef = parseFloat(chien.poids_ideal) > 0 ? parseFloat(chien.poids_ideal) : poids;
+  if (ageEnAns(age) >= seuilSenior(poidsRef)) coeff *= 0.90;
 
   const objectifs = Array.isArray(chien.objectifs) ? chien.objectifs.map(normaliser) : [];
   const hasObj = kw => objectifs.some(o => o.includes(kw));
