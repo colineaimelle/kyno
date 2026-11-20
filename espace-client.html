@@ -355,6 +355,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 .accordion-body{padding:0 18px 18px;display:none;flex-direction:column;gap:14px;}
 .accordion-body.open{display:flex;}
 .btn-copy-courses{display:inline-flex;align-items:center;justify-content:center;background:#F2B630;color:#451A36;border:3px solid #451A36;border-radius:999px;padding:12px 22px;font:700 15px/1 var(--font-texte),sans-serif;cursor:pointer;align-self:flex-start;}
+.btn-prepare-menu{display:inline-flex;align-items:center;justify-content:center;background:#F2B630;color:#451A36;border:3px solid #451A36;border-radius:999px;padding:12px 22px;font:700 15px/1 var(--font-texte),sans-serif;cursor:pointer;margin-top:8px;}
 @media(max-width:768px){
   .menu-card-body{grid-template-columns:1fr;}
   .menu-portion{border-right:none;border-bottom:3px solid #451A36;}
@@ -1654,9 +1655,8 @@ function renderFicheSante(p) {
 
 // ─── MENU CARD ───
 function renderMenuCard(p) {
-  const recipe = p.recette || (Array.isArray(p.recettes) && p.recettes[0]) || null;
+  const recipe = p.recette || null;  // Pas de repli vers foyer.recettes
 
-  // En-tete
   const saison = p.saison || '';
   const weekLabel = document.getElementById('menuWeekLabel');
   if (weekLabel) weekLabel.textContent = saison ? 'Semaine en cours · ' + saison : 'Semaine en cours';
@@ -1666,29 +1666,37 @@ function renderMenuCard(p) {
 
   const tags = document.getElementById('menuCardTags');
   if (tags) {
-    const items = [
-      p.temps_prep ? 'Temps de prépa : ' + p.temps_prep : null,
-      p.cout_semaine ? 'Coût : ' + p.cout_semaine : null
-    ].filter(Boolean);
+    const items = [p.temps_prep ? 'Temps de prépa : ' + p.temps_prep : null].filter(Boolean);
     tags.innerHTML = items.map(t => `<span class="pastille">${esc(t)}</span>`).join('');
   }
 
-  // Portion du jour
-  if (recipe) {
-    const sub = document.getElementById('menuPortionSub');
-    if (sub && recipe.ration) sub.textContent = '2 repas par jour, ' + recipe.ration + ' g au total.';
-    const ing = document.getElementById('menuIngList');
-    if (ing && Array.isArray(recipe.ingredients)) {
-      ing.innerHTML = recipe.ingredients.map(i =>
-        `<li><span>${esc(i.name || '')}</span><b>${esc(i.qty || '')}</b></li>`
-      ).join('');
+  const prt = document.getElementById('menuPortion');
+  if (prt) {
+    if (recipe) {
+      prt.innerHTML =
+        '<p class="menu-portion-title">Sa portion du jour</p>' +
+        '<p id="menuPortionSub">' + (recipe.ration ? '2 repas par jour, ' + recipe.ration + ' g au total.' : '') + '</p>' +
+        '<ul class="menu-portion-list" id="menuIngList">' +
+        (recipe.ingredients || []).map(function(i) {
+          return '<li><span>' + esc(i.name || '') + '</span><b>' + esc(i.qty || '') + '</b></li>';
+        }).join('') + '</ul>';
+    } else {
+      var nom = cap(p.prenom_chien || '') || 'ce chien';
+      var cid = currentChienId || '';
+      prt.innerHTML =
+        '<div class="menu-pending">' +
+        '<div class="menu-pending-title">Le premier menu de ' + esc(nom) + ' est en préparation.</div>' +
+        '<div class="menu-pending-sub">Génère-le maintenant ou attends le prochain envoi automatique.</div>' +
+        '<button class="btn-prepare-menu" onclick="generateMenuPourChien(' + JSON.stringify(cid) + ')">Préparer son menu maintenant</button>' +
+        '</div>';
     }
   }
 
-  // Sous-labels accordeons
-  const nCourses = (p.courses || []).flatMap(c => c.items || []).length;
+  // Sous-labels accordeons (depuis toutes les recettes des chiens actifs)
+  const avecRecette = chiens.filter(function(c) { return c.recette; });
+  const nCourses = avecRecette.reduce(function(s, c) { return s + (c.recette.ingredients || []).length; }, 0);
   const courseSub = document.getElementById('coursesSubLabel');
-  if (courseSub && nCourses) courseSub.textContent = nCourses + ' produits, à copier en un clic';
+  if (courseSub) courseSub.textContent = nCourses ? nCourses + ' produits, à copier en un clic' : '';
 
   const nMenus = Array.isArray(p.historique_menus) ? p.historique_menus.length : 0;
   const menusSub = document.getElementById('menusSubLabel');
@@ -1697,7 +1705,7 @@ function renderMenuCard(p) {
 
 // ─── RECETTES ───
 function renderRecipes(p) {
-  const recipes = p.recette ? [p.recette] : (Array.isArray(p.recettes) && p.recettes.length ? p.recettes.slice(0, 1) : null);
+  const recipes = p.recette ? [p.recette] : null;  // Pas de repli vers foyer.recettes
   const c = document.getElementById('recipesContainer');
   if (!recipes) {
     const nom = cap(p.prenom_chien || '') || 'ton chien';
