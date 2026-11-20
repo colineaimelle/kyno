@@ -177,6 +177,7 @@ FORMAT DU TEXTE dans le champ "reply" : pas d'emoji, pas de tiret cadratin, pas 
     const newObservations = Array.isArray(parsed.observations) ? parsed.observations : [];
 
     // ── Mises à jour du profil chien ────────────────────────────────────────
+    const patchedUpdates = {};
     if (authedEmail && Object.keys(updates).length > 0) {
       const patch = { ...updates };
 
@@ -196,16 +197,23 @@ FORMAT DU TEXTE dans le champ "reply" : pas d'emoji, pas de tiret cadratin, pas 
       // Champs chien → table chien
       const CHIEN_FIELDS = new Set(['poids', 'allergies', 'sensibilites', 'objectifs', 'activite', 'comportement',
         'race', 'age', 'sexe', 'maladies', 'traitements', 'reactions_allergiques', 'reaction_statut',
-        'mode_alimentaire', 'alimentation_actuelle', 'observations', 'proteine_principale', 'apports', 'batch_special']);
+        'mode_alimentaire', 'alimentation_actuelle', 'observations', 'proteine_principale', 'apports', 'batch_special',
+        'digestion']);
       const chienPatch = {};
       Object.entries(patch).forEach(([k, v]) => {
         if (CHIEN_FIELDS.has(k)) chienPatch[k] = v;
         else userPatch[k] = v;
       });
 
-      if (Object.keys(chienPatch).length > 0) await patchChien(chienId, chienPatch);
-      if (Object.keys(userPatch).length > 0)  await patchSupabase(authedEmail, userPatch);
-      Object.assign(profile, patch);
+      if (Object.keys(chienPatch).length > 0) {
+        const ok = await patchChien(chienId, chienPatch);
+        if (ok) Object.assign(patchedUpdates, chienPatch);
+      }
+      if (Object.keys(userPatch).length > 0) {
+        const ok = await patchSupabase(authedEmail, userPatch);
+        if (ok) Object.assign(patchedUpdates, userPatch);
+      }
+      Object.assign(profile, patchedUpdates);
     }
 
     // ── Historique du chat → chien ───────────────────────────────────────────
@@ -219,6 +227,18 @@ FORMAT DU TEXTE dans le champ "reply" : pas d'emoji, pas de tiret cadratin, pas 
       await saveObservations(chienId, newObservations);
     }
 
+    // ── Champs réellement écrits → label lisible ────────────────────────────
+    const updatedFields = [];
+    if (patchedUpdates.poids != null)       updatedFields.push(`poids ${patchedUpdates.poids} kg`);
+    if (patchedUpdates.digestion)           updatedFields.push('digestion');
+    if (patchedUpdates.sensibilites)        updatedFields.push('sensibilités');
+    if (patchedUpdates.activite)            updatedFields.push('activité');
+    if (patchedUpdates.comportement)        updatedFields.push('comportement');
+    if (patchedUpdates.antecedents)         updatedFields.push('antécédents');
+    if (patchedUpdates.score_sante != null) updatedFields.push(`score santé ${patchedUpdates.score_sante}`);
+    if (patchedUpdates.objectifs)           updatedFields.push('objectifs');
+    if (patchedUpdates.allergies)           updatedFields.push('allergies');
+
     // ── Génération du menu du foyer entier ───────────────────────────────────
     let menuGenere = false;
     if (genererMenu && authedEmail) {
@@ -230,7 +250,7 @@ FORMAT DU TEXTE dans le champ "reply" : pas d'emoji, pas de tiret cadratin, pas 
       }
     }
 
-    return res.status(200).json({ success: true, reply, menuGenere });
+    return res.status(200).json({ success: true, reply, menuGenere, updatedFields, patchedUpdates });
 
   } catch (error) {
     console.error('Erreur chat.js:', error);
@@ -281,7 +301,9 @@ async function patchSupabase(email, fields) {
   if (!res.ok) {
     const errBody = await res.text().catch(() => '');
     console.error('Erreur PATCH user:', res.status, errBody);
+    return false;
   }
+  return true;
 }
 
 async function patchChien(chienId, fields) {
@@ -296,7 +318,9 @@ async function patchChien(chienId, fields) {
   if (!res.ok) {
     const errBody = await res.text().catch(() => '');
     console.error(`Erreur PATCH chien ${chienId}:`, res.status, errBody);
+    return false;
   }
+  return true;
 }
 
 async function saveChatHistory(chienId, messages) {

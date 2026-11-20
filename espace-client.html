@@ -492,6 +492,7 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
 .chat-unread{position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;background:#B8301D;border:2px solid #FFF4E0;display:flex;align-items:center;justify-content:center;font-family:var(--font-texte);font-weight:700;font-size:10px;color:#fff;z-index:2;}
 .chat-unread::before{content:'';position:absolute;inset:-2px;border-radius:50%;background:#B8301D;animation:kring 1.6s infinite;z-index:-1;}
 .chat-overlay{display:none;position:fixed;inset:0;background:rgba(69,26,54,.35);z-index:79;}
+.chat-update-tag{font-family:var(--font-texte);font-size:11px;color:#17706C;background:#DDF3F1;border:1.5px solid #17706C;border-radius:8px;padding:5px 10px;margin-top:4px;align-self:flex-start;}
 
 /* ─── LOADING ─── */
 #loadingScreen{position:fixed;inset:0;background:#FFF4E0;display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;}
@@ -2102,12 +2103,22 @@ async function handleSend() {
   try {
     const res = await fetch('/api/chat', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: chatHistory, profile: userProfile, email: currentUser?.email })
+      body: JSON.stringify({ messages: chatHistory, profile: userProfile, email: currentUser?.email, chien_id: currentChienId })
     });
     if (res.ok) {
       const data = await res.json();
       if (data && data.success && data.reply) {
         removeTyping(); addMessage('ia', data.reply);
+        if (data.updatedFields && data.updatedFields.length) {
+          addUpdateTag(data.updatedFields);
+          if (data.patchedUpdates && Object.keys(data.patchedUpdates).length) {
+            Object.assign(userProfile, data.patchedUpdates);
+            renderFicheSante(userProfile);
+            renderSlide1(userProfile);
+            renderSlide2(userProfile);
+            renderSlide3(userProfile);
+          }
+        }
         chatHistory.push({ role: 'assistant', content: data.reply });
         await saveChatHistory(); replied = true;
       }
@@ -2150,6 +2161,15 @@ function addMessage(type, text, withSuggest) {
     document.getElementById('chatUnread').style.display = 'flex';
   }
 }
+function addUpdateTag(fields) {
+  const zone = document.getElementById('chatMessages');
+  const tag = document.createElement('div');
+  tag.className = 'chat-update-tag';
+  tag.textContent = 'Fiche mise a jour : ' + fields.join(', ');
+  zone.appendChild(tag);
+  zone.scrollTop = zone.scrollHeight;
+}
+
 function showTyping() {
   const zone = document.getElementById('chatMessages');
   const div = document.createElement('div');
