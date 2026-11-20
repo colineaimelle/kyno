@@ -1868,12 +1868,18 @@ function reviewWeek(label) { toggleChat(true); addMessage('user', `Je veux revoi
 // ═══════════════════════════════════════════════════════════
 //  GÉNÉRATION MENU PAR CHIEN
 // ═══════════════════════════════════════════════════════════
-// auto=true : déclenché automatiquement à l'ajout, sans vérification de limite.
+let _generating = false; // garde contre le double-clic
+
+// auto=true : déclenché automatiquement à l'ajout, sans vérification locale.
+// La limite réelle est vérifiée côté serveur (chien.derniere_generation).
+// localStorage sert uniquement à griser le bouton sans aller au réseau.
 async function generateMenuPourChien(chienId, auto) {
-  if (!chienId || !sb) return;
+  if (!chienId || !sb || _generating) return;
+  _generating = true;
   const today = new Date().toISOString().slice(0, 10);
   const rlKey = 'kyno_gen_' + chienId;
   if (!auto && localStorage.getItem(rlKey) === today) {
+    _generating = false;
     alert('Le menu de ce chien a déjà été généré aujourd\'hui. Reviens demain ou demande une mise à jour via le chat.');
     return;
   }
@@ -1891,8 +1897,18 @@ async function generateMenuPourChien(chienId, auto) {
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
       body: JSON.stringify({ chien_id: chienId })
     });
-    if (!res.ok) throw new Error('Erreur ' + res.status);
-    const data = await res.json();
+    const data = await res.json().catch(function() { return {}; });
+    if (res.status === 429) {
+      // Limite serveur atteinte — on synchronise localStorage pour éviter un prochain appel inutile.
+      localStorage.setItem(rlKey, today);
+      if (prt) prt.innerHTML =
+        '<div class="menu-pending">' +
+        '<div class="menu-pending-title">Menu déjà généré aujourd\'hui.</div>' +
+        '<div class="menu-pending-sub">Reviens demain ou demande une mise à jour via le chat.</div>' +
+        '</div>';
+      return;
+    }
+    if (!res.ok) throw new Error(data.error || 'Erreur ' + res.status);
     chiens = chiens.map(function(c) { return c.id === chienId ? Object.assign({}, c, data.chien) : c; });
     if (currentChienId === chienId) {
       currentChien = chiens.find(function(c) { return c.id === chienId; }) || currentChien;
@@ -1907,6 +1923,8 @@ async function generateMenuPourChien(chienId, auto) {
       '<div class="menu-pending-title">Erreur lors de la génération.</div>' +
       '<div class="menu-pending-sub">Réessaie dans quelques secondes.</div>' +
       '</div>';
+  } finally {
+    _generating = false;
   }
 }
 
