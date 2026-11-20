@@ -1654,7 +1654,7 @@ function renderFicheSante(p) {
 
 // ─── MENU CARD ───
 function renderMenuCard(p) {
-  const recipe = Array.isArray(p.recettes) && p.recettes[0] ? p.recettes[0] : null;
+  const recipe = p.recette || (Array.isArray(p.recettes) && p.recettes[0]) || null;
 
   // En-tete
   const saison = p.saison || '';
@@ -1697,7 +1697,7 @@ function renderMenuCard(p) {
 
 // ─── RECETTES ───
 function renderRecipes(p) {
-  const recipes = Array.isArray(p.recettes) && p.recettes.length ? p.recettes.slice(0, 1) : null;
+  const recipes = p.recette ? [p.recette] : (Array.isArray(p.recettes) && p.recettes.length ? p.recettes.slice(0, 1) : null);
   const c = document.getElementById('recipesContainer');
   if (!recipes) {
     const nom = cap(p.prenom_chien || '') || 'ton chien';
