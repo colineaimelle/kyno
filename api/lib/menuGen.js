@@ -109,15 +109,18 @@ function buildMultiDogMenuPrompt(chiens, foyer, saison, ciblesKcal = {}) {
         "titre": "nom court de la recette de ${nom}",
         "ration": <grammes CRU par repas pour ${nom} = sum(ingredients_grammes_crus) / 2>,
         "ingredients": [
-          {"name": "ingrédient", "qty": "quantité CRU par repas pour ${nom}, ex: 40 g (≈ 120 g cuit)"}
+          {"name": "ingrédient", "qty": "quantité CRU par repas pour ${nom}, ex: 40 g (≈ 120 g cuit)"},
+          {"name": "huile de colza", "qty": "X g par repas (= qty_g_jour / 2)"},
+          {"name": "CMV adulte", "qty": "X g par repas selon notice"}
         ],
         "note": "1 phrase pourquoi cette recette est bonne pour ${nom}"
       },
       "ingredients_grammes_crus": [
         {"name": "ingrédient A", "qty_g_jour": <grammes CRU par JOUR pour ${nom}>, "kcal_100g": <kcal pour 100 g cru, source NRC/Ciqual>},
-        {"name": "huile de colza", "qty_g_jour": <grammes CRU par JOUR, huiles comprises>, "kcal_100g": 900}
+        {"name": "huile de colza", "qty_g_jour": <grammes par JOUR>, "kcal_100g": 900},
+        {"name": "CMV adulte", "qty_g_jour": <grammes par JOUR selon notice>, "kcal_100g": 0}
       ],
-      "batch_special": "compléments à ajouter AU MOMENT DU REPAS uniquement pour ${nom} (huile, CMV…)",
+      "batch_special": "résumé des compléments à ajouter AU MOMENT DU REPAS pour ${nom} (ex: huile de colza + CMV — déjà dans recette.ingredients)",
       "apports": [
         {"nom": "Calories",  "unite": "kcal", "valeur": <n>, "cible": ${cibleParRepas}, "pct": <n>, "color": "#FF5A3C"},
         {"nom": "Protéines", "unite": "g",    "valeur": <n>, "cible": <n>, "pct": <n>, "color": "#8A3A7C"},
@@ -208,11 +211,13 @@ ${chiensJsonExample}
 
 ## RÈGLES IMPORTANTES
 - "ration" = sum(ingredients_grammes_crus.qty_g_jour) / 2 pour ce chien (poids CRU par repas)
-- "ingredients_grammes_crus" : TOUS les ingrédients (huiles comprises) en grammes CRU par JOUR pour CE chien, avec une estimation "kcal_100g" (source NRC/Ciqual) pour chaque ingrédient. La somme de leurs kcal doit correspondre à la cible énergétique fournie dans le profil.
+- "ingredients_grammes_crus" : TOUS les ingrédients (huiles ET CMV compris) en grammes CRU par JOUR pour CE chien, avec une estimation "kcal_100g" (source NRC/Ciqual) pour chaque ingrédient. La somme de leurs kcal doit correspondre à la cible énergétique fournie dans le profil. Huile et CMV DOIVENT apparaître ici avec qty_g_jour > 0.
 - "qty" dans recette.ingredients = quantité CRU par repas pour CE chien uniquement = qty_g_jour / 2
 - "qty" dans courses_commune = quantité CRU TOTALE foyer = (poids cru par repas × nb chiens concernés) × 14 repas. Pour les féculents qui absorbent l'eau (riz × 3, lentilles × 2,5, pâtes × 2,5) : utilise le poids CRU. Exemple : 40 g riz cru/repas × 14 = 560 g cru
 - "batch_cooking_commun" et "note" dans recette : NE JAMAIS écrire de grammes ni de quantités numériques dans les étapes ou les notes — désigner les ingrédients par leur nom ("la dinde hachée", "la quantité de riz indiquée dans les ingrédients"). Les chiffres n'apparaissent QUE dans "ingredients", "ingredients_grammes_crus" et "courses_commune", que le code recalcule.
-- "batch_special" : compléments ajoutés au bol — jamais cuits (huile, CMV, levure…)
+- "batch_special" : résumé des compléments ajoutés au bol (jamais cuits) — ils doivent AUSSI figurer dans recette.ingredients et ingredients_grammes_crus avec leurs quantités
+- "batch_cooking_commun" : écrire les prénoms des chiens avec une MAJUSCULE (ex: "Tetu", "Patte", pas "tetu" ni "patte")
+- "recette.ingredients" : INCLURE huile et CMV comme ingrédients à part entière (avec leur qty par repas)
 - "proteine_principale" : une seule protéine en minuscules sans article
 - "score_sante" : 85-100 excellent, 70-84 bonne forme, 55-69 à surveiller, <55 vigilance
 - "score_bullets" : 2-3 points (mix positifs/négatifs) propres à CE chien
