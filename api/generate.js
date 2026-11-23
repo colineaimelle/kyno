@@ -3,7 +3,7 @@
 // Champs quiz → Supabase → espace client
 
 const { waitUntil } = require('@vercel/functions');
-const { besoinKcalJour } = require('./lib/energie');
+const { besoinKcalJour } = require('./_lib/energie');
 
 const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'colinemngl@gmail.com';

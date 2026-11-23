@@ -6,7 +6,7 @@
 
 const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'colinemngl@gmail.com';
-const { genererMenuFoyer } = require('./lib/genererMenuChien');
+const { genererMenuFoyer } = require('./_lib/genererMenuChien');
 
 module.exports = async function handler(req, res) {
 

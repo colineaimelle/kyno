@@ -2,12 +2,12 @@
 // Cron quotidien (5h UTC via GitHub Actions).
 // Charge les chiens actifs par foyer et génère un menu par foyer.
 
-const { getSaison, buildEmailMenuHtml } = require('./lib/menuGen');
-const { genererMenuFoyer }              = require('./lib/genererMenuChien');
+const { getSaison, buildEmailMenuHtml } = require('./_lib/menuGen');
+const { genererMenuFoyer }              = require('./_lib/genererMenuChien');
 
 const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'colinemngl@gmail.com';
-const { detecterTermeNonNie } = require('./lib/allergenes');
+const { detecterTermeNonNie } = require('./_lib/allergenes');
 
 // ── HELPERS TIMEZONE ──────────────────────────────────────────
 function getDayParis() {

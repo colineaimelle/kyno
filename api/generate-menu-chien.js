@@ -6,7 +6,7 @@
 // Enregistre batch_steps, courses, recettes au niveau foyer (table user).
 // Requiert la migration : ALTER TABLE chien ADD COLUMN IF NOT EXISTS derniere_generation date;
 
-const { genererMenuFoyer } = require('./lib/genererMenuChien');
+const { genererMenuFoyer } = require('./_lib/genererMenuChien');
 
 function getEmailFromJwt(authHeader) {
   if (!authHeader?.startsWith('Bearer ')) return null;

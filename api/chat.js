@@ -3,8 +3,8 @@
 // chat_history et observations lus/écrits sur la table `chien`.
 // Vérification d'appartenance par JWT (ou email body en fallback).
 
-const { getSaison, buildEmailMenuHtml } = require('./lib/menuGen');
-const { genererMenuFoyer }             = require('./lib/genererMenuChien');
+const { getSaison, buildEmailMenuHtml } = require('./_lib/menuGen');
+const { genererMenuFoyer }             = require('./_lib/genererMenuChien');
 
 module.exports = async function handler(req, res) {
 

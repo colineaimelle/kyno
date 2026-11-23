@@ -2,7 +2,7 @@
 // Lance avec : node tests/verifier-menu.test.js
 // Vérifie verifierMenu sur des recettes d'exemple, sans appel IA.
 
-const { verifierMenu } = require('../api/lib/verifierMenu');
+const { verifierMenu } = require('../api/_lib/verifierMenu');
 
 let passed = 0;
 let failed = 0;
