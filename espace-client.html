@@ -1929,7 +1929,24 @@ async function generateMenuPourChien(chienId, auto) {
         '</div>';
       return;
     }
-    if (!res.ok) throw new Error(data.error || 'Erreur ' + res.status);
+    if (!res.ok) {
+      if (data.blocked) {
+        const dogBloque = chiens.find(function(c) { return c.id === chienId; });
+        if (dogBloque && dogBloque.recette) {
+          // Recette précédente conservée — re-render sans toucher l'état
+          if (currentChienId === chienId) renderAll(userProfile);
+        } else {
+          var nomBloque = esc(cap((dogBloque && dogBloque.prenom_chien) || 'votre chien'));
+          if (prt) prt.innerHTML =
+            '<div class="menu-pending">' +
+            '<div class="menu-pending-title">Le menu de ' + nomBloque + ' est en cours de vérification.</div>' +
+            '<div class="menu-pending-sub">Il arrive très vite.</div>' +
+            '</div>';
+        }
+        return;
+      }
+      throw new Error(data.error || 'Erreur ' + res.status);
+    }
     chiens = chiens.map(function(c) { return c.id === chienId ? Object.assign({}, c, data.chien) : c; });
     if (currentChienId === chienId) {
       currentChien = chiens.find(function(c) { return c.id === chienId; }) || currentChien;
