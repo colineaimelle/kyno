@@ -3,7 +3,8 @@
 // chat_history et observations lus/écrits sur la table `chien`.
 // Vérification d'appartenance par JWT (ou email body en fallback).
 
-const { getSaison, buildMultiDogMenuPrompt, buildEmailMenuHtml } = require('./lib/menuGen');
+const { getSaison, buildEmailMenuHtml } = require('./lib/menuGen');
+const { genererMenuFoyer }             = require('./lib/genererMenuChien');
 
 module.exports = async function handler(req, res) {
 
@@ -243,8 +244,7 @@ FORMAT DU TEXTE dans le champ "reply" : pas d'emoji, pas de tiret cadratin, pas 
     let menuGenere = false;
     if (genererMenu && authedEmail) {
       try {
-        const updatedPm = profile.poids ? Math.pow(profile.poids, 0.75).toFixed(2) : pm;
-        menuGenere = await generateAndSaveMenu(authedEmail, chienId, profile, saison, updatedPm);
+        menuGenere = await generateAndSaveMenu(authedEmail, chienId, profile, saison);
       } catch (menuErr) {
         console.error('Erreur génération menu depuis chat:', menuErr);
       }
@@ -351,7 +351,7 @@ async function saveObservations(chienId, newObs) {
 }
 
 // ── GÉNÉRATION DU MENU DU FOYER ENTIER ───────────────────────
-async function generateAndSaveMenu(email, chienId, profile, saison, pm) {
+async function generateAndSaveMenu(email, chienId, profile, saison) {
   // Charger tous les chiens actifs du foyer
   const chiensRes = await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/chien?user_email=eq.${encodeURIComponent(email)}&actif=eq.true&order=ordre.asc&select=*`,
@@ -374,62 +374,29 @@ async function generateAndSaveMenu(email, chienId, profile, saison, pm) {
     ? ((await foyerRes.json().catch(() => []))[0] || {})
     : {};
 
-  const menuRes = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 6000,
-      system: buildMultiDogMenuPrompt(chiensToProcess, foyer, saison),
-      messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
-    })
-  });
+  // Pipeline unifié
+  const { menuData, ciblesKcal, echecs, stats } = await genererMenuFoyer(chiensToProcess, foyer, { saison });
 
-  if (!menuRes.ok) {
-    const err = await menuRes.json().catch(() => ({}));
-    throw new Error(err.error?.message || 'Erreur API Anthropic menu');
-  }
-
-  const menuResult = await menuRes.json();
-  let rawText = menuResult.content[0].text.trim();
-  rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
-  const first = rawText.indexOf('{');
-  const last  = rawText.lastIndexOf('}');
-  if (first > 0 || last < rawText.length - 1) rawText = rawText.slice(first, last + 1);
-
-  let menuData;
-  try {
-    menuData = JSON.parse(rawText);
-  } catch (parseErr) {
-    console.error('Erreur parsing JSON menu (chat):', parseErr.message);
-    throw parseErr;
-  }
-
-  if (!Array.isArray(menuData.chiens) || !menuData.chiens.length) {
-    throw new Error('Réponse Claude invalide: champ chiens manquant');
-  }
+  console.log(`[chat] Menu ${stats.resultat} — ${stats.nbOk}/${stats.nbTotal} chiens, ${stats.tentatives} essai(s)`);
 
   // Sauvegarder par chien
-  await Promise.all(menuData.chiens.map(async mc => {
+  await Promise.all((menuData.chiens || []).map(async mc => {
     const patch = {};
-    if (mc.recette)                                                 patch.recette       = mc.recette;
-    if (mc.score_sante != null)                                     patch.score_sante   = mc.score_sante;
-    if (Array.isArray(mc.score_bullets) && mc.score_bullets.length) patch.score_bullets = mc.score_bullets.slice(0, 3);
-    if (mc.proteine_principale)                                     patch.proteine_principale = mc.proteine_principale;
-    if (Array.isArray(mc.apports) && mc.apports.length)             patch.apports       = mc.apports;
-    if (mc.batch_special)                                           patch.batch_special = mc.batch_special;
+    if (mc.recette)                                                        patch.recette             = mc.recette;
+    if (mc.score_sante != null)                                            patch.score_sante         = mc.score_sante;
+    if (Array.isArray(mc.score_bullets) && mc.score_bullets.length)       patch.score_bullets       = mc.score_bullets.slice(0, 3);
+    if (mc.proteine_principale)                                            patch.proteine_principale = mc.proteine_principale;
+    if (Array.isArray(mc.apports) && mc.apports.length)                   patch.apports             = mc.apports;
+    if (mc.batch_special)                                                  patch.batch_special       = mc.batch_special;
+    if (Array.isArray(mc.ingredients_grammes_crus) && mc.ingredients_grammes_crus.length)
+                                                                           patch.ingredients_grammes_crus = mc.ingredients_grammes_crus;
     if (Object.keys(patch).length) await patchChien(mc.chien_id, patch);
   }));
 
-  // Sauvegarder au niveau foyer (backward compat)
-  const premierMenu = menuData.chiens[0];
-  const foyerPatch = {
+  // Sauvegarder au niveau foyer
+  await patchSupabase(email, {
     menu_texte:   '',
-    recettes:     menuData.chiens.map(mc => mc.recette).filter(Boolean),
+    recettes:     (menuData.chiens || []).map(mc => mc.recette).filter(Boolean),
     batch_steps:  menuData.batch_cooking_commun || [],
     courses:      menuData.courses_commune || [],
     cout_semaine: menuData.cout_semaine || null,
@@ -437,18 +404,14 @@ async function generateAndSaveMenu(email, chienId, profile, saison, pm) {
     economie:     menuData.economie || null,
     batch_time:   menuData.batch_time || null,
     menu_envoye:  true,
-  };
-  if (premierMenu.proteine_principale) foyerPatch.proteine_principale = premierMenu.proteine_principale;
-  if (Array.isArray(premierMenu.apports) && premierMenu.apports.length) foyerPatch.apports = premierMenu.apports;
-  if (premierMenu.batch_special) foyerPatch.batch_special = premierMenu.batch_special;
-  await patchSupabase(email, foyerPatch);
+  });
 
   // Envoyer l'email
   const nomLog = chiensToProcess.map(c => c.prenom_chien || 'Chien').join(' & ');
-  await sendEmailMenu(email, nomLog, buildEmailMenuHtml(foyer, chiensToProcess, menuData, saison));
+  await sendEmailMenu(email, nomLog, buildEmailMenuHtml(foyer, chiensToProcess, menuData, saison, ciblesKcal));
 
   console.log(`Menu chat généré pour ${nomLog} (${email})`);
-  return true;
+  return stats.nbOk > 0;
 }
 
 async function sendEmailMenu(email, prenom, htmlContent) {

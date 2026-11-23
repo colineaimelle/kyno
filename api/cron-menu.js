@@ -2,12 +2,12 @@
 // Cron quotidien (5h UTC via GitHub Actions).
 // Charge les chiens actifs par foyer et génère un menu par foyer.
 
-const { getSaison, buildMultiDogMenuPrompt, ajusterRations, buildEmailMenuHtml } = require('./lib/menuGen');
+const { getSaison, buildEmailMenuHtml } = require('./lib/menuGen');
+const { genererMenuFoyer }              = require('./lib/genererMenuChien');
 
 const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'colinemngl@gmail.com';
-const { getTermesExclus, detecterTermeInterdit, detecterTermeNonNie } = require('./lib/allergenes');
-const { besoinKcalJour } = require('./lib/energie');
+const { detecterTermeNonNie } = require('./lib/allergenes');
 
 // ── HELPERS TIMEZONE ──────────────────────────────────────────
 function getDayParis() {
@@ -91,35 +91,6 @@ async function loadChiensForFoyer(email) {
     return [];
   }
   return await res.json().catch(() => []);
-}
-
-// ── VÉRIFICATION ALLERGIES POST-GÉNÉRATION ────────────────────
-// Retourne la liste des violations (terme interdit trouvé dans la recette d'un chien).
-function verifierAllergiesMenu(menuData, chiens) {
-  const chienMap = {};
-  chiens.forEach(c => { chienMap[c.id] = c; });
-
-  const violations = [];
-  for (const mc of (menuData.chiens || [])) {
-    const chien = chienMap[mc.chien_id];
-    if (!chien) continue;
-    const termesExclus = getTermesExclus(chien.allergies);
-    if (!termesExclus.length) continue;
-
-    // Champs structurés : détection stricte (ingrédient présent = violation)
-    for (const ing of (mc.recette?.ingredients || [])) {
-      const found = detecterTermeInterdit(ing.name, termesExclus);
-      if (found) violations.push({ chien: chien.prenom_chien, champ: `ingrédient "${ing.name}"`, terme: found });
-    }
-    const foundBatch = detecterTermeInterdit(mc.batch_special, termesExclus);
-    if (foundBatch) violations.push({ chien: chien.prenom_chien, champ: 'batch_special', terme: foundBatch });
-    // Textes libres : ignorer les mentions niées (« sans poulet », « exclu »…)
-    for (const champ of ['titre', 'note']) {
-      const found = detecterTermeNonNie(mc.recette?.[champ], termesExclus);
-      if (found) violations.push({ chien: chien.prenom_chien, champ, terme: found });
-    }
-  }
-  return violations;
 }
 
 // ── HANDLER PRINCIPAL ─────────────────────────────────────────
@@ -239,23 +210,18 @@ module.exports = async function handler(req, res) {
 // ── GÉNÉRATION DU MENU POUR UN FOYER ─────────────────────────
 async function generateMenuForFoyer(foyer, chiens, saison, todayParis) {
   const email = foyer.email;
-  // Le brief limite à 4 chiens par appel. S'il y en a plus, on prend les 4 premiers actifs.
   const chiensToProcess = chiens.slice(0, 4);
   const nomsFoyer = chiensToProcess.map(c => c.prenom_chien || c.id).join(' & ');
 
-  // ── 1. Archiver le menu actuel (backward compat — données foyer) ────────────
+  // ── 1. Archiver le menu actuel ──────────────────────────────
   if (Array.isArray(foyer.recettes) && foyer.recettes.length > 0) {
     const recetteActuelle = foyer.recettes[0];
     const existingHistorique = Array.isArray(foyer.historique_menus) ? foyer.historique_menus : [];
-    const newEntry = {
-      score: foyer.score_sante || 85,
-      label: getLabelSemaine(),
-      note:  recetteActuelle.titre || ''
-    };
+    const newEntry = { score: foyer.score_sante || 85, label: getLabelSemaine(), note: recetteActuelle.titre || '' };
     await patchSupabase(email, { historique_menus: [...existingHistorique, newEntry].slice(-10) });
   }
 
-  // ── 2. Archiver le poids du premier chien ──────────────────────────────────
+  // ── 2. Archiver le poids du premier chien ──────────────────
   const premierChien = chiensToProcess[0];
   if (premierChien.poids) {
     const existingPoids = Array.isArray(foyer.poids_historique) ? foyer.poids_historique : [];
@@ -263,100 +229,34 @@ async function generateMenuForFoyer(foyer, chiens, saison, todayParis) {
     await patchSupabase(email, { poids_historique: [...existingPoids, poidsEntry].slice(-6) });
   }
 
-  // ── 3. Calcul des cibles énergétiques ─────────────────────────────────────
-  const ciblesKcal = {};
-  for (const chien of chiensToProcess) {
-    const besoin = besoinKcalJour(chien);
-    if (besoin) {
-      ciblesKcal[chien.id] = besoin;
-      console.log(`[energie] ${chien.prenom_chien || chien.id} — besoin : ${besoin} kcal/jour`);
-    }
+  // ── 3. Pipeline unifié (calcul cibles + Claude × 2 + verif + alerte) ──────
+  const { menuData, ciblesKcal, echecs, stats } = await genererMenuFoyer(chiensToProcess, foyer, { saison });
+
+  if (stats.resultat === 'bloque') {
+    throw new Error(`Menu bloqué après 2 essais pour ${nomsFoyer}`);
   }
 
-  // ── 4. Générer le menu via Claude (max 2 tentatives si violation allergie) ──
-  const systemPrompt = buildMultiDogMenuPrompt(chiensToProcess, foyer, saison, ciblesKcal);
-  let menuData;
+  console.log(`[cron] ${stats.resultat} — ${stats.nbOk}/${stats.nbTotal} chiens, ${stats.tentatives} essai(s)`);
 
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    const menuRes = await withRetry(
-      () => fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 8000,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
-        })
-      }),
-      `Claude menu pour ${nomsFoyer} (tentative ${attempt})`
-    );
-
-    if (!menuRes.ok) {
-      const err = await menuRes.json().catch(() => ({}));
-      throw new Error(err.error?.message || `Erreur API Anthropic (${menuRes.status})`);
-    }
-
-    const menuResult = await menuRes.json();
-    let rawText = menuResult.content[0].text.trim();
-    rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
-    const first = rawText.indexOf('{');
-    const last  = rawText.lastIndexOf('}');
-    if (first > 0 || last < rawText.length - 1) rawText = rawText.slice(first, last + 1);
-
-    let parsed;
-    try {
-      parsed = JSON.parse(rawText);
-    } catch (parseErr) {
-      throw new Error(`Parsing JSON menu échoué: ${parseErr.message}`);
-    }
-
-    if (!Array.isArray(parsed.chiens) || !parsed.chiens.length) {
-      throw new Error('Réponse Claude invalide : champ "chiens" manquant ou vide');
-    }
-
-    // Vérification allergies post-génération
-    const violations = verifierAllergiesMenu(parsed, chiensToProcess);
-    if (!violations.length) {
-      menuData = parsed;
-      break;
-    }
-
-    const violationsStr = violations.map(v => `${v.chien} — ${v.champ} contient "${v.terme}"`).join('; ');
-    if (attempt === 2) {
-      throw new Error(`Violations allergie après régénération : ${violationsStr}`);
-    }
-    console.warn(`[allergie][tentative ${attempt}] violations détectées, régénération : ${violationsStr}`);
-  }
-
-  // ── 4bis. Ajustement des rations si l'écart dépasse 5 % ──────────────────
-  const chienMap = {};
-  chiensToProcess.forEach(c => { chienMap[c.id] = c; });
-  menuData = ajusterRations(menuData, chienMap, ciblesKcal);
-
-  // ── 5. Sauvegarder les données par chien dans la table `chien` ─────────────
-  await Promise.all(menuData.chiens.map(async mc => {
+  // ── 4. Enregistrer par chien ───────────────────────────────
+  await Promise.all((menuData.chiens || []).map(async mc => {
     const chienPatch = {};
-    if (mc.recette)                                                      chienPatch.recette       = mc.recette;
-    if (mc.score_sante != null)                                          chienPatch.score_sante   = mc.score_sante;
-    if (Array.isArray(mc.score_bullets) && mc.score_bullets.length)      chienPatch.score_bullets = mc.score_bullets.slice(0, 3);
-    if (mc.proteine_principale)                                          chienPatch.proteine_principale = mc.proteine_principale;
-    if (Array.isArray(mc.apports) && mc.apports.length)                  chienPatch.apports       = mc.apports;
-    if (mc.batch_special)                                                chienPatch.batch_special = mc.batch_special;
-    if (Object.keys(chienPatch).length) {
-      await patchChien(mc.chien_id, chienPatch);
-    }
+    if (mc.recette)                                                        chienPatch.recette             = mc.recette;
+    if (mc.score_sante != null)                                            chienPatch.score_sante         = mc.score_sante;
+    if (Array.isArray(mc.score_bullets) && mc.score_bullets.length)       chienPatch.score_bullets       = mc.score_bullets.slice(0, 3);
+    if (mc.proteine_principale)                                            chienPatch.proteine_principale = mc.proteine_principale;
+    if (Array.isArray(mc.apports) && mc.apports.length)                   chienPatch.apports             = mc.apports;
+    if (mc.batch_special)                                                  chienPatch.batch_special       = mc.batch_special;
+    if (Array.isArray(mc.ingredients_grammes_crus) && mc.ingredients_grammes_crus.length)
+                                                                           chienPatch.ingredients_grammes_crus = mc.ingredients_grammes_crus;
+    if (Object.keys(chienPatch).length) await patchChien(mc.chien_id, chienPatch);
   }));
 
-  // ── 5. Sauvegarder les données foyer dans la table `user` (backward compat) ─
-  const premierMenu = menuData.chiens[0];
-  const corePayload = {
+  // ── 5. Enregistrer au niveau foyer ────────────────────────
+  const premierMenu = (menuData.chiens || [])[0] || {};
+  await patchSupabase(email, {
     menu_texte:   '',
-    recettes:     menuData.chiens.map(mc => mc.recette).filter(Boolean),
+    recettes:     (menuData.chiens || []).map(mc => mc.recette).filter(Boolean),
     batch_steps:  menuData.batch_cooking_commun || [],
     courses:      menuData.courses_commune || [],
     cout_semaine: menuData.cout_semaine || null,
@@ -364,30 +264,12 @@ async function generateMenuForFoyer(foyer, chiens, saison, todayParis) {
     economie:     menuData.economie || null,
     batch_time:   menuData.batch_time || null,
     menu_envoye:  true,
-  };
-  await patchSupabase(email, corePayload);
+  });
 
-  if (premierMenu.score_sante != null) {
-    const scorePatch = { score_sante: premierMenu.score_sante };
-    if (Array.isArray(premierMenu.score_bullets) && premierMenu.score_bullets.length) {
-      scorePatch.score_bullets = premierMenu.score_bullets.slice(0, 3);
-    }
-    await patchSupabase(email, scorePatch);
-  }
-  if (premierMenu.proteine_principale) {
-    await patchSupabase(email, { proteine_principale: premierMenu.proteine_principale });
-  }
-  if (Array.isArray(premierMenu.apports) && premierMenu.apports.length) {
-    await patchSupabase(email, { apports: premierMenu.apports });
-  }
-  if (premierMenu.batch_special) {
-    await patchSupabase(email, { batch_special: premierMenu.batch_special });
-  }
-
-  // ── 7. Envoyer l'email ─────────────────────────────────────────────────────
+  // ── 6. Envoyer l'email ─────────────────────────────────────
   await sendEmailMenu(foyer, chiensToProcess, menuData, saison, ciblesKcal);
 
-  // ── 7. Marquer l'envoi ─────────────────────────────────────────────────────
+  // ── 7. Marquer l'envoi ─────────────────────────────────────
   if (todayParis) {
     await patchSupabase(email, { dernier_menu_envoye_le: todayParis });
   }

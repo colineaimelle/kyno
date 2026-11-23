@@ -6,6 +6,7 @@
 
 const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'colinemngl@gmail.com';
+const { genererMenuFoyer } = require('./lib/genererMenuChien');
 
 module.exports = async function handler(req, res) {
 
@@ -63,279 +64,90 @@ module.exports = async function handler(req, res) {
 
 // ── GÉNÉRATION DU MENU ─────────────────────────────────────
 async function generateMenuInBackground(email) {
-  const userResponse = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}&select=*`,
-    {
-      headers: {
-        'apikey': process.env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`
-      }
-    }
-  );
-  const users = await userResponse.json();
-  if (!users || !users.length) {
-    console.error('Profil non trouvé pour génération menu:', email);
-    return;
-  }
-  const profile = users[0];
-  const prenomChien = profile.prenom_chien || profile.prenom || 'ton chien';
-  const saison = getSaison();
-  const pm = profile.poids ? Math.pow(profile.poids, 0.75).toFixed(2) : 'à calculer';
-
-  const menuResponse = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 8000,
-      system: buildMenuPrompt(profile, saison, pm, profile.proteine_principale || null),
-      messages: [{ role: 'user', content: 'Génère le menu de la semaine au format JSON demandé. Réponds uniquement avec le JSON, sans texte avant ni après, sans balises markdown.' }]
-    })
-  });
-
-  if (!menuResponse.ok) {
-    const err = await menuResponse.json().catch(() => ({}));
-    console.error('Erreur génération menu Claude:', err);
-    return;
-  }
-
-  const menuResult = await menuResponse.json();
-  let rawText = menuResult.content[0].text.trim();
-
-  rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
-
-  const firstBrace = rawText.indexOf('{');
-  const lastBrace = rawText.lastIndexOf('}');
-  if (firstBrace > 0 || lastBrace < rawText.length - 1) {
-    rawText = rawText.slice(firstBrace, lastBrace + 1);
-  }
-
-  let menuData;
-  try {
-    menuData = JSON.parse(rawText);
-  } catch (parseErr) {
-    console.error('Erreur de parsing JSON du menu:', parseErr.message, '| stop_reason:', menuResult.stop_reason, '| longueur:', rawText.length, '| fin du texte:', rawText.slice(-200));
-    return;
-  }
-
-  // PATCH 1 — champs garantis existants en base
-  const corePayload = {
-    menu_texte:  menuData.email_html || '',
-    recettes:    menuData.recette ? [menuData.recette] : [],
-    batch_steps: menuData.batch_steps || [],
-    courses:     menuData.courses || [],
-    cout_semaine: menuData.cout_semaine || null,
-    cout_indus:  menuData.cout_indus || null,
-    economie:    menuData.economie || null,
-    batch_time:  menuData.batch_time || null,
-    menu_envoye: true
+  const sbHeaders = {
+    'apikey': process.env.SUPABASE_SERVICE_KEY,
+    'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`
   };
 
+  // Charger le foyer et tous les chiens actifs
+  const [usersRes, chiensRes] = await Promise.all([
+    fetch(`${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}&select=*`, { headers: sbHeaders }),
+    fetch(`${process.env.SUPABASE_URL}/rest/v1/chien?user_email=eq.${encodeURIComponent(email)}&actif=eq.true&order=ordre.asc&select=*`, { headers: sbHeaders }),
+  ]);
+
+  const users  = usersRes.ok  ? await usersRes.json().catch(() => [])  : [];
+  const chiens = chiensRes.ok ? await chiensRes.json().catch(() => []) : [];
+
+  if (!users.length) {
+    console.error('[magic-link] Profil non trouvé pour génération menu:', email);
+    return;
+  }
+  const foyer = users[0];
+
+  if (!chiens.length) {
+    console.log('[magic-link] Aucun chien actif — génération ignorée pour:', email);
+    return;
+  }
+
+  const chiensToProcess = chiens.slice(0, 4);
+  const prenomChien = chiensToProcess.map(c => c.prenom_chien || 'Chien').join(' & ');
+
+  // Pipeline unifié
+  const { menuData, ciblesKcal, echecs, stats } = await genererMenuFoyer(chiensToProcess, foyer);
+
+  console.log(`[magic-link] Menu ${stats.resultat} — ${stats.nbOk}/${stats.nbTotal} chiens, ${stats.tentatives} essai(s)`);
+
+  if (!menuData.chiens || !menuData.chiens.length) {
+    console.error('[magic-link] Aucun menu valide généré pour:', email);
+    return;
+  }
+
+  // Sauvegarder par chien
+  await Promise.all(menuData.chiens.map(async mc => {
+    const chienPatch = {};
+    if (mc.recette)                                                        chienPatch.recette             = mc.recette;
+    if (mc.score_sante != null)                                            chienPatch.score_sante         = mc.score_sante;
+    if (Array.isArray(mc.score_bullets) && mc.score_bullets.length)       chienPatch.score_bullets       = mc.score_bullets.slice(0, 3);
+    if (mc.proteine_principale)                                            chienPatch.proteine_principale = mc.proteine_principale;
+    if (Array.isArray(mc.apports) && mc.apports.length)                   chienPatch.apports             = mc.apports;
+    if (mc.batch_special)                                                  chienPatch.batch_special       = mc.batch_special;
+    if (Array.isArray(mc.ingredients_grammes_crus) && mc.ingredients_grammes_crus.length)
+                                                                           chienPatch.ingredients_grammes_crus = mc.ingredients_grammes_crus;
+    if (!Object.keys(chienPatch).length) return;
+    await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/chien?id=eq.${encodeURIComponent(mc.chien_id)}`,
+      { method: 'PATCH', headers: { ...sbHeaders, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify(chienPatch) }
+    ).then(r => { if (!r.ok) r.text().then(t => console.error(`[magic-link] PATCH chien ${mc.chien_id}:`, t)); });
+  }));
+
+  // Sauvegarder au niveau foyer
+  const foyerPatch = {
+    menu_texte:   '',
+    recettes:     menuData.chiens.map(mc => mc.recette).filter(Boolean),
+    batch_steps:  menuData.batch_cooking_commun || [],
+    courses:      menuData.courses_commune || [],
+    cout_semaine: menuData.cout_semaine || null,
+    cout_indus:   menuData.cout_indus || null,
+    economie:     menuData.economie || null,
+    batch_time:   menuData.batch_time || null,
+    menu_envoye:  true,
+  };
   const patchRes = await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
-    {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': process.env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify(corePayload)
-    }
+    { method: 'PATCH', headers: { ...sbHeaders, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify(foyerPatch) }
   );
+  if (!patchRes.ok) console.error('[magic-link] PATCH foyer:', await patchRes.text().catch(() => ''));
 
-  if (!patchRes.ok) {
-    const errBody = await patchRes.text().catch(() => '');
-    console.error(`Erreur PATCH Supabase menu core (${patchRes.status}):`, errBody);
-  } else {
-    console.log(`Supabase menu core sauvegardé pour ${prenomChien} (${email})`);
-  }
+  // Email de notification avec données du premier chien
+  const premierMc = menuData.chiens[0];
+  const emailData = {
+    recette:      premierMc.recette,
+    batch_time:   menuData.batch_time,
+    cout_semaine: menuData.cout_semaine,
+  };
+  await sendEmailMenu(email, prenomChien, emailData);
 
-  // PATCH 2 — proteine_principale (colonne optionnelle, PATCH séparé)
-  if (menuData.proteine_principale) {
-    const patchProteine = await fetch(
-      `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': process.env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ proteine_principale: menuData.proteine_principale })
-      }
-    );
-    if (!patchProteine.ok) {
-      const errBody = await patchProteine.text().catch(() => '');
-      console.error(`Erreur PATCH proteine_principale (${patchProteine.status}):`, errBody);
-    }
-  }
-
-  // PATCH 4 — apports (colonne optionnelle, PATCH séparé pour ne pas bloquer le core)
-  if (menuData.apports && Array.isArray(menuData.apports) && menuData.apports.length > 0) {
-    const patchApports = await fetch(
-      `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': process.env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ apports: menuData.apports })
-      }
-    );
-    if (!patchApports.ok) {
-      const errBody = await patchApports.text().catch(() => '');
-      console.error(`Erreur PATCH apports (${patchApports.status}) — colonne manquante en base ?:`, errBody);
-    } else {
-      console.log(`Apports nutritionnels sauvegardés pour ${prenomChien} (${email})`);
-    }
-  }
-
-  // PATCH 5 — batch_special (colonne optionnelle, PATCH séparé pour ne pas bloquer le core)
-  if (menuData.batch_special) {
-    const patchSpecial = await fetch(
-      `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': process.env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ batch_special: menuData.batch_special })
-      }
-    );
-    if (!patchSpecial.ok) {
-      const errBody = await patchSpecial.text().catch(() => '');
-      console.error(`Erreur PATCH batch_special (${patchSpecial.status}) — colonne manquante en base ?:`, errBody);
-    }
-  }
-
-  await sendEmailMenu(email, prenomChien, menuData);
-
-  console.log(`Menu généré et envoyé avec succès pour ${prenomChien} (${email})`);
-}
-
-// ── PROMPT MENU ────────────────────────────────────────────
-function buildMenuPrompt(profile, saison, pm, proteineActuelle = null) {
-  const nom = profile.prenom_chien || profile.prenom || 'ton chien';
-  const intolerances = Array.isArray(profile.allergies) ? profile.allergies : [];
-  const equipement = Array.isArray(profile.equipement) ? profile.equipement : [];
-
-  // FIX : interdiction formulée en premier, en majuscules, avant tout le reste du prompt.
-  // Claude peut ignorer une contrainte douce enfouie dans le corps du prompt quand
-  // elle entre en conflit avec ses priors nutritionnels (ex: saumon = bon pour les chiens).
-  // La placer en ouverture avec un langage catégorique empêche ce comportement.
-  const interdictionBlock = intolerances.length > 0
-    ? `⚠️ INTERDICTION ABSOLUE — LIS CECI EN PREMIER :
-Les ingrédients suivants sont STRICTEMENT INTERDITS dans ce menu : ${intolerances.join(', ')}.
-NE LES UTILISE JAMAIS, ni dans les recettes, ni dans la liste de courses, ni dans le email_html.
-Peu importe leur valeur nutritionnelle. Une violation de cette règle met la vie du chien en danger.
-Si tu n'as aucun autre choix pour une catégorie d'ingrédient, choisis une alternative totalement différente.
-
-`
-    : '';
-
-  const rotationBlock = proteineActuelle
-    ? `⚠️ ROTATION DES PROTÉINES — OBLIGATOIRE :
-Le menu précédent contenait : ${proteineActuelle}. Utilise OBLIGATOIREMENT une protéine principale différente cette semaine. Ne répète jamais la même protéine deux semaines de suite.
-
-`
-    : '';
-
-  return `${interdictionBlock}${rotationBlock}Tu es Kyno, expert en nutrition canine. Tu génères des menus hebdomadaires pratiques et réalistes basés sur NRC 2006 et FEDIAF 2023. Tu tutoies le propriétaire. Tu réponds UNIQUEMENT en JSON valide, sans aucun texte avant ou après, sans balises markdown \`\`\`.
-
-## PROFIL
-- Prénom : ${nom}
-- Race : ${profile.race || 'non renseigné'}
-- Poids : ${profile.poids ? profile.poids + ' kg' : 'non renseigné'} — Poids métabolique : ${pm} kg PM
-- Activité : ${profile.activite || 'non renseigné'}
-- Saison : ${saison}
-- Mode alimentaire : ${profile.modeAlimentaire || 'ration ménagère'}
-- Budget : ${profile.budget || 'moyen'}
-- Équipement : ${equipement.join(', ') || 'standard'}
-- Temps préparation : ${profile.tempsPrep || 'non renseigné'}
-- Intolérances INTERDITES (aucune exception) : ${intolerances.length > 0 ? intolerances.join(', ') : 'aucune'}
-
-## CONCEPT DU MENU
-Le propriétaire cuisine UNE SEULE FOIS par semaine — une grande marmite.
-- 1 SEULE recette, servie matin ET soir (×14 portions : 7 jours × 2 repas)
-- La recette est cuisinée en grande quantité pour toute la semaine
-- Conservation : jours 1-2-3 au réfrigérateur, jours 4-5-6-7 au congélateur en portions
-- Les portions sont décongelées la veille au frigo
-- Les compléments sensibles (huile, CMV, etc.) sont ajoutés AU MOMENT DU REPAS, jamais à la cuisson
-- Adapte les légumes et protéines à la saison : ${saison}
-
-## STRUCTURE JSON EXACTE À RESPECTER
-
-{
-  "recette": {
-    "moment": "Matin et soir",
-    "color": "#17706C",
-    "titre": "nom de la recette, court et appétissant",
-    "ration": nombre en grammes par repas (matin = soir = même quantité),
-    "ingredients": [
-      { "name": "nom de l'ingrédient", "qty": "quantité par repas, ex: 80 g" }
-    ],
-    "note": "note nutritionnelle courte, 1 phrase, pourquoi cette recette est bonne pour ${nom}"
-  },
-  "batch_special": "instruction à ajouter UNIQUEMENT au moment du repas, jamais à la cuisson. Ex : Ajouter X ml d'huile de saumon et X g de CMV juste avant de servir. Ne jamais cuire ces compléments.",
-  "batch_time": "≈ XX min de prépa",
-  "batch_steps": [
-    { "n": 1, "text": "étape détaillée et concrète, avec temps de cuisson si pertinent" },
-    { "n": 2, "text": "..." },
-    { "n": 3, "text": "..." },
-    { "n": 4, "text": "..." }
-  ],
-  "courses": [
-    { "cat": "Viandes & poissons", "items": [{ "name": "ingrédient", "qty": "quantité totale pour 7 jours, ex: 560 g" }] },
-    { "cat": "Légumes & féculents", "items": [{ "name": "ingrédient", "qty": "quantité totale pour 7 jours" }] },
-    { "cat": "Compléments", "items": [{ "name": "ingrédient", "qty": "quantité totale pour 7 jours" }] }
-  ],
-  "cout_semaine": "XX,XX €",
-  "cout_indus": "XX €",
-  "economie": "XX,XX €",
-  "apports": [
-    { "nom": "Calories", "unite": "kcal", "valeur": <kcal réels par repas estimés depuis les ingrédients>, "cible": <besoins journaliers / 2 selon NRC 2006 : 130 × PM^0.75 × facteur activité>, "pct": <arrondi valeur/cible×100>, "color": "#E5432F" },
-    { "nom": "Protéines", "unite": "g", "valeur": <g protéines par repas>, "cible": <cible par repas selon FEDIAF 2023>, "pct": <arrondi>, "color": "#17706C" },
-    { "nom": "Lipides", "unite": "g", "valeur": <g lipides par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#B8301D" },
-    { "nom": "Calcium", "unite": "g", "valeur": <g calcium par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#17706C" },
-    { "nom": "Oméga-3", "unite": "g", "valeur": <g oméga-3 par repas>, "cible": <cible par repas>, "pct": <arrondi>, "color": "#F2B630" }
-  ],
-  "proteine_principale": "nom court de la protéine principale (ex: dinde, bœuf, saumon, agneau, poulet, cabillaud)",
-  "email_html": "Texte complet du menu en Markdown. Utilise \\n pour les retours à la ligne et ** pour le gras. Commence par 'Voici le menu de la semaine de ${nom} !'. Présente la recette unique servie matin et soir, le batch cooking, la liste de courses et le coût."
-}
-
-## RÈGLES IMPORTANTES
-- "ration" dans recette = quantité PAR REPAS (matin et soir identiques)
-- "qty" dans ingredients = quantité par repas
-- "qty" dans courses > items = quantité TOTALE pour 7 jours (×14 repas)
-- "batch_special" : compléments ajoutés au moment du repas uniquement (huile, CMV, levure, etc.) — jamais cuits
-- "cout_indus" est une estimation du prix d'un service de livraison industrielle équivalent (Butternut Box, Pet's Deli) pour comparaison
-- "economie" = cout_indus - cout_semaine
-- "proteine_principale" : une seule protéine en minuscules, sans article (ex: "dinde" pas "de la dinde")${proteineActuelle ? ` — DOIT être différente de "${proteineActuelle}"` : ''}
-- INTERDICTION ABSOLUE (rappel final) : ${intolerances.length > 0 ? `les ingrédients suivants ne doivent apparaître nulle part dans ta réponse : ${intolerances.join(', ')}` : 'aucune intolérance déclarée'}
-- Le JSON doit être strictement valide : pas de virgule finale, toutes les clés entre guillemets doubles
-- Pour "apports" : calcule les besoins énergétiques avec la formule NRC 2006 (130 × PM^0.75 × facteur d'activité : sédentaire 1.0, modéré 1.4, actif 1.8) divisés par 2 (= cible par repas). Estime les valeurs réelles à partir des ingrédients de la recette (protéines : viande ~20%, poisson ~18% ; lipides : viande ~8%, huile ~100% ; calcium : os crus ~8%, légumes vert ~0.1% ; oméga-3 : huile saumon ~22%, maquereau ~2%). "pct" = arrondi entier de valeur/cible×100. Les valeurs "valeur" et "cible" sont des nombres (pas de chaînes)`;
-}
-
-// ── SAISON ────────────────────────────────────────────────
-function getSaison() {
-  const m = new Date().getMonth() + 1;
-  if (m >= 3 && m <= 5) return 'Printemps';
-  if (m >= 6 && m <= 8) return 'Été';
-  if (m >= 9 && m <= 11) return 'Automne';
-  return 'Hiver';
+  console.log(`[magic-link] Menu généré et envoyé pour ${prenomChien} (${email})`);
 }
 
 // ── EMAIL MENU ────────────────────────────────────────────
