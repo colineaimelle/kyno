@@ -1692,7 +1692,7 @@ function renderMenuCard(p) {
         }).join('') + '</ul>';
     } else {
       var nom = cap(p.prenom_chien || '') || 'ce chien';
-      var cid = currentChienId || '';
+      var cid = p.id || currentChienId || '';
       prt.innerHTML =
         '<div class="menu-pending">' +
         '<div class="menu-pending-title">Le premier menu de ' + esc(nom) + ' est en préparation.</div>' +
@@ -1874,16 +1874,30 @@ let _generating = false; // garde contre le double-clic
 // La limite réelle est vérifiée côté serveur (chien.derniere_generation).
 // localStorage sert uniquement à griser le bouton sans aller au réseau.
 async function generateMenuPourChien(chienId, auto) {
-  if (!chienId || !sb || _generating) return;
+  if (_generating) return;
+  const prt = document.getElementById('menuPortion');
+  if (!chienId) {
+    console.error('generateMenuPourChien: chienId vide ou manquant');
+    if (prt) prt.innerHTML =
+      '<div class="menu-pending">' +
+      '<div class="menu-pending-title">Erreur : identifiant du chien manquant.</div>' +
+      '<div class="menu-pending-sub">Recharge la page et réessaie.</div>' +
+      '</div>';
+    return;
+  }
+  if (!sb) return;
   _generating = true;
   const today = new Date().toISOString().slice(0, 10);
   const rlKey = 'kyno_gen_' + chienId;
   if (!auto && localStorage.getItem(rlKey) === today) {
     _generating = false;
-    alert('Le menu de ce chien a déjà été généré aujourd\'hui. Reviens demain ou demande une mise à jour via le chat.');
+    if (prt) prt.innerHTML =
+      '<div class="menu-pending">' +
+      '<div class="menu-pending-title">Menu déjà généré aujourd\'hui.</div>' +
+      '<div class="menu-pending-sub">Reviens demain ou demande une mise à jour via le chat.</div>' +
+      '</div>';
     return;
   }
-  const prt = document.getElementById('menuPortion');
   if (prt) prt.innerHTML =
     '<div class="menu-pending">' +
     '<div class="menu-pending-title">Génération en cours…</div>' +
@@ -1928,7 +1942,8 @@ async function generateMenuPourChien(chienId, auto) {
     if (prt) prt.innerHTML =
       '<div class="menu-pending">' +
       '<div class="menu-pending-title">Erreur lors de la génération.</div>' +
-      '<div class="menu-pending-sub">Réessaie dans quelques secondes.</div>' +
+      '<div class="menu-pending-sub">' + (e && e.message ? esc(e.message) : 'Réessaie dans quelques secondes.') + '</div>' +
+      '<button class="btn-prepare-menu" onclick="generateMenuPourChien(' + JSON.stringify(chienId).replace(/"/g, '&quot;') + ')">Réessayer</button>' +
       '</div>';
   } finally {
     _generating = false;
