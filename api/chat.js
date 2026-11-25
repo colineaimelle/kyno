@@ -383,6 +383,7 @@ async function generateAndSaveMenu(email, chienId, profile, saison) {
   await Promise.all((menuData.chiens || []).map(async mc => {
     const patch = {};
     if (mc.recette)                                                        patch.recette             = mc.recette;
+    if (mc.recette)                                                        patch.recette_verifiee    = true;
     if (mc.score_sante != null)                                            patch.score_sante         = mc.score_sante;
     if (Array.isArray(mc.score_bullets) && mc.score_bullets.length)       patch.score_bullets       = mc.score_bullets.slice(0, 3);
     if (mc.proteine_principale)                                            patch.proteine_principale = mc.proteine_principale;

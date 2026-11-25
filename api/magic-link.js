@@ -106,6 +106,7 @@ async function generateMenuInBackground(email) {
   await Promise.all(menuData.chiens.map(async mc => {
     const chienPatch = {};
     if (mc.recette)                                                        chienPatch.recette             = mc.recette;
+    if (mc.recette)                                                        chienPatch.recette_verifiee    = true;
     if (mc.score_sante != null)                                            chienPatch.score_sante         = mc.score_sante;
     if (Array.isArray(mc.score_bullets) && mc.score_bullets.length)       chienPatch.score_bullets       = mc.score_bullets.slice(0, 3);
     if (mc.proteine_principale)                                            chienPatch.proteine_principale = mc.proteine_principale;

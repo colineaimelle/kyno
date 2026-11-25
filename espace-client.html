@@ -1239,7 +1239,7 @@ const DEMO_PROFILE = {
   // Auto-génération pour un chien ajouté sans recette (flag posé par quiz.html)
   if (sessionStorage.getItem('kyno_new_chien') === 'true') {
     sessionStorage.removeItem('kyno_new_chien');
-    const newDog = chiens.find(function(c) { return !c.recette; });
+    const newDog = chiens.find(function(c) { return !c.recette || !c.recette_verifiee; });
     if (newDog) {
       selectChien(newDog.id);
       setTimeout(function() { generateMenuPourChien(newDog.id, true); }, 400);
@@ -1665,7 +1665,7 @@ function renderFicheSante(p) {
 
 // ─── MENU CARD ───
 function renderMenuCard(p) {
-  const recipe = p.recette || null;  // Pas de repli vers foyer.recettes
+  const recipe = (p.recette && p.recette_verifiee) ? p.recette : null;  // Affiche seulement si vérifiée
 
   const saison = p.saison || '';
   const weekLabel = document.getElementById('menuWeekLabel');
@@ -1703,7 +1703,7 @@ function renderMenuCard(p) {
   }
 
   // Sous-labels accordeons (depuis toutes les recettes des chiens actifs)
-  const avecRecette = chiens.filter(function(c) { return c.recette; });
+  const avecRecette = chiens.filter(function(c) { return c.recette && c.recette_verifiee; });
   const nCourses = avecRecette.reduce(function(s, c) { return s + (c.recette.ingredients || []).length; }, 0);
   const nomsRecette = avecRecette.map(function(c) { return cap(c.prenom_chien || ''); }).filter(Boolean);
   const courseSub = document.getElementById('coursesSubLabel');
@@ -1722,7 +1722,7 @@ function renderMenuCard(p) {
 
 // ─── RECETTES ───
 function renderRecipes(p) {
-  const recipes = p.recette ? [p.recette] : null;  // Pas de repli vers foyer.recettes
+  const recipes = (p.recette && p.recette_verifiee) ? [p.recette] : null;  // Affiche seulement si vérifiée
   const c = document.getElementById('recipesContainer');
   if (!recipes) {
     const nom = cap(p.prenom_chien || '') || 'ton chien';
@@ -1829,7 +1829,7 @@ function renderSavings(p) {
   const coutDay = coutWeek / 7;
   const ecoDogChef = Math.max(0, Math.round((7 - coutDay) * days));
   const ecoCroq = Math.max(0, Math.round((3.5 - coutDay) * days));
-  const nomsAvecRecette = chiens.filter(c => c.recette).map(c => cap(c.prenom_chien || '')).filter(Boolean);
+  const nomsAvecRecette = chiens.filter(c => c.recette && c.recette_verifiee).map(c => cap(c.prenom_chien || '')).filter(Boolean);
   const noms = nomsAvecRecette.length ? nomsAvecRecette : (p.prenom_chien ? [cap(p.prenom_chien)] : []);
   const pour = noms.length ? ' pour ' + noms.join(' et ') : '';
   block.style.display = 'block';
@@ -1932,8 +1932,8 @@ async function generateMenuPourChien(chienId, auto) {
     if (!res.ok) {
       if (data.blocked) {
         const dogBloque = chiens.find(function(c) { return c.id === chienId; });
-        if (dogBloque && dogBloque.recette) {
-          // Recette précédente conservée — re-render sans toucher l'état
+        if (dogBloque && dogBloque.recette && dogBloque.recette_verifiee) {
+          // Recette précédente vérifiée conservée — re-render sans toucher l'état
           if (currentChienId === chienId) renderAll(userProfile);
         } else {
           var nomBloque = esc(cap((dogBloque && dogBloque.prenom_chien) || 'votre chien'));
