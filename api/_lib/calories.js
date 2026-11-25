@@ -159,16 +159,26 @@ function escapeRe(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// Retourne les kcal/100 g CRU pour un ingrédient, ou null si inconnu.
-// Cherche d'abord la clé la plus longue compatible (mot entier ou expression).
-function kcalPour100g(nom) {
-  const n = normaliser(nom);
+function _lookup(n) {
   const padded = ' ' + n + ' ';
   for (const { key, kcal } of TABLE) {
     const re = new RegExp(`(?:^| )${escapeRe(key)}(?= |$)`);
     if (re.test(padded)) return kcal;
   }
   return null;
+}
+
+// Retourne les kcal/100 g CRU pour un ingrédient, ou null si inconnu.
+// Essaie d'abord la forme normalisée exacte, puis dépluralise mot à mot
+// (ex. "carottes" → "carotte", "haricots verts" → "haricot vert").
+function kcalPour100g(nom) {
+  const n = normaliser(nom);
+  let r = _lookup(n);
+  if (r !== null) return r;
+  // Dépluralisation mot à mot : supprime le "s" final de chaque mot
+  const deplu = n.split(' ').map(w => w.endsWith('s') && w.length > 2 ? w.slice(0, -1) : w).join(' ');
+  if (deplu !== n) r = _lookup(deplu);
+  return r;
 }
 
 // Calcule les kcal totales d'une liste [{name, qty_g_jour}].

@@ -160,7 +160,11 @@ module.exports = async function handler(req, res) {
     const { menuData, echecs, ciblesKcal, stats } = pipelineResult;
 
     // ── 6. Enregistrement des chiens ayant réussi la vérification ───────────
-    await Promise.all((menuData.chiens || []).map(async mc => {
+    // Promise.allSettled : un PATCH échoué n'annule pas les autres.
+    // Si le PATCH échoue (ex. colonne inconnue), derniere_generation n'est pas écrite
+    // → le polling côté client expire après 90 s et propose de réessayer
+    // → le rate-limit quotidien n'est pas déclenché → l'utilisateur peut relancer.
+    const patchResults = await Promise.allSettled((menuData.chiens || []).map(async mc => {
       const chienPatch = { derniere_generation: today2 };
       if (mc.recette)                                                          chienPatch.recette             = mc.recette;
       if (mc.recette)                                                          chienPatch.recette_verifiee    = true;
@@ -173,6 +177,10 @@ module.exports = async function handler(req, res) {
                                                                                chienPatch.ingredients_grammes_crus = mc.ingredients_grammes_crus;
       await patchChien(mc.chien_id, chienPatch);
     }));
+    patchResults.forEach((r, i) => {
+      if (r.status === 'rejected')
+        console.error(`[gen-chien] PATCH chien[${i}] rejeté :`, r.reason?.message);
+    });
 
     // ── 7. §4 — Chiens en échec : préserver et re-vérifier l'ancienne recette
     for (const { chien: chienEchec } of echecs) {
