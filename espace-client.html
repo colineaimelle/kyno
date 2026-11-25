@@ -1924,7 +1924,7 @@ async function generateMenuPourChien(chienId, auto) {
   if (prt) prt.innerHTML =
     '<div class="menu-pending">' +
     '<div class="menu-pending-title">Génération en cours…</div>' +
-    '<div class="menu-pending-sub">Environ 20 secondes.</div>' +
+    '<div class="menu-pending-sub">Environ 30 secondes.</div>' +
     '</div>';
   try {
     const { data: { session } } = await sb.auth.getSession();
@@ -1941,9 +1941,7 @@ async function generateMenuPourChien(chienId, auto) {
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
       body: JSON.stringify({ chien_id: chienId })
     });
-    const data = await res.json().catch(function() { return {}; });
     if (res.status === 429) {
-      // Limite serveur atteinte — on synchronise localStorage pour éviter un prochain appel inutile.
       localStorage.setItem(rlKey, today);
       if (prt) prt.innerHTML =
         '<div class="menu-pending">' +
@@ -1953,30 +1951,11 @@ async function generateMenuPourChien(chienId, auto) {
       return;
     }
     if (!res.ok) {
-      if (data.blocked) {
-        const dogBloque = chiens.find(function(c) { return c.id === chienId; });
-        if (dogBloque && dogBloque.recette && dogBloque.recette_verifiee) {
-          // Recette précédente vérifiée conservée — re-render sans toucher l'état
-          if (currentChienId === chienId) renderAll(userProfile);
-        } else {
-          var nomBloque = esc(cap((dogBloque && dogBloque.prenom_chien) || 'votre chien'));
-          if (prt) prt.innerHTML =
-            '<div class="menu-pending">' +
-            '<div class="menu-pending-title">Le menu de ' + nomBloque + ' est en cours de vérification.</div>' +
-            '<div class="menu-pending-sub">Il arrive très vite.</div>' +
-            '</div>';
-        }
-        return;
-      }
+      const data = await res.json().catch(function() { return {}; });
       throw new Error(data.error || 'Erreur ' + res.status);
     }
-    chiens = chiens.map(function(c) { return c.id === chienId ? Object.assign({}, c, data.chien) : c; });
-    if (currentChienId === chienId) {
-      currentChien = chiens.find(function(c) { return c.id === chienId; }) || currentChien;
-      userProfile = Object.assign({}, foyer || {}, currentChien);
-    }
-    localStorage.setItem(rlKey, today);
-    renderAll(userProfile);
+    // §5 — 202 : génération en arrière-plan → polling Supabase
+    await _pollJusquaGeneration(chienId, session, today, prt);
   } catch (e) {
     console.error('generateMenuPourChien:', e);
     if (prt) prt.innerHTML =
@@ -1988,6 +1967,62 @@ async function generateMenuPourChien(chienId, auto) {
   } finally {
     _generating = false;
   }
+}
+
+// §5 — Poll Supabase toutes les 3 secondes jusqu'à ce que derniere_generation = today,
+// puis recharge tous les chiens du foyer et re-rend l'affichage.
+// Timeout à 90 secondes.
+async function _pollJusquaGeneration(chienId, session, today, prt) {
+  var MAX_WAIT = 90000;
+  var INTERVAL = 3000;
+  var debut = Date.now();
+
+  return new Promise(function(resolve) {
+    var timer = setInterval(async function() {
+      try {
+        var r = await fetch(
+          SUPABASE_URL + '/rest/v1/chien?id=eq.' + encodeURIComponent(chienId) + '&select=derniere_generation',
+          { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + session.access_token } }
+        );
+        if (r.ok) {
+          var rows = await r.json().catch(function() { return []; });
+          if (rows[0] && rows[0].derniere_generation === today) {
+            clearInterval(timer);
+            // Recharger tous les chiens du foyer (tous ont pu être mis à jour)
+            var allRes = await fetch(
+              SUPABASE_URL + '/rest/v1/chien?user_email=eq.' + encodeURIComponent(session.user.email) +
+              '&actif=eq.true&order=ordre.asc&select=*',
+              { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + session.access_token } }
+            );
+            if (allRes.ok) {
+              var updated = await allRes.json().catch(function() { return null; });
+              if (updated) chiens = updated;
+            }
+            var cCurrent = chiens.find(function(c) { return c.id === (currentChienId || chienId); });
+            if (cCurrent) {
+              currentChien = cCurrent;
+              userProfile = Object.assign({}, foyer || {}, cCurrent);
+            }
+            localStorage.setItem('kyno_gen_' + chienId, today);
+            renderAll(userProfile);
+            resolve();
+            return;
+          }
+        }
+      } catch (pollErr) {
+        console.warn('[poll]', pollErr);
+      }
+      if (Date.now() - debut > MAX_WAIT) {
+        clearInterval(timer);
+        if (prt) prt.innerHTML =
+          '<div class="menu-pending">' +
+          '<div class="menu-pending-title">Génération plus longue que prévu.</div>' +
+          '<div class="menu-pending-sub">Recharge la page dans quelques secondes pour voir le menu.</div>' +
+          '</div>';
+        resolve();
+      }
+    }, INTERVAL);
+  });
 }
 
 // ═══════════════════════════════════════════════════════════

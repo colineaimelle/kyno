@@ -4,7 +4,7 @@
       "maxDuration": 45
     },
     "api/generate-menu-chien.js": {
-      "maxDuration": 45
+      "maxDuration": 120
     }
   }
 }

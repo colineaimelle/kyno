@@ -1,12 +1,17 @@
 // api/generate-menu-chien.js
 // Génère le menu de tous les chiens actifs d'un foyer à la demande (bouton espace client ou ajout).
 // POST authentifié (JWT Supabase), body : { chien_id }
-// Enregistre recette, score_sante, score_bullets, apports, proteine_principale,
-// batch_special, derniere_generation dans la table chien pour chaque chien actif.
-// Enregistre batch_steps, courses, recettes au niveau foyer (table user).
-// Requiert la migration : ALTER TABLE chien ADD COLUMN IF NOT EXISTS derniere_generation date;
+//
+// §5 — Réponse HTTP 202 immédiate, pipeline en arrière-plan via waitUntil.
+// Le frontend poll Supabase (chien.derniere_generation) pour détecter la fin.
+//
+// §4 — Pour les chiens en échec, l'ancienne recette est re-vérifiée et préservée
+// (recette_verifiee = true si elle passe) : un menu existant n'est jamais effacé.
 
+const { waitUntil }      = require('@vercel/functions');
 const { genererMenuFoyer } = require('./_lib/genererMenuChien');
+const { verifierMenu }   = require('./_lib/verifierMenu');
+const { besoinKcalJour } = require('./_lib/energie');
 
 function getEmailFromJwt(authHeader) {
   if (!authHeader?.startsWith('Bearer ')) return null;
@@ -74,6 +79,37 @@ async function patchUser(email, fields) {
   }
 }
 
+// §4 — Pour un chien en échec, re-vérifie son ancienne recette et renvoie le patch à appliquer.
+// Retourne toujours { derniere_generation } + recette_verifiee si l'ancienne recette est valide.
+function buildPatchEchec(ancien, ciblesKcal, today2) {
+  const patch = { derniere_generation: today2 };
+
+  if (!ancien.recette) return patch; // pas d'ancienne recette, rien à préserver
+
+  // Si déjà marquée valide : on ne touche pas recette_verifiee (le PATCH ne l'inclut pas)
+  if (ancien.recette_verifiee) return patch;
+
+  // Ancienne recette présente mais non vérifiée → la vérifier maintenant
+  const mc = {
+    chien_id:                 ancien.id,
+    recette:                  ancien.recette,
+    ingredients_grammes_crus: Array.isArray(ancien.ingredients_grammes_crus) ? ancien.ingredients_grammes_crus : [],
+    batch_special:            ancien.batch_special || '',
+    apports:                  Array.isArray(ancien.apports) ? ancien.apports : [],
+  };
+  const cible = ciblesKcal[ancien.id] || besoinKcalJour(ancien);
+  if (!cible) return patch;
+
+  const { ok, raisons } = verifierMenu(mc, ancien, { [ancien.id]: cible });
+  if (ok) {
+    patch.recette_verifiee = true;
+    console.log(`[gen-chien] §4 — ancienne recette de ${ancien.prenom_chien || ancien.id} re-vérifiée : valide`);
+  } else {
+    console.warn(`[gen-chien] §4 — ancienne recette de ${ancien.prenom_chien || ancien.id} invalide : ${raisons.join('; ')}`);
+  }
+  return patch;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -105,67 +141,63 @@ module.exports = async function handler(req, res) {
   ]);
   const foyer = foyerRows[0] || {};
 
-  // ── 5. Pipeline unifié ────────────────────────────────────────────────────
-  let pipelineResult;
-  try {
-    pipelineResult = await genererMenuFoyer(allChiens, foyer);
-  } catch (err) {
-    console.error(`[gen-chien] Pipeline échoué pour ${email}:`, err.message);
-    return res.status(502).json({ error: err.message });
-  }
+  // ── 5. §5 — Réponse 202 immédiate, pipeline en arrière-plan ──────────────
+  res.status(202).json({ status: 'generating', chien_id });
 
-  const { menuData, echecs, stats } = pipelineResult;
+  waitUntil((async () => {
+    const today2 = new Date().toISOString().slice(0, 10);
 
-  // ── 6. Enregistrement par chien ───────────────────────────────────────────
-  const today2 = new Date().toISOString().slice(0, 10);
-  await Promise.all((menuData.chiens || []).map(async mc => {
-    const chienPatch = { derniere_generation: today2 };
-    if (mc.recette)                                                          chienPatch.recette             = mc.recette;
-    if (mc.recette)                                                          chienPatch.recette_verifiee    = true;
-    if (mc.score_sante != null)                                              chienPatch.score_sante         = mc.score_sante;
-    if (Array.isArray(mc.score_bullets) && mc.score_bullets.length)         chienPatch.score_bullets       = mc.score_bullets.slice(0, 3);
-    if (mc.proteine_principale)                                              chienPatch.proteine_principale = mc.proteine_principale;
-    if (Array.isArray(mc.apports) && mc.apports.length)                     chienPatch.apports             = mc.apports;
-    if (mc.batch_special)                                                    chienPatch.batch_special       = mc.batch_special;
-    if (Array.isArray(mc.ingredients_grammes_crus) && mc.ingredients_grammes_crus.length)
-                                                                             chienPatch.ingredients_grammes_crus = mc.ingredients_grammes_crus;
-    await patchChien(mc.chien_id, chienPatch);
-  }));
+    // ── Pipeline ────────────────────────────────────────────────────────────
+    let pipelineResult;
+    try {
+      pipelineResult = await genererMenuFoyer(allChiens, foyer);
+    } catch (err) {
+      console.error(`[gen-chien] Pipeline échoué pour ${email}:`, err.message);
+      // Ne pas marquer derniere_generation → l'utilisateur peut réessayer
+      return;
+    }
 
-  // ── 7. Enregistrement foyer (batch + courses communs) ─────────────────────
-  if (menuData.chiens && menuData.chiens.length > 0) {
-    await patchUser(email, {
-      recettes:     (menuData.chiens || []).map(mc => mc.recette).filter(Boolean),
-      batch_steps:  menuData.batch_cooking_commun || [],
-      courses:      menuData.courses_commune || [],
-      cout_semaine: menuData.cout_semaine || null,
-      cout_indus:   menuData.cout_indus || null,
-      economie:     menuData.economie || null,
-      batch_time:   menuData.batch_time || null,
-      menu_envoye:  true,
-    });
-  }
+    const { menuData, echecs, ciblesKcal, stats } = pipelineResult;
 
-  console.log(`[gen-chien] ${stats.resultat} (${stats.nbOk}/${stats.nbTotal} chiens, ${stats.tentatives} essai(s)) — ${email}`);
+    // ── 6. Enregistrement des chiens ayant réussi la vérification ───────────
+    await Promise.all((menuData.chiens || []).map(async mc => {
+      const chienPatch = { derniere_generation: today2 };
+      if (mc.recette)                                                          chienPatch.recette             = mc.recette;
+      if (mc.recette)                                                          chienPatch.recette_verifiee    = true;
+      if (mc.score_sante != null)                                              chienPatch.score_sante         = mc.score_sante;
+      if (Array.isArray(mc.score_bullets) && mc.score_bullets.length)         chienPatch.score_bullets       = mc.score_bullets.slice(0, 3);
+      if (mc.proteine_principale)                                              chienPatch.proteine_principale = mc.proteine_principale;
+      if (Array.isArray(mc.apports) && mc.apports.length)                     chienPatch.apports             = mc.apports;
+      if (mc.batch_special)                                                    chienPatch.batch_special       = mc.batch_special;
+      if (Array.isArray(mc.ingredients_grammes_crus) && mc.ingredients_grammes_crus.length)
+                                                                               chienPatch.ingredients_grammes_crus = mc.ingredients_grammes_crus;
+      await patchChien(mc.chien_id, chienPatch);
+    }));
 
-  // ── 8. Réponse ────────────────────────────────────────────────────────────
-  const mcRequested = (menuData.chiens || []).find(mc => mc.chien_id === chien_id);
-  if (!mcRequested) {
-    const echecChien = echecs.find(e => e.chien.id === chien_id);
-    if (echecChien) {
-      return res.status(502).json({
-        error: `Menu bloqué après 2 essais : ${echecChien.raisons2.join('; ')}`,
-        blocked: true,
-        raisons1: echecChien.raisons1,
-        raisons2: echecChien.raisons2,
+    // ── 7. §4 — Chiens en échec : préserver et re-vérifier l'ancienne recette
+    for (const { chien: chienEchec } of echecs) {
+      const ancien = allChiens.find(c => c.id === chienEchec.id);
+      if (!ancien) continue;
+      const patch = buildPatchEchec(ancien, ciblesKcal, today2);
+      await patchChien(ancien.id, patch).catch(e =>
+        console.error('[gen-chien] §4 PATCH chien échec:', e.message)
+      );
+    }
+
+    // ── 8. Enregistrement foyer (batch + courses) ───────────────────────────
+    if (menuData.chiens && menuData.chiens.length > 0) {
+      await patchUser(email, {
+        recettes:     (menuData.chiens || []).map(mc => mc.recette).filter(Boolean),
+        batch_steps:  menuData.batch_cooking_commun || [],
+        courses:      menuData.courses_commune || [],
+        cout_semaine: menuData.cout_semaine || null,
+        cout_indus:   menuData.cout_indus || null,
+        economie:     menuData.economie || null,
+        batch_time:   menuData.batch_time || null,
+        menu_envoye:  true,
       });
     }
-    return res.status(502).json({ error: 'Réponse Claude incomplète (recette manquante)' });
-  }
 
-  return res.status(200).json({
-    success: true,
-    chien: { ...mcRequested, derniere_generation: today2 },
-    stats,
-  });
+    console.log(`[gen-chien] ${stats.resultat} (${stats.nbOk}/${stats.nbTotal} chiens, ${stats.tentatives} essai(s)) — ${email}`);
+  })());
 };
