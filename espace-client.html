@@ -1687,9 +1687,32 @@ function renderMenuCard(p) {
         '<p class="menu-portion-title">Sa portion du jour</p>' +
         '<p id="menuPortionSub">' + (recipe.ration ? '2 repas par jour, ' + recipe.ration + ' g au total.' : '') + '</p>' +
         '<ul class="menu-portion-list" id="menuIngList">' +
-        (recipe.ingredients || []).map(function(i) {
-          return '<li><span>' + esc(i.name || '') + '</span><b>' + esc(i.qty || '') + '</b></li>';
-        }).join('') + '</ul>';
+        (function() {
+          var recIngs = (recipe.ingredients || []).map(function(i) {
+            return { name: i.name || '', qty: i.qty || '' };
+          });
+          var extra = [];
+          if (p.batch_special) {
+            p.batch_special.replace(/^ajouter\s+/i, '').split(/\s*\+\s*/).forEach(function(seg) {
+              var m = seg.trim().match(/^(\d+(?:[,.]\d+)?)\s*(g|ml)\s+(.*)/i);
+              if (!m) return;
+              var nm = m[3]
+                .replace(/\s+(directement|dans\s+le|au\s+moment|jamais|\().*$/i, '')
+                .replace(/^d[e']\s*/i, '')
+                .trim();
+              if (!nm) return;
+              var nmLow = nm.toLowerCase();
+              var already = recIngs.some(function(x) {
+                var xLow = x.name.toLowerCase();
+                return xLow === nmLow || xLow.includes(nmLow) || nmLow.includes(xLow);
+              });
+              if (!already) extra.push({ name: nm, qty: m[1] + ' ' + m[2] });
+            });
+          }
+          return recIngs.concat(extra).map(function(i) {
+            return '<li><span>' + esc(i.name) + '</span><b>' + esc(i.qty) + '</b></li>';
+          }).join('');
+        })() + '</ul>';
     } else {
       var nom = cap(p.prenom_chien || '') || 'ce chien';
       var cid = p.id || currentChienId || '';
