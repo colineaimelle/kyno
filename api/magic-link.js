@@ -43,6 +43,43 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ success: true });
     }
 
+    // ── Rétractation (§4.1) ────────────────────────────────────────────────────
+    if (action === 'retractation') {
+      const { subscription_date } = req.body;
+      if (!email) return res.status(400).json({ error: 'Email manquant' });
+      const dateStr = new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Paris' });
+      await Promise.all([
+        sendBrevoEmail(CONTACT_EMAIL, 'Kyno Admin',
+          `Demande de rétractation – ${email}`,
+          `<p>Rétractation reçue le <strong>${dateStr}</strong>.</p>
+           <p>Client : <strong>${email}</strong></p>
+           <p>Date d’abonnement : ${subscription_date || 'non renseignée'}</p>`),
+        sendBrevoEmail(email, email,
+          'Kyno – Confirmation de rétractation',
+          `<p>Nous avons bien reçu ta rétractation du <strong>${dateStr}</strong>. Tu seras remboursé du montant restant sous 14 jours au plus tard, par le même moyen de paiement.</p>
+           <p>Une question ? Écris-nous à <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a>.</p>`),
+      ]);
+      return res.status(200).json({ success: true });
+    }
+
+    // ── Résiliation (§4.2) ─────────────────────────────────────────────────────
+    if (action === 'resiliation') {
+      if (!email) return res.status(400).json({ error: 'Email manquant' });
+      const dateStr = new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Paris' });
+      await Promise.all([
+        sendBrevoEmail(CONTACT_EMAIL, 'Kyno Admin',
+          `Demande de résiliation – ${email}`,
+          `<p>Résiliation demandée le <strong>${dateStr}</strong>.</p>
+           <p>Client : <strong>${email}</strong></p>
+           <p>Action : arrêter l’abonnement dans Stripe à la fin de la période en cours.</p>`),
+        sendBrevoEmail(email, email,
+          'Kyno – Confirmation de résiliation',
+          `<p>Nous avons bien reçu ta demande de résiliation du <strong>${dateStr}</strong>. Ton abonnement sera arrêté à la fin de ta période en cours. Tu recevras une confirmation dès que la résiliation est effective.</p>
+           <p>Une question ? Écris-nous à <a href="mailto:${CONTACT_EMAIL}">${CONTACT_EMAIL}</a>.</p>`),
+      ]);
+      return res.status(200).json({ success: true });
+    }
+
     if (!email) return res.status(400).json({ error: 'Email manquant' });
 
     // ── 1. Envoyer le lien magique via Supabase Auth ──────
@@ -173,6 +210,20 @@ async function generateMenuInBackground(email) {
   await sendEmailMenu(email, prenomChien, emailData);
 
   console.log(`[magic-link] Menu généré et envoyé pour ${prenomChien} (${email})`);
+}
+
+// ── EMAIL GÉNÉRIQUE (rétractation, résiliation, consentement) ────────────────
+async function sendBrevoEmail(toEmail, toName, subject, bodyHtml) {
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:32px 16px;background:#FFF4E0;font-family:Arial,Helvetica,sans-serif;color:#451A36;font-size:16px;line-height:1.6;">
+${bodyHtml}
+<p style="margin-top:24px;font-size:13px;color:#6E4A63;">Kyno &middot; &eacute;dit&eacute; par Elycoop, coop&eacute;rative d&apos;activit&eacute; et d&apos;emploi</p>
+</body></html>`;
+  return fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'api-key': process.env.BREVO_API_KEY },
+    body: JSON.stringify({ sender: { name: 'Kyno', email: CONTACT_EMAIL }, to: [{ email: toEmail, name: toName }], subject, htmlContent: html }),
+  });
 }
 
 // ── EMAIL MENU ────────────────────────────────────────────

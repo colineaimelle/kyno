@@ -573,6 +573,15 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
   .chat-panel{position:fixed;left:0;right:0;bottom:0;width:100%;max-width:100%;border-radius:24px 24px 0 0;border-bottom:none;bottom:0;animation:kslideup .3s cubic-bezier(.22,.61,.36,1);}
   @keyframes kslideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
 }
+/* Rétractation et résiliation (§4) */
+.abo-actions{display:flex;flex-direction:column;gap:10px;align-items:flex-end;}
+.btn-retractation{background:#FFF4E0;color:#E5432F;border:2px solid #E5432F;border-radius:999px;padding:10px 18px;font:700 13px/1 var(--font-texte),sans-serif;cursor:pointer;}
+.btn-resiliation{background:#FFF4E0;color:#6E4A63;border:2px solid #6E4A63;border-radius:999px;padding:10px 18px;font:400 13px/1 var(--font-texte),sans-serif;cursor:pointer;}
+.abo-confirm{background:#FCEBC4;border:2px solid #451A36;border-radius:16px;padding:14px 16px;font:400 14px/1.5 var(--font-texte),sans-serif;color:#451A36;display:none;margin-top:4px;max-width:280px;}
+.abo-confirm strong{font-weight:700;}
+.abo-confirm-btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.btn-abo-oui{background:#451A36;color:#FFF4E0;border:none;border-radius:999px;padding:8px 18px;font:700 13px/1 var(--font-texte),sans-serif;cursor:pointer;}
+.btn-abo-non{background:#FFF4E0;color:#451A36;border:2px solid #451A36;border-radius:999px;padding:7px 14px;font:400 13px/1 var(--font-texte),sans-serif;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -999,12 +1008,34 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
     <div class="kp-abo">
       <div class="kp-abo-left">
         <p class="kp-abo-title">Ton abonnement</p>
-        <span class="kp-abo-pill">Kyno+ fondateur · 12 €/mois</span>
+        <span class="kp-abo-pill">Kyno+ fondateur · 12 &#x20AC;/mois</span>
         <p class="kp-abo-note">Tarif garanti tant que ton abonnement reste actif.</p>
       </div>
-      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end">
-        <span class="kp-soon">Bientôt disponible</span>
-        <button class="kp-btn" disabled>Gérer mon abonnement</button>
+      <div class="abo-actions">
+        <!-- Rétractation : visible uniquement pendant 14 jours après l'abonnement -->
+        <div id="retractation-wrap" style="display:none">
+          <button class="btn-retractation" id="btn-retractation" onclick="showRetractConfirm()">Renoncer au contrat ici</button>
+          <div class="abo-confirm" id="confirm-retractation">
+            <strong>Confirmer la r&eacute;tractation ?</strong><br>
+            Tu seras rembours&eacute; du montant restant sous 14 jours au plus tard, par le m&ecirc;me moyen de paiement.
+            <div class="abo-confirm-btns">
+              <button class="btn-abo-oui" onclick="confirmerRetractation()">Oui, je me r&eacute;tracte</button>
+              <button class="btn-abo-non" onclick="fermerConfirm()">Annuler</button>
+            </div>
+          </div>
+        </div>
+        <!-- Résiliation : toujours visible -->
+        <div>
+          <button class="btn-resiliation" id="btn-resiliation" onclick="showResilConfirm()">R&eacute;silier mon abonnement</button>
+          <div class="abo-confirm" id="confirm-resiliation">
+            <strong>Confirmer la r&eacute;siliation ?</strong><br>
+            Ton abonnement sera arr&ecirc;t&eacute; &agrave; la fin de ta p&eacute;riode en cours.
+            <div class="abo-confirm-btns">
+              <button class="btn-abo-oui" onclick="confirmerResiliation()">Oui, r&eacute;silier</button>
+              <button class="btn-abo-non" onclick="fermerConfirm()">Annuler</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1232,6 +1263,7 @@ const DEMO_PROFILE = {
   userProfile = profile;
   buildDogSelector();
   renderAll(profile);
+  checkRetractationVisibility();
   await loadChatHistory();
   if (sb && currentUser) { sb.from('user').update({ derniere_connexion: new Date().toISOString() }).eq('email', currentUser.email).then(() => {}).catch(() => {}); }
   document.getElementById('loadingScreen').style.display = 'none';
@@ -2434,6 +2466,55 @@ function renderIaText(t) { if (t == null) return ''; return String(t).replace(/&
 function formatMonth(iso) { if (!iso) return 'récemment'; try { return new Date(iso).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }); } catch (e) { return 'récemment'; } }
 function daysSince(iso) { if (!iso) return 0; const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000); return d > 0 ? d : 0; }
 function shortLabel(s) { return String(s || '').replace(/^Semaine du /i, ''); }
+
+// ── Rétractation et résiliation (§4) ────────────────────────────────────────
+function checkRetractationVisibility() {
+  if (!foyer || !foyer.subscription_started_at) return;
+  if (daysSince(foyer.subscription_started_at) <= 14) {
+    document.getElementById('retractation-wrap').style.display = 'block';
+  }
+}
+function showRetractConfirm() {
+  document.getElementById('btn-retractation').style.display = 'none';
+  document.getElementById('confirm-retractation').style.display = 'block';
+}
+function showResilConfirm() {
+  document.getElementById('btn-resiliation').style.display = 'none';
+  document.getElementById('confirm-resiliation').style.display = 'block';
+}
+function fermerConfirm() {
+  document.getElementById('btn-retractation').style.display = '';
+  document.getElementById('confirm-retractation').style.display = 'none';
+  document.getElementById('btn-resiliation').style.display = '';
+  document.getElementById('confirm-resiliation').style.display = 'none';
+}
+async function confirmerRetractation() {
+  const email = currentUser && currentUser.email;
+  if (!email) return;
+  document.getElementById('confirm-retractation').innerHTML =
+    '<p>R&eacute;tractation enregistr&eacute;e. Tu vas recevoir une confirmation par email.</p>';
+  fetch('/api/magic-link', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      action: 'retractation', email: email,
+      subscription_date: foyer && foyer.subscription_started_at
+        ? new Date(foyer.subscription_started_at).toLocaleDateString('fr-FR')
+        : null
+    })
+  }).catch(function() {});
+}
+async function confirmerResiliation() {
+  const email = currentUser && currentUser.email;
+  if (!email) return;
+  document.getElementById('confirm-resiliation').innerHTML =
+    '<p>R&eacute;siliation enregistr&eacute;e. Tu vas recevoir une confirmation par email.</p>';
+  fetch('/api/magic-link', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ action: 'resiliation', email: email })
+  }).catch(function() {});
+}
 </script>
 
 
