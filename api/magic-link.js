@@ -6,6 +6,7 @@
 
 const SITE_URL = process.env.SITE_URL || (process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : 'https://kyno.fr');
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'colinemngl@gmail.com';
+const ALERT_EMAIL   = process.env.ALERT_EMAIL   || CONTACT_EMAIL;
 const { genererMenuFoyer } = require('./_lib/genererMenuChien');
 
 module.exports = async function handler(req, res) {
@@ -24,23 +25,38 @@ module.exports = async function handler(req, res) {
     if (action === 'consent') {
       const { cgv_version, case_cgv, case_retractation, case_newsletter, page } = req.body;
       if (!cgv_version) return res.status(400).json({ error: 'Données manquantes' });
-      await fetch(`${process.env.SUPABASE_URL}/rest/v1/consent_logs`, {
-        method: 'POST',
-        headers: {
-          'apikey': process.env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal',
-        },
-        body: JSON.stringify({
-          email:             email || null,
-          cgv_version,
-          case_cgv:          !!case_cgv,
-          case_retractation: !!case_retractation,
-          case_newsletter:   !!case_newsletter,
-          page:              page || null,
-        }),
-      });
+      let insertOk = false;
+      try {
+        const r = await fetch(`${process.env.SUPABASE_URL}/rest/v1/consent_logs`, {
+          method: 'POST',
+          headers: {
+            'apikey': process.env.SUPABASE_SERVICE_KEY,
+            'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify({
+            email:             email || null,
+            cgv_version,
+            case_cgv:          !!case_cgv,
+            case_retractation: !!case_retractation,
+            case_newsletter:   !!case_newsletter,
+            page:              page || null,
+          }),
+        });
+        if (r.ok) insertOk = true;
+      } catch (e) {}
+      if (!insertOk) {
+        await sendBrevoEmail(ALERT_EMAIL, 'Kyno Admin',
+          'ALERTE — Échec enregistrement consentement',
+          `<p><strong>L&#x2019;enregistrement dans consent_logs a échoué.</strong></p>
+           <p>Email : ${email || 'inconnu'}</p>
+           <p>Page : ${page || '?'}</p>
+           <p>CGV version : ${cgv_version || '?'}</p>
+           <p>Heure : ${new Date().toISOString()}</p>`
+        ).catch(() => {});
+        return res.status(500).json({ error: 'Échec de l\'enregistrement du consentement' });
+      }
       return res.status(200).json({ success: true });
     }
 

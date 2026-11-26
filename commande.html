@@ -6,6 +6,7 @@
 <title>Kyno+ · Place fondatrice</title>
 <link rel="icon" href="kyno-favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="charte-kyno.css">
+<script src="/vendor/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{min-height:100vh;background:var(--papier);-webkit-font-smoothing:antialiased;font-family:var(--font-texte);color:var(--aubergine);}
@@ -18,13 +19,13 @@ body{min-height:100vh;background:var(--papier);-webkit-font-smoothing:antialiase
 .cmd-prix{font-family:var(--font-titre);font-size:52px;font-weight:400;line-height:1;margin:16px 0 4px;}
 .cmd-prix small{font-size:22px;}
 .cmd-resilier{font-size:14px;color:var(--aubergine-doux);margin-bottom:28px;}
-.cmd-sep{border:none;border-top:2px solid var(--trait);margin:28px 0;}
-.cmd-section-titre{font:700 15px/1 var(--font-texte);text-transform:uppercase;letter-spacing:.06em;color:var(--canard);margin-bottom:14px;}
 .cmd-liste{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:0;padding:0;}
 .cmd-liste li{display:flex;gap:10px;font-size:15px;line-height:1.45;}
 .cmd-check{font-weight:700;color:var(--canard);flex:none;}
 .cmd-soon{display:inline-block;background:var(--moutarde-pale);border:1.5px solid var(--aubergine);border-radius:999px;font-size:11px;font-weight:700;padding:2px 8px;vertical-align:middle;margin-left:4px;}
 .cmd-card{background:#FFF;border:3px solid var(--aubergine);border-radius:24px;box-shadow:6px 6px 0 var(--aubergine);padding:28px 28px 24px;margin-top:32px;}
+.cmd-email-info{font-size:15px;margin-bottom:16px;color:var(--aubergine-doux);}
+.cmd-email-info strong{color:var(--aubergine);}
 .cmd-email-label{display:block;font:600 14px/1 var(--font-texte);margin-bottom:8px;}
 .cmd-email{display:block;width:100%;padding:12px 16px;border:2px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:15px;color:var(--aubergine);background:var(--blanc);box-sizing:border-box;outline:none;margin-bottom:16px;}
 .cmd-email:focus{border-width:3px;}
@@ -37,7 +38,11 @@ body{min-height:100vh;background:var(--papier);-webkit-font-smoothing:antialiase
 .cmd-btn{display:block;width:100%;padding:17px 24px;background:var(--moutarde);border:3px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:17px;font-weight:700;color:var(--aubergine);cursor:pointer;text-align:center;transition:background .15s;}
 .cmd-btn:hover{background:#E5A51F;}
 .cmd-btn:disabled{background:var(--trait);color:var(--aubergine-doux);border-color:var(--trait);cursor:not-allowed;}
+.cmd-btn-sec{display:block;width:100%;padding:14px 24px;background:var(--blanc);border:2px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:16px;font-weight:700;color:var(--aubergine);cursor:pointer;text-align:center;transition:background .15s;margin-top:12px;}
+.cmd-btn-sec:hover{background:var(--moutarde-pale);}
 .cmd-mention{font-size:12px;color:var(--aubergine-doux);text-align:center;margin-top:12px;line-height:1.5;}
+.cmd-login-sent{background:var(--turquoise-pale);border:2px solid var(--canard);border-radius:16px;padding:20px;margin-top:16px;font-size:15px;line-height:1.6;display:none;}
+.cmd-spinner{display:none;text-align:center;padding:40px 0;font-size:15px;color:var(--aubergine-doux);}
 @media(max-width:600px){
   .nav-top{padding:16px 20px;}
   .cmd-wrap{margin:32px auto 60px;padding:0 16px;}
@@ -69,10 +74,12 @@ body{min-height:100vh;background:var(--papier);-webkit-font-smoothing:antialiase
     <li><span class="cmd-check">&#10003;</span><span>Suivi sant&eacute; renforc&eacute; : courbe de poids, rapport pour le v&eacute;t&eacute;rinaire <span class="cmd-soon">Bient&ocirc;t disponible</span></span></li>
   </ul>
 
-  <div class="cmd-card">
-    <label class="cmd-email-label" for="cmdEmail">Ton adresse email</label>
-    <input type="email" id="cmdEmail" class="cmd-email" placeholder="ton@email.com" autocomplete="email">
+  <!-- État : chargement session -->
+  <div class="cmd-spinner" id="cmdSpinner">V&eacute;rification de ta connexion&hellip;</div>
 
+  <!-- État A : connecté → formulaire de commande -->
+  <div class="cmd-card" id="cmdCheckout" style="display:none">
+    <p class="cmd-email-info">Commande pour&nbsp;: <strong id="cmdEmailDisplay"></strong></p>
     <div class="cmd-cases">
       <label class="cmd-case">
         <input type="checkbox" id="cgv-cmd">
@@ -83,10 +90,21 @@ body{min-height:100vh;background:var(--papier);-webkit-font-smoothing:antialiase
         <span>Je demande &agrave; acc&eacute;der au Service d&egrave;s maintenant, avant la fin du d&eacute;lai de r&eacute;tractation de 14&nbsp;jours. Je reconnais que, si je me r&eacute;tracte, je paierai un montant proportionnel au service fourni jusqu&#x2019;&agrave; ma r&eacute;tractation, et que je perds mon droit de r&eacute;tractation une fois le service pleinement ex&eacute;cut&eacute;.</span>
       </label>
     </div>
-
-    <div class="cmd-err" id="cmdErr">Merci de saisir ton email et de cocher les deux cases pour continuer.</div>
+    <div class="cmd-err" id="cmdErr">Merci de cocher les deux cases pour continuer.</div>
     <button class="cmd-btn" id="cmdBtn" onclick="validerCommande()">Commande avec obligation de paiement</button>
     <p class="cmd-mention">Paiement s&eacute;curis&eacute; par Stripe. Tu seras redirig&eacute;(e) vers la page de paiement.</p>
+  </div>
+
+  <!-- État B : non connecté → envoyer lien de connexion -->
+  <div class="cmd-card" id="cmdLogin" style="display:none">
+    <p style="font-size:15px;line-height:1.6;margin-bottom:16px;">Tu dois &ecirc;tre connect&eacute;(e) pour finaliser ta commande. Saisis ton adresse email : on t&#x2019;envoie un lien pour revenir ici en un clic.</p>
+    <label class="cmd-email-label" for="loginEmail">Ton adresse email</label>
+    <input type="email" id="loginEmail" class="cmd-email" placeholder="ton@email.com" autocomplete="email">
+    <div class="cmd-err" id="loginErr">Merci de saisir une adresse email valide.</div>
+    <button class="cmd-btn" id="loginBtn" onclick="envoyerLienConnexion()">Recevoir mon lien de connexion</button>
+    <div class="cmd-login-sent" id="loginSent">
+      <strong>Lien envoy&eacute; !</strong> Ouvre l&#x2019;email qu&#x2019;on vient de t&#x2019;envoyer et clique sur le lien — tu reviendras ici directement pour finaliser ta commande. V&eacute;rifie tes spams si besoin.
+    </div>
   </div>
 
 </main>
@@ -94,35 +112,68 @@ body{min-height:100vh;background:var(--papier);-webkit-font-smoothing:antialiase
 <footer class="ky-pied"><p>Kyno est &eacute;dit&eacute; par Elycoop, coop&eacute;rative d&apos;activit&eacute; et d&apos;emploi. &mdash; <a href="cgv.html">CGV</a> &middot; <a href="confidentialite.html">Politique de confidentialit&eacute;</a> &middot; Contact&nbsp;: <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a></p></footer>
 
 <script>
-var VERSION_CGV = '3 novembre 2026';
+var VERSION_CGV = '26 novembre 2026';
+var SUPABASE_URL  = 'https://peexewhsnewjkpyhzuen.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_diGOGSUwIR3dHuLUcsni0g_XbfDdbo9';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var _userEmail = null;
 
-// Pré-remplir l'email depuis ?email= (lien rapport) ou session Supabase
-(function() {
-  var emailParam = new URLSearchParams(window.location.search).get('email');
-  if (emailParam) document.getElementById('cmdEmail').value = decodeURIComponent(emailParam);
+document.getElementById('cmdSpinner').style.display = 'block';
+
+(async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  document.getElementById('cmdSpinner').style.display = 'none';
+  if (session && session.user && session.user.email) {
+    _userEmail = session.user.email;
+    document.getElementById('cmdEmailDisplay').textContent = _userEmail;
+    document.getElementById('cmdCheckout').style.display = 'block';
+  } else {
+    document.getElementById('cmdLogin').style.display = 'block';
+  }
 })();
 
+async function envoyerLienConnexion() {
+  var email = document.getElementById('loginEmail').value.trim();
+  var errEl = document.getElementById('loginErr');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  document.getElementById('loginBtn').disabled = true;
+  document.getElementById('loginBtn').textContent = 'Envoi en cours…';
+  var redirectTo = window.location.origin + '/commande.html';
+  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } });
+  document.getElementById('loginBtn').disabled = false;
+  document.getElementById('loginBtn').textContent = 'Recevoir mon lien de connexion';
+  if (error) {
+    errEl.textContent = 'Erreur lors de l’envoi. Réessaie dans quelques instants.';
+    errEl.style.display = 'block';
+  } else {
+    document.getElementById('loginSent').style.display = 'block';
+  }
+}
+
 async function validerCommande() {
-  var email = document.getElementById('cmdEmail').value.trim();
-  var cgv   = document.getElementById('cgv-cmd').checked;
+  var cgv    = document.getElementById('cgv-cmd').checked;
   var retract = document.getElementById('retract-cmd').checked;
-  var err   = document.getElementById('cmdErr');
-  var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  if (!emailOk || !cgv || !retract) {
+  var err    = document.getElementById('cmdErr');
+  if (!cgv || !retract) {
     err.style.display = 'block';
     return;
   }
   err.style.display = 'none';
-  document.getElementById('cmdBtn').disabled = true;
-  document.getElementById('cmdBtn').textContent = 'Redirection en cours…';
+  var btn = document.getElementById('cmdBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enregistrement…';
 
   try {
-    await fetch('/api/magic-link', {
+    const r = await fetch('/api/magic-link', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         action: 'consent',
-        email: email,
+        email: _userEmail,
         cgv_version: VERSION_CGV,
         case_cgv: true,
         case_retractation: true,
@@ -130,16 +181,23 @@ async function validerCommande() {
         page: 'commande'
       })
     });
-  } catch(e) {}
+    if (!r.ok) throw new Error('consent-failed');
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Commande avec obligation de paiement';
+    err.textContent = 'Enregistrement du consentement échoué. Réessaie ou contacte-nous à bonjour@monkyno.fr.';
+    err.style.display = 'block';
+    return;
+  }
 
   // TODO Coline : remplacer STRIPE_URL par le vrai lien Stripe checkout
   var STRIPE_URL = null;
   if (STRIPE_URL) {
-    window.location.href = STRIPE_URL + '?prefilled_email=' + encodeURIComponent(email);
+    window.location.href = STRIPE_URL + '?prefilled_email=' + encodeURIComponent(_userEmail);
   } else {
-    document.getElementById('cmdBtn').disabled = false;
-    document.getElementById('cmdBtn').textContent = 'Commande avec obligation de paiement';
-    err.textContent = 'Le lien de paiement n’est pas encore disponible. Reviens très bientôt !';
+    btn.disabled = false;
+    btn.textContent = 'Commande avec obligation de paiement';
+    err.textContent = 'Le lien de paiement n’est pas encore disponible. Reviens très bientôt !';
     err.style.display = 'block';
   }
 }

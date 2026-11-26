@@ -2478,9 +2478,7 @@ function checkRetractationVisibility() {
     const wrap = document.getElementById('upgrade-wrap');
     const lien = document.getElementById('btn-upgrade');
     if (wrap) wrap.style.display = 'block';
-    if (lien && currentUser && currentUser.email) {
-      lien.href = 'commande.html?email=' + encodeURIComponent(currentUser.email);
-    }
+    if (lien) lien.href = 'commande.html'; // l'email est lu depuis la session Supabase
   }
 }
 function showRetractConfirm() {

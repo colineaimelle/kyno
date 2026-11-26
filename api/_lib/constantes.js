@@ -10,7 +10,7 @@ const TOLERANCE_KCAL_PCT    = 0.10; // ±10 % autour de la cible
 const SEUIL_APPORTS_MIN_PCT = 80;   // protéines, calcium, oméga-3 à ≥ 80 % de leur cible
 
 // Version des CGV acceptées (à mettre à jour à chaque nouvelle version)
-const VERSION_CGV = '3 novembre 2026';
+const VERSION_CGV = '26 novembre 2026';
 
 // Limites de messages de l'assistant, par chien et par jour (réinitialisées à minuit heure de Paris)
 const MSG_LIMIT_PREMIERS_JOURS = 20; // pendant les DUREE premiers jours d'abonnement (toutes formules)

@@ -366,7 +366,7 @@ body{
 
   if (email) {
     document.getElementById('stepEmail').textContent = email;
-    document.getElementById('lienCommande').href = 'commande.html?email=' + encodeURIComponent(email);
+    // lienCommande pointe déjà sur commande.html, l'email est lu depuis la session
   } else {
     document.getElementById('accessBtn').disabled = true;
   }

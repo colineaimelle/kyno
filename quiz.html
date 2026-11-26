@@ -1580,6 +1580,30 @@ async function submitQuiz() {
   document.getElementById('loadingScreen').style.display = 'block';
   window.scrollTo({top:0,behavior:'smooth'});
 
+  // Étape 1 : enregistrer le consentement AVANT de générer (preuve juridique)
+  try {
+    const consentRes = await fetch('/api/magic-link', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        action: 'consent',
+        email: quizData.email,
+        cgv_version: '26 novembre 2026',
+        case_cgv: true,
+        case_newsletter: !!(document.getElementById('newsletter-quiz')?.checked),
+        case_retractation: false,
+        page: 'quiz'
+      })
+    });
+    if (!consentRes.ok) throw new Error('consent-failed');
+  } catch (consentErr) {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('quizWrap').style.display = 'block';
+    document.getElementById('errorMsg').textContent = 'L\'enregistrement du consentement a échoué. Réessaie dans quelques secondes ou contacte-nous à bonjour@monkyno.fr.';
+    return;
+  }
+
+  // Étape 2 : générer le rapport
   var successShown = false;
   var startTime = Date.now();
 
@@ -1606,20 +1630,6 @@ async function submitQuiz() {
     }
     const result = await res.json();
     if (result.success) {
-      // Log consentement CGV + newsletter (fire and forget)
-      fetch('/api/magic-link', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          action: 'consent',
-          email: quizData.email,
-          cgv_version: '3 novembre 2026',
-          case_cgv: true,
-          case_newsletter: !!(document.getElementById('newsletter-quiz')?.checked),
-          case_retractation: false,
-          page: 'quiz'
-        })
-      }).catch(function(){});
       // Attendre au moins 1 boucle vidéo (≈ 5 s) avant d'afficher « en route »
       clearTimeout(maxTimer);
       var elapsed = Date.now() - startTime;
