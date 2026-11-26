@@ -125,3 +125,9 @@ body{font-family:var(--font-texte);color:var(--aubergine);background:var(--papie
 .ky-bulle svg{position:absolute;inset:0;width:100%;height:100%}
 .ky-bulle path{fill:var(--papier);stroke:var(--aubergine);stroke-width:5;stroke-linejoin:round}
 .ky-bulle p{position:absolute;left:0;right:0;top:38px;margin:0;text-align:center;font-family:var(--font-titre);font-size:40px;line-height:1.05;color:var(--aubergine)}
+
+/* Pied de page légal commun (§6) */
+.ky-pied{background:var(--aubergine);padding:18px 32px;text-align:center;}
+.ky-pied p{font-family:var(--font-texte),sans-serif;font-size:13px;color:#E8DCC6;margin:0;line-height:1.6;}
+.ky-pied a{color:#DDF3F1;text-decoration:none;}
+.ky-pied a:hover{text-decoration:underline;}
