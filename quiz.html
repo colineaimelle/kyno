@@ -2,13 +2,9 @@
 <html lang="fr"><head>
 <meta charset="UTF-8">
 <link rel="icon" href="kyno-favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="charte-kyno.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Kyno : Créer le profil de mon chien</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <style>/* cyrillic-ext */
 
 /* cyrillic */
@@ -1164,6 +1160,7 @@ answers.jourEnvoi = 1;
 let current = 1;
 const total = 22;
 const IS_AJOUT = new URLSearchParams(window.location.search).has('ajout');
+const SOURCE_VISITE = (new URLSearchParams(window.location.search).get('source') || '').slice(0, 50);
 // Préfill depuis le hero (case papier)
 (function(){
   var prenom = sessionStorage.getItem('kyno_prenom');
@@ -1551,6 +1548,7 @@ async function submitQuiz() {
     email:         answers.q21 || '',
     jourEnvoi:     answers.jourEnvoi || 1,
     plan:          'beta',
+    source:        SOURCE_VISITE || null,
   };
   _lastQuizData = quizData;
 

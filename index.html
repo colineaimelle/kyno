@@ -2,8 +2,6 @@
 <html lang="fr"><head>
 <meta charset="UTF-8">
 <link rel="icon" href="kyno-favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="charte-kyno.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kyno : Nutrition Canine Individualisée</title>
@@ -13,8 +11,6 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://kyno.fr">
 <meta property="og:image" content="https://kyno.fr/og-image.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <style>/* cyrillic-ext */
 
 /* cyrillic */
@@ -1408,6 +1404,16 @@ document.querySelectorAll('#navLinks a').forEach(function(a){
 });
 </script>
 <script>
+// Propagation de ?source= de page en page — sans cookie ni localStorage (§5)
+(function() {
+  var src = new URLSearchParams(window.location.search).get('source');
+  if (!src) return;
+  window._kynoSource = src.slice(0, 50);
+  document.querySelectorAll('a[href^="quiz.html"]').forEach(function(a) {
+    a.href = 'quiz.html?source=' + encodeURIComponent(window._kynoSource);
+  });
+})();
+
 var VERSION_CGV_FRONT = '3 novembre 2026';
 function commanderPlan(planId) {
   var emailEl   = document.getElementById('email-'   + planId);
@@ -1431,8 +1437,10 @@ function commanderPlan(planId) {
       page: 'index.html'
     })
   }).catch(function() {});
-  // TODO Coline : remplacer quiz.html par le lien Stripe une fois disponible
-  window.location.href = 'quiz.html';
+  // TODO Coline : remplacer par le lien Stripe une fois disponible
+  var dest = 'quiz.html';
+  if (window._kynoSource) dest += '?source=' + encodeURIComponent(window._kynoSource);
+  window.location.href = dest;
 }
 </script>
 </body></html>
