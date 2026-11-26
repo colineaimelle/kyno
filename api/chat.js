@@ -5,6 +5,12 @@
 
 const { getSaison, buildEmailMenuHtml } = require('./_lib/menuGen');
 const { genererMenuFoyer }             = require('./_lib/genererMenuChien');
+const {
+  MSG_LIMIT_PREMIERS_JOURS,
+  MSG_LIMIT_KYNO,
+  MSG_LIMIT_KYNO_PLUS,
+  MSG_LIMIT_DUREE_JOURS,
+} = require('./_lib/constantes');
 
 module.exports = async function handler(req, res) {
 
@@ -39,9 +45,26 @@ module.exports = async function handler(req, res) {
     }
     if (!chienId) return res.status(400).json({ error: 'chien_id manquant' });
 
-    // ── Vérification d'appartenance du chien ────────────────────────────────
-    const owned = await verifyChienOwnership(chienId, authedEmail);
-    if (!owned) return res.status(403).json({ error: 'Accès interdit à ce chien' });
+    // ── Vérification d'appartenance + données limite ────────────────────────
+    const [chienData, userFormule] = await Promise.all([
+      getChienIfOwned(chienId, authedEmail),
+      getUserFormule(authedEmail),
+    ]);
+    if (!chienData) return res.status(403).json({ error: 'Accès interdit à ce chien' });
+
+    // ── Limite de messages par chien par jour (minuit heure de Paris) ────────
+    const today     = todayParis();
+    const msgCount  = chienData.msg_count_date === today ? (chienData.msg_count || 0) : 0;
+    const limite    = computeLimit(userFormule.formule, userFormule.subscription_started_at);
+    const prenomChien = chienData.prenom_chien || 'ton chien';
+    if (msgCount >= limite) {
+      return res.status(200).json({
+        success: true,
+        reply: `Tu as posé tes ${limite} questions du jour pour ${prenomChien}. On se retrouve demain !`,
+        menuGenere: false,
+        limitAtteinte: true,
+      });
+    }
 
     // ── Contexte chat ────────────────────────────────────────────────────────
     const saison = getSaison();
@@ -250,6 +273,9 @@ FORMAT DU TEXTE dans le champ "reply" : pas d'emoji, pas de tiret cadratin, pas 
       }
     }
 
+    // ── Incrémenter le compteur de messages du jour ─────────────────────────
+    await patchChien(chienId, { msg_count: msgCount + 1, msg_count_date: today });
+
     return res.status(200).json({ success: true, reply, menuGenere, updatedFields, patchedUpdates });
 
   } catch (error) {
@@ -271,14 +297,38 @@ function getEmailFromJwt(authHeader) {
   }
 }
 
-async function verifyChienOwnership(chienId, email) {
+// Vérifie l'appartenance et renvoie la ligne du chien (avec les champs de limite),
+// ou null si le chien n'appartient pas à cet email.
+async function getChienIfOwned(chienId, email) {
   const res = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/chien?id=eq.${encodeURIComponent(chienId)}&user_email=eq.${encodeURIComponent(email)}&select=id&limit=1`,
+    `${process.env.SUPABASE_URL}/rest/v1/chien?id=eq.${encodeURIComponent(chienId)}&user_email=eq.${encodeURIComponent(email)}&select=id,prenom_chien,msg_count,msg_count_date&limit=1`,
     { headers: supabaseHeaders() }
   );
-  if (!res.ok) return false;
+  if (!res.ok) return null;
   const rows = await res.json().catch(() => []);
-  return rows.length > 0;
+  return rows.length > 0 ? rows[0] : null;
+}
+
+async function getUserFormule(email) {
+  const res = await fetch(
+    `${process.env.SUPABASE_URL}/rest/v1/user?email=eq.${encodeURIComponent(email)}&select=formule,subscription_started_at&limit=1`,
+    { headers: supabaseHeaders() }
+  );
+  if (!res.ok) return {};
+  const rows = await res.json().catch(() => []);
+  return rows[0] || {};
+}
+
+function todayParis() {
+  // sv-SE produit YYYY-MM-DD, qui correspond au format date de Supabase
+  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
+}
+
+function computeLimit(formule, subscriptionStartedAt) {
+  if (!subscriptionStartedAt) return MSG_LIMIT_KYNO;
+  const daysSince = (Date.now() - new Date(subscriptionStartedAt).getTime()) / 86400000;
+  if (daysSince <= MSG_LIMIT_DUREE_JOURS) return MSG_LIMIT_PREMIERS_JOURS;
+  return formule === 'kyno_plus' ? MSG_LIMIT_KYNO_PLUS : MSG_LIMIT_KYNO;
 }
 
 // ── HELPERS SUPABASE ──────────────────────────────────────────
