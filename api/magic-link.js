@@ -22,7 +22,7 @@ module.exports = async function handler(req, res) {
 
     // ── Enregistrement du consentement commande (§3) ─────────────────────────
     if (action === 'consent') {
-      const { cgv_version, case_cgv, case_retractation, page } = req.body;
+      const { cgv_version, case_cgv, case_retractation, case_newsletter, page } = req.body;
       if (!cgv_version) return res.status(400).json({ error: 'Données manquantes' });
       await fetch(`${process.env.SUPABASE_URL}/rest/v1/consent_logs`, {
         method: 'POST',
@@ -37,6 +37,7 @@ module.exports = async function handler(req, res) {
           cgv_version,
           case_cgv:          !!case_cgv,
           case_retractation: !!case_retractation,
+          case_newsletter:   !!case_newsletter,
           page:              page || null,
         }),
       });

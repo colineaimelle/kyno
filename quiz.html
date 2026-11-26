@@ -317,6 +317,11 @@ textarea{resize:vertical;min-height:100px;}
   .loading-video-case{min-height:220px;}
   .success-actions{flex-direction:column;}
 }
+.quiz-consent{display:flex;flex-direction:column;gap:10px;margin:12px 0 4px;}
+.quiz-consent-case{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:14px;line-height:1.5;color:var(--aubergine);}
+.quiz-consent-case input[type=checkbox]{flex:none;width:17px;height:17px;margin-top:2px;cursor:pointer;accent-color:var(--canard);}
+.quiz-consent-case a{color:var(--canard);font-weight:600;text-decoration:underline;}
+.quiz-consent-err{font-size:13px;color:#E5432F;display:none;margin-top:2px;}
 </style>
 </head>
 <body>
@@ -947,6 +952,17 @@ textarea{resize:vertical;min-height:100px;}
           <input type="email" id="q21" placeholder="ton@email.com" inputmode="email">
         </div>
         <div class="error-msg" id="errorMsg"></div>
+        <div class="quiz-consent">
+          <label class="quiz-consent-case">
+            <input type="checkbox" id="cgv-quiz">
+            <span>J&#x2019;accepte les <a href="/cgv.html" target="_blank">Conditions g&eacute;n&eacute;rales de vente</a> et la <a href="/confidentialite.html" target="_blank">Politique de confidentialit&eacute;</a>.</span>
+          </label>
+          <label class="quiz-consent-case">
+            <input type="checkbox" id="newsletter-quiz">
+            <span>J&#x2019;accepte de recevoir des conseils et des nouvelles de Kyno par email.</span>
+          </label>
+          <div class="quiz-consent-err" id="errConsentQuiz">Merci d&#x2019;accepter les CGV pour continuer.</div>
+        </div>
         <div class="step-nav">
           <button class="btn-back" onclick="prev(22)">Retour</button>
           <button class="btn-next" id="submitBtn" onclick="submitQuiz()" style="background:var(--rouge);color:var(--papier);font-size:19px;">Recevoir son plan</button>
@@ -1502,6 +1518,13 @@ async function retrySubmit() {
 
 async function submitQuiz() {
   if (!validate(22)) return;
+  const cgvOk = document.getElementById('cgv-quiz')?.checked;
+  const errConsent = document.getElementById('errConsentQuiz');
+  if (!cgvOk) {
+    if (errConsent) errConsent.style.display = 'block';
+    return;
+  }
+  if (errConsent) errConsent.style.display = 'none';
 
   const sexeBase = answers.q5 || '';
   const castre = answers.q5b || '';
@@ -1583,6 +1606,20 @@ async function submitQuiz() {
     }
     const result = await res.json();
     if (result.success) {
+      // Log consentement CGV + newsletter (fire and forget)
+      fetch('/api/magic-link', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          action: 'consent',
+          email: quizData.email,
+          cgv_version: '3 novembre 2026',
+          case_cgv: true,
+          case_newsletter: !!(document.getElementById('newsletter-quiz')?.checked),
+          case_retractation: false,
+          page: 'quiz'
+        })
+      }).catch(function(){});
       // Attendre au moins 1 boucle vidéo (≈ 5 s) avant d'afficher « en route »
       clearTimeout(maxTimer);
       var elapsed = Date.now() - startTime;

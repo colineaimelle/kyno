@@ -325,6 +325,7 @@ body{
           <span id="accessErrorText">Une erreur est survenue. R&#233;essaie dans quelques instants.</span>
         </div>
         <p class="mention">Aucun mot de passe &#224; retenir, juste un lien de connexion s&#233;curis&#233;.</p>
+        <p class="mention" style="margin-top:16px;">Tu veux passer &agrave; Kyno+&nbsp;? <a id="lienCommande" href="commande.html" style="color:var(--canard);font-weight:600;text-decoration:underline;">D&eacute;couvrir la place fondatrice &rarr;</a></p>
       </div>
     </div>
 
@@ -365,6 +366,7 @@ body{
 
   if (email) {
     document.getElementById('stepEmail').textContent = email;
+    document.getElementById('lienCommande').href = 'commande.html?email=' + encodeURIComponent(email);
   } else {
     document.getElementById('accessBtn').disabled = true;
   }

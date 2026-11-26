@@ -702,16 +702,7 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   .s-cta-xpl{display:block;width:90px;height:90px;left:50%;right:auto;top:auto;bottom:130px;transform:translateX(-50%) rotate(12deg);}
   .s-cta-xpl p{top:22px;font-size:16px;}
 }
-/* Consentement commande (§3) */
-.tarif-consent{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
-.tarif-consent-email{display:block;width:100%;padding:11px 14px;border:2px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:15px;color:var(--aubergine);background:var(--blanc);box-sizing:border-box;outline:none;}
-.tarif-consent-email:focus{border-width:3px;}
-.tarif-consent-email::placeholder{color:var(--aubergine-doux);}
-.tarif-consent-case{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:13.5px;line-height:1.5;color:var(--aubergine);}
-.tarif-consent-case input[type=checkbox]{flex:none;width:16px;height:16px;margin-top:2px;cursor:pointer;accent-color:var(--canard);}
-.tarif-consent-case a{color:var(--canard);font-weight:600;}
-.tarif-consent-err{font-size:13px;color:#E5432F;display:none;margin-top:2px;}
-button.tarif-btn{cursor:pointer;width:100%;appearance:none;-webkit-appearance:none;}
+.tarif-btn-sub{display:block;font-size:13px;color:var(--aubergine-doux);margin-top:5px;line-height:1.4;}
 </style>
 </head>
 <body>
@@ -1024,19 +1015,8 @@ button.tarif-btn{cursor:pointer;width:100%;appearance:none;-webkit-appearance:no
         <li><span class="tl-check">&#10003;</span><span>Chat IA pour les adaptations au quotidien</span></li>
       </ul>
       <p class="tarif-note tarif-note-doux">Chien supplémentaire : +6 &#x20AC;/mois. Menus distincts, une seule liste de courses.</p>
-      <div class="tarif-consent" id="consent-kyno">
-        <input type="email" class="tarif-consent-email" id="email-kyno" placeholder="Ton adresse email" autocomplete="email">
-        <label class="tarif-consent-case">
-          <input type="checkbox" id="cgv-kyno">
-          <span>J&#x2019;ai lu et j&#x2019;accepte les <a href="cgv.html" target="_blank">Conditions g&eacute;n&eacute;rales de vente</a> et la <a href="confidentialite.html" target="_blank">Politique de confidentialit&eacute;</a>.</span>
-        </label>
-        <label class="tarif-consent-case">
-          <input type="checkbox" id="retract-kyno">
-          <span>Je demande &agrave; acc&eacute;der au Service d&egrave;s maintenant, avant la fin du d&eacute;lai de r&eacute;tractation de 14&nbsp;jours. Je reconnais que, si je me r&eacute;tracte, je paierai un montant correspondant au service fourni jusqu&#x2019;&agrave; ma r&eacute;tractation, proportionn&eacute; au prix total de l&#x2019;abonnement, et que je perds mon droit de r&eacute;tractation une fois le service pleinement ex&eacute;cut&eacute;.</span>
-        </label>
-        <div class="tarif-consent-err" id="err-kyno">Veuillez saisir votre email et cocher les deux cases pour continuer.</div>
-        <button class="tarif-btn" onclick="commanderPlan('kyno')">Commande avec obligation de paiement</button>
-      </div>
+      <a href="quiz.html" class="tarif-btn">Faire le bilan gratuit de mon chien</a>
+      <span class="tarif-btn-sub">21 questions, rapport envoy&eacute; par email</span>
     </div>
     <!-- Kyno+ -->
     <div class="tarif-card tarif-card-forte">
@@ -1054,19 +1034,8 @@ button.tarif-btn{cursor:pointer;width:100%;appearance:none;-webkit-appearance:no
         <li><span class="tl-check">&#10003;</span><span>Suivi santé renforcé : courbe de poids, rapport pour le vétérinaire <span class="ky-pastille ky-pastille-sm">Bientôt disponible</span></span></li>
       </ul>
       <p class="tarif-note">Chien supplémentaire : +10,50 &#x20AC;/mois ou +90 &#x20AC;/an.</p>
-      <div class="tarif-consent" id="consent-kynoplus">
-        <input type="email" class="tarif-consent-email" id="email-kynoplus" placeholder="Ton adresse email" autocomplete="email">
-        <label class="tarif-consent-case">
-          <input type="checkbox" id="cgv-kynoplus">
-          <span>J&#x2019;ai lu et j&#x2019;accepte les <a href="cgv.html" target="_blank">Conditions g&eacute;n&eacute;rales de vente</a> et la <a href="confidentialite.html" target="_blank">Politique de confidentialit&eacute;</a>.</span>
-        </label>
-        <label class="tarif-consent-case">
-          <input type="checkbox" id="retract-kynoplus">
-          <span>Je demande &agrave; acc&eacute;der au Service d&egrave;s maintenant, avant la fin du d&eacute;lai de r&eacute;tractation de 14&nbsp;jours. Je reconnais que, si je me r&eacute;tracte, je paierai un montant correspondant au service fourni jusqu&#x2019;&agrave; ma r&eacute;tractation, proportionn&eacute; au prix total de l&#x2019;abonnement, et que je perds mon droit de r&eacute;tractation une fois le service pleinement ex&eacute;cut&eacute;.</span>
-        </label>
-        <div class="tarif-consent-err" id="err-kynoplus">Veuillez saisir votre email et cocher les deux cases pour continuer.</div>
-        <button class="tarif-btn" onclick="commanderPlan('kynoplus')">Commande avec obligation de paiement</button>
-      </div>
+      <a href="quiz.html" class="tarif-btn">Faire le bilan gratuit de mon chien</a>
+      <span class="tarif-btn-sub">21 questions, rapport envoy&eacute; par email</span>
     </div>
   </div>
   <!-- Places fondatrices -->
@@ -1412,33 +1381,5 @@ document.querySelectorAll('#navLinks a').forEach(function(a){
   });
 })();
 
-var VERSION_CGV_FRONT = '3 novembre 2026';
-function commanderPlan(planId) {
-  var emailEl   = document.getElementById('email-'   + planId);
-  var cgvEl     = document.getElementById('cgv-'     + planId);
-  var retractEl = document.getElementById('retract-' + planId);
-  var errEl     = document.getElementById('err-'     + planId);
-  var email     = emailEl ? emailEl.value.trim() : '';
-  var emailOk   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  if (!emailOk || !cgvEl.checked || !retractEl.checked) {
-    errEl.style.display = 'block';
-    return;
-  }
-  errEl.style.display = 'none';
-  fetch('/api/magic-link', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      action: 'consent', email: email,
-      cgv_version: VERSION_CGV_FRONT,
-      case_cgv: true, case_retractation: true,
-      page: 'index.html'
-    })
-  }).catch(function() {});
-  // TODO Coline : remplacer par le lien Stripe une fois disponible
-  var dest = 'quiz.html';
-  if (window._kynoSource) dest += '?source=' + encodeURIComponent(window._kynoSource);
-  window.location.href = dest;
-}
 </script>
 </body></html>

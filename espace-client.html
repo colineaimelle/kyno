@@ -1008,6 +1008,10 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
         <p class="kp-abo-note">Tarif garanti tant que ton abonnement reste actif.</p>
       </div>
       <div class="abo-actions">
+        <!-- Upgrade Kyno+ : visible uniquement si pas encore abonné Kyno+ -->
+        <div id="upgrade-wrap" style="display:none">
+          <a id="btn-upgrade" href="commande.html" class="btn-retractation" style="text-decoration:none;display:inline-block;background:var(--moutarde);color:var(--aubergine);border-color:var(--aubergine);">Passer &agrave; Kyno+ &rarr;</a>
+        </div>
         <!-- Rétractation : visible uniquement pendant 14 jours après l'abonnement -->
         <div id="retractation-wrap" style="display:none">
           <button class="btn-retractation" id="btn-retractation" onclick="showRetractConfirm()">Renoncer au contrat ici</button>
@@ -2468,6 +2472,15 @@ function checkRetractationVisibility() {
   if (!foyer || !foyer.subscription_started_at) return;
   if (daysSince(foyer.subscription_started_at) <= 14) {
     document.getElementById('retractation-wrap').style.display = 'block';
+  }
+  const formule = foyer.formule || '';
+  if (formule !== 'kyno_plus') {
+    const wrap = document.getElementById('upgrade-wrap');
+    const lien = document.getElementById('btn-upgrade');
+    if (wrap) wrap.style.display = 'block';
+    if (lien && currentUser && currentUser.email) {
+      lien.href = 'commande.html?email=' + encodeURIComponent(currentUser.email);
+    }
   }
 }
 function showRetractConfirm() {
