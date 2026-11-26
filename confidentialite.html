@@ -12,24 +12,292 @@ body{min-height:100vh;background:var(--papier);-webkit-font-smoothing:antialiase
 .nav-top{padding:22px 48px;border-bottom:3px solid var(--trait);}
 .nav-logo{display:inline-block;text-decoration:none;}
 .nav-logo img{height:38px;width:auto;}
-.page-wrap{max-width:720px;margin:52px auto 80px;padding:0 24px;}
-.page-titre{font-family:var(--font-titre);font-size:40px;font-weight:400;line-height:1.1;margin-bottom:8px;}
-.page-date{font-size:14px;color:var(--aubergine-doux);margin-bottom:40px;}
-.page-corps p{font-size:16px;line-height:1.75;color:var(--aubergine-doux);}
-@media(max-width:600px){.nav-top{padding:16px 20px;}.page-wrap{margin:32px auto 60px;padding:0 16px;}.page-titre{font-size:30px;}}
+.page-wrap{max-width:740px;margin:52px auto 100px;padding:0 24px;}
+.page-titre{font-family:var(--font-titre);font-size:38px;font-weight:400;line-height:1.1;margin-bottom:6px;}
+.page-version{font-size:14px;color:var(--aubergine-doux);margin-bottom:36px;}
+.sommaire{background:#FFF;border:2px solid var(--trait);border-radius:16px;padding:20px 24px;margin-bottom:48px;}
+.sommaire-titre{font:700 13px/1 var(--font-texte);text-transform:uppercase;letter-spacing:.06em;color:var(--canard);margin-bottom:12px;}
+.sommaire ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;}
+.sommaire li{font-size:14px;line-height:1.5;}
+.sommaire a{color:var(--aubergine);text-decoration:none;}
+.sommaire a:hover{text-decoration:underline;color:var(--canard);}
+.corps{display:flex;flex-direction:column;gap:36px;}
+.section{scroll-margin-top:24px;}
+.section h2{font-family:var(--font-titre);font-size:22px;font-weight:400;line-height:1.2;margin-bottom:12px;color:var(--aubergine);}
+.section p{font-size:15px;line-height:1.75;color:var(--aubergine);margin-bottom:10px;}
+.section p:last-child{margin-bottom:0;}
+.section ul{margin:8px 0 10px 20px;display:flex;flex-direction:column;gap:6px;}
+.section li{font-size:15px;line-height:1.6;}
+.section strong{font-weight:700;}
+.section em{font-style:italic;}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:12px 0;}
+.table-wrap table{border-collapse:collapse;min-width:520px;width:100%;font-size:14px;line-height:1.5;}
+.table-wrap th{background:var(--aubergine);color:#FFF4E0;font-weight:700;padding:10px 14px;text-align:left;border:2px solid var(--aubergine);}
+.table-wrap td{padding:10px 14px;border:2px solid var(--trait);vertical-align:top;background:#FFF;}
+.table-wrap tr:nth-child(even) td{background:#FAFAFA;}
+.note-dpo{background:var(--moutarde-pale);border:2px solid var(--moutarde);border-radius:12px;padding:12px 16px;font-size:14px;line-height:1.5;margin:10px 0;font-style:italic;}
+@media(max-width:600px){
+  .nav-top{padding:16px 20px;}
+  .page-wrap{margin:32px auto 72px;padding:0 16px;}
+  .page-titre{font-size:28px;}
+}
 </style>
 </head>
 <body>
 <nav class="nav-top">
   <a href="index.html" class="nav-logo"><img src="kyno-logo.svg" alt="Kyno"></a>
 </nav>
+
 <main class="page-wrap">
   <h1 class="page-titre">Politique de confidentialit&eacute;</h1>
-  <p class="page-date">Derni&egrave;re mise &agrave; jour : 3 novembre 2026</p>
-  <div class="page-corps">
-    <p>Le texte d&eacute;finitif de la politique de confidentialit&eacute; sera ajout&eacute; prochainement.</p>
+  <p class="page-version">Version du 26 novembre 2026</p>
+
+  <nav class="sommaire" aria-label="Sommaire">
+    <p class="sommaire-titre">Sommaire</p>
+    <ol>
+      <li><a href="#s1">1. Qui traite vos donn&eacute;es</a></li>
+      <li><a href="#s2">2. Donn&eacute;es collect&eacute;es, finalit&eacute;s et bases l&eacute;gales</a></li>
+      <li><a href="#s3">3. Intelligence artificielle et am&eacute;lioration du service</a></li>
+      <li><a href="#s4">4. Destinataires, sous-traitants et transferts hors UE</a></li>
+      <li><a href="#s5">5. Dur&eacute;es de conservation</a></li>
+      <li><a href="#s6">6. Vos droits</a></li>
+      <li><a href="#s7">7. S&eacute;curit&eacute;</a></li>
+      <li><a href="#s8">8. Cookies</a></li>
+      <li><a href="#s9">9. Modification de cette politique</a></li>
+    </ol>
+  </nav>
+
+  <div class="corps">
+
+    <section class="section" id="s1">
+      <h2>1. Qui traite vos donn&eacute;es</h2>
+      <p>Le responsable du traitement de vos donn&eacute;es est Elycoop, SA coop&eacute;rative &agrave; conseil d&apos;administration, SIREN 429 851 637, si&egrave;ge 26 rue &Eacute;mile Decorps, 69100 Villeurbanne, qui &eacute;dite le service Kyno pour le compte de Coline Mangel, entrepreneure salari&eacute;e de la coop&eacute;rative.</p>
+      <p>Pour toute question sur vos donn&eacute;es ou pour exercer vos droits&nbsp;: <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a>.</p>
+      <div class="note-dpo">[D&eacute;l&eacute;gu&eacute; &agrave; la protection des donn&eacute;es d&apos;Elycoop&nbsp;: nom et contact, &agrave; demander &agrave; Agn&egrave;s. Si Elycoop n&apos;en a pas d&eacute;sign&eacute;, supprimer cette ligne.]</div>
+      <p>Cette politique explique quelles donn&eacute;es Kyno collecte, pourquoi, avec qui elles sont partag&eacute;es, combien de temps elles sont conserv&eacute;es et quels sont vos droits, conform&eacute;ment au r&egrave;glement (UE) 2016/679 (RGPD) et &agrave; la loi Informatique et Libert&eacute;s.</p>
+    </section>
+
+    <section class="section" id="s2">
+      <h2>2. Donn&eacute;es collect&eacute;es, finalit&eacute;s et bases l&eacute;gales</h2>
+      <p>Kyno collecte uniquement les donn&eacute;es n&eacute;cessaires pour produire des recommandations alimentaires adapt&eacute;es &agrave; votre chien et g&eacute;rer votre abonnement.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Donn&eacute;es</th>
+              <th>Pourquoi</th>
+              <th>Base l&eacute;gale (art. 6 RGPD)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Adresse email</td>
+              <td>Envoyer le rapport gratuit, vous connecter par lien s&eacute;curis&eacute;, envoyer les menus hebdomadaires</td>
+              <td>Ex&eacute;cution du contrat (bilan gratuit ou abonnement)</td>
+            </tr>
+            <tr>
+              <td>Profil du chien&nbsp;: pr&eacute;nom, race, &acirc;ge, sexe, poids et historique de poids, activit&eacute;, environnement, allergies et intol&eacute;rances, maladies, traitements, comportement, alimentation actuelle, objectifs</td>
+              <td>Calculer ses besoins et g&eacute;n&eacute;rer le rapport et les menus</td>
+              <td>Ex&eacute;cution du contrat</td>
+            </tr>
+            <tr>
+              <td>Informations sur le foyer&nbsp;: &eacute;quipement de cuisine, temps de pr&eacute;paration, lieux de courses, jour de r&eacute;ception du menu, d&eacute;partement</td>
+              <td>Adapter les menus &agrave; votre organisation et aux produits disponibles</td>
+              <td>Ex&eacute;cution du contrat</td>
+            </tr>
+            <tr>
+              <td>Messages &eacute;chang&eacute;s avec l&apos;assistant conversationnel et observations sur l&apos;&eacute;tat du chien</td>
+              <td>R&eacute;pondre &agrave; vos questions et suivre l&apos;&eacute;volution du chien</td>
+              <td>Ex&eacute;cution du contrat</td>
+            </tr>
+            <tr>
+              <td>Formule souscrite, date de souscription, historique des paiements, factures</td>
+              <td>G&eacute;rer l&apos;abonnement et la facturation</td>
+              <td>Ex&eacute;cution du contrat&nbsp;; obligation l&eacute;gale (comptabilit&eacute;)</td>
+            </tr>
+            <tr>
+              <td>Preuve de vos acceptations&nbsp;: date, version des conditions, cases coch&eacute;es</td>
+              <td>Prouver l&apos;acceptation des conditions et de vos choix</td>
+              <td>Obligation l&eacute;gale&nbsp;; int&eacute;r&ecirc;t l&eacute;gitime d&apos;Elycoop &agrave; pouvoir en justifier</td>
+            </tr>
+            <tr>
+              <td>Donn&eacute;es de paiement (carte bancaire)</td>
+              <td>Encaisser le paiement</td>
+              <td>Collect&eacute;es directement par Stripe&nbsp;; Kyno ne les conserve pas</td>
+            </tr>
+            <tr>
+              <td>Origine de votre visite (par exemple &laquo;&nbsp;instagram&nbsp;&raquo;), seulement si le lien sur lequel vous avez cliqu&eacute; la contient</td>
+              <td>Savoir quels canaux de communication fonctionnent</td>
+              <td>Int&eacute;r&ecirc;t l&eacute;gitime d&apos;Elycoop &agrave; mesurer l&apos;efficacit&eacute; de sa communication</td>
+            </tr>
+            <tr>
+              <td>Email, si vous n&apos;&ecirc;tes pas abonn&eacute;</td>
+              <td>Vous envoyer des conseils et des nouvelles de Kyno apr&egrave;s le bilan gratuit</td>
+              <td>Consentement (case &agrave; cocher non pr&eacute;-coch&eacute;e)</td>
+            </tr>
+            <tr>
+              <td>Donn&eacute;es relatives au chien, apr&egrave;s anonymisation</td>
+              <td>Am&eacute;liorer les r&egrave;gles nutritionnelles de Kyno (voir section 3)</td>
+              <td>Int&eacute;r&ecirc;t l&eacute;gitime d&apos;Elycoop &agrave; am&eacute;liorer son service</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Les informations de sant&eacute; que vous renseignez concernent votre chien&nbsp;: il ne s&apos;agit pas de donn&eacute;es de sant&eacute; au sens du RGPD. Nous vous demandons de ne pas communiquer d&apos;informations sur vous-m&ecirc;me ou sur des tiers dans l&apos;assistant conversationnel.</p>
+      <p>Kyno ne collecte pas votre nom&nbsp;: seulement votre adresse email et le pr&eacute;nom de votre chien.</p>
+      <p>Le Service est r&eacute;serv&eacute; aux personnes majeures. Kyno ne collecte pas sciemment de donn&eacute;es concernant des mineurs.</p>
+    </section>
+
+    <section class="section" id="s3">
+      <h2>3. Intelligence artificielle et am&eacute;lioration du service</h2>
+      <p>Les rapports, menus et r&eacute;ponses de l&apos;assistant sont g&eacute;n&eacute;r&eacute;s par un mod&egrave;le d&apos;intelligence artificielle fourni par Anthropic (Claude), qui applique les r&egrave;gles nutritionnelles d&eacute;finies par Kyno.</p>
+      <ul>
+        <li><strong>Ce qui est transmis au mod&egrave;le&nbsp;:</strong> le profil du chien, les informations sur le foyer et vos messages &agrave; l&apos;assistant. Votre adresse email n&apos;est jamais transmise.</li>
+        <li><strong>Ce que le fournisseur du mod&egrave;le en fait&nbsp;:</strong> Anthropic s&apos;interdit contractuellement d&apos;utiliser ces donn&eacute;es pour entra&icirc;ner ses mod&egrave;les et les supprime dans un d&eacute;lai de 30 jours, sauf obligation l&eacute;gale ou contr&ocirc;le de s&eacute;curit&eacute; (conservation possible jusqu&apos;&agrave; 2 ans pour un contenu signal&eacute; comme contraire &agrave; ses r&egrave;gles d&apos;utilisation).</li>
+        <li><strong>D&eacute;cision automatis&eacute;e&nbsp;:</strong> les recommandations sont produites automatiquement, sans relecture humaine individuelle, et passent des contr&ocirc;les automatiques avant d&apos;&ecirc;tre affich&eacute;es ou envoy&eacute;es. Elles n&apos;emportent aucun effet juridique &agrave; votre &eacute;gard&nbsp;: vous restez libre de les suivre ou non (voir CGV, article 4).</li>
+      </ul>
+      <p><strong>Am&eacute;lioration du service.</strong> Kyno peut utiliser les donn&eacute;es relatives aux chiens, apr&egrave;s anonymisation, pour affiner ses r&egrave;gles nutritionnelles&nbsp;: par exemple, les besoins observ&eacute;s par race ou l&apos;&eacute;volution du poids selon les menus. L&apos;anonymisation supprime tout lien avec vous (email, pr&eacute;nom du chien) et ne conserve qu&apos;une zone g&eacute;ographique large (r&eacute;gion ou d&eacute;partement). Les analyses portent sur des groupes de chiens, jamais sur un chien isol&eacute;. Une fois anonymis&eacute;es, ces donn&eacute;es ne permettent plus de vous identifier et ne sont plus des donn&eacute;es personnelles.</p>
+      <p>Vous pouvez vous opposer &agrave; cette utilisation &agrave; tout moment, sans justification, en &eacute;crivant &agrave; <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a>.</p>
+    </section>
+
+    <section class="section" id="s4">
+      <h2>4. Destinataires, sous-traitants et transferts hors UE</h2>
+      <p>Vos donn&eacute;es sont accessibles uniquement &agrave; Coline Mangel, qui exploite Kyno, et aux services d&apos;Elycoop qui en ont besoin (facturation, comptabilit&eacute;). Elles ne sont jamais vendues ni c&eacute;d&eacute;es &agrave; des tiers &agrave; des fins commerciales.</p>
+      <p>Kyno fait appel aux prestataires suivants, li&eacute;s par un accord de traitement des donn&eacute;es (art. 28 RGPD)&nbsp;:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Prestataire</th>
+              <th>R&ocirc;le</th>
+              <th>Lieu de stockage</th>
+              <th>Transfert hors UE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Supabase</td>
+              <td>Base de donn&eacute;es</td>
+              <td>Irlande</td>
+              <td>Soci&eacute;t&eacute; am&eacute;ricaine&nbsp;: encadr&eacute; par les clauses contractuelles types de la Commission europ&eacute;enne</td>
+            </tr>
+            <tr>
+              <td>Vercel</td>
+              <td>H&eacute;bergement du site</td>
+              <td>Irlande (Dublin)</td>
+              <td>Soci&eacute;t&eacute; am&eacute;ricaine&nbsp;: encadr&eacute; par les clauses contractuelles types de la Commission europ&eacute;enne</td>
+            </tr>
+            <tr>
+              <td>Anthropic (Claude)</td>
+              <td>G&eacute;n&eacute;ration des recommandations par IA</td>
+              <td>&Eacute;tats-Unis</td>
+              <td>Oui&nbsp;: encadr&eacute; par les clauses contractuelles types de la Commission europ&eacute;enne</td>
+            </tr>
+            <tr>
+              <td>Brevo</td>
+              <td>Envoi des emails</td>
+              <td>France</td>
+              <td>Non</td>
+            </tr>
+            <tr>
+              <td>OVHcloud</td>
+              <td>Messagerie de contact (bonjour@monkyno.fr)</td>
+              <td>France</td>
+              <td>Non</td>
+            </tr>
+            <tr>
+              <td>Stripe</td>
+              <td>Paiement en ligne</td>
+              <td>Union europ&eacute;enne (Irlande)</td>
+              <td>Soci&eacute;t&eacute; am&eacute;ricaine&nbsp;: encadr&eacute; par les clauses contractuelles types de la Commission europ&eacute;enne</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Le site n&apos;utilise aucune ressource charg&eacute;e depuis un site tiers&nbsp;: les polices de caract&egrave;res et les biblioth&egrave;ques sont h&eacute;berg&eacute;es directement sur le site Kyno.</p>
+      <p>Vos donn&eacute;es peuvent enfin &ecirc;tre communiqu&eacute;es aux autorit&eacute;s si la loi l&apos;exige.</p>
+    </section>
+
+    <section class="section" id="s5">
+      <h2>5. Dur&eacute;es de conservation</h2>
+      <p>Kyno conserve vos donn&eacute;es le temps n&eacute;cessaire au service, puis les supprime ou les anonymise.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Donn&eacute;es</th>
+              <th>Dur&eacute;e de conservation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Compte et profil du chien (abonn&eacute;)</td>
+              <td>Pendant l&apos;abonnement, puis 3 ans apr&egrave;s la r&eacute;siliation ou votre dernier contact, avant suppression ou anonymisation</td>
+            </tr>
+            <tr>
+              <td>Bilan gratuit sans abonnement (email et profil du chien)</td>
+              <td>3 ans apr&egrave;s votre dernier contact</td>
+            </tr>
+            <tr>
+              <td>Historique de l&apos;assistant conversationnel</td>
+              <td>[Pendant l&apos;abonnement, puis supprim&eacute; &agrave; la r&eacute;siliation&nbsp;: &agrave; confirmer par Coline]</td>
+            </tr>
+            <tr>
+              <td>Factures et donn&eacute;es comptables</td>
+              <td>10 ans (obligation l&eacute;gale, art. L.123-22 du Code de commerce)</td>
+            </tr>
+            <tr>
+              <td>Preuve de vos acceptations et consentements</td>
+              <td>Pendant la dur&eacute;e de la relation, puis 5 ans</td>
+            </tr>
+            <tr>
+              <td>Donn&eacute;es transmises au mod&egrave;le d&apos;IA (chez Anthropic)</td>
+              <td>30 jours maximum, sauf exception d&eacute;crite en section 3</td>
+            </tr>
+            <tr>
+              <td>Donn&eacute;es anonymis&eacute;es</td>
+              <td>Sans limite&nbsp;: elles ne permettent plus de vous identifier</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="s6">
+      <h2>6. Vos droits</h2>
+      <p>Vous disposez &agrave; tout moment des droits suivants sur vos donn&eacute;es&nbsp;:</p>
+      <ul>
+        <li><strong>acc&egrave;s</strong>&nbsp;: savoir quelles donn&eacute;es Kyno d&eacute;tient sur vous et en obtenir une copie&nbsp;;</li>
+        <li><strong>rectification</strong>&nbsp;: corriger une donn&eacute;e inexacte (la plupart des informations du chien sont modifiables directement dans l&apos;espace client)&nbsp;;</li>
+        <li><strong>effacement</strong>&nbsp;: demander la suppression de vos donn&eacute;es&nbsp;;</li>
+        <li><strong>opposition</strong>&nbsp;: vous opposer &agrave; l&apos;utilisation de vos donn&eacute;es fond&eacute;e sur l&apos;int&eacute;r&ecirc;t l&eacute;gitime, notamment &agrave; l&apos;am&eacute;lioration du service&nbsp;;</li>
+        <li><strong>limitation</strong>&nbsp;: demander le gel temporaire de l&apos;utilisation de vos donn&eacute;es&nbsp;;</li>
+        <li><strong>portabilit&eacute;</strong>&nbsp;: r&eacute;cup&eacute;rer vos donn&eacute;es dans un format lisible par une machine&nbsp;;</li>
+        <li><strong>retrait du consentement</strong>&nbsp;: vous d&eacute;sinscrire des emails d&apos;information, via le lien pr&eacute;sent dans chaque email&nbsp;;</li>
+        <li><strong>directives post-mortem</strong>&nbsp;: d&eacute;finir le sort de vos donn&eacute;es apr&egrave;s votre d&eacute;c&egrave;s.</li>
+      </ul>
+      <p>Pour exercer ces droits, &eacute;crivez &agrave; <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a>. Kyno r&eacute;pond dans un d&eacute;lai d&apos;un mois. Une pi&egrave;ce d&apos;identit&eacute; peut vous &ecirc;tre demand&eacute;e en cas de doute sur votre identit&eacute;.</p>
+      <p>Si vous estimez que vos droits ne sont pas respect&eacute;s, vous pouvez adresser une r&eacute;clamation &agrave; la CNIL, 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07, ou sur <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener">cnil.fr/fr/plaintes</a>.</p>
+    </section>
+
+    <section class="section" id="s7">
+      <h2>7. S&eacute;curit&eacute;</h2>
+      <p>Kyno prot&egrave;ge vos donn&eacute;es par des mesures techniques adapt&eacute;es&nbsp;: connexion par lien s&eacute;curis&eacute; envoy&eacute; par email, sans mot de passe&nbsp;; chiffrement des &eacute;changes (HTTPS)&nbsp;; acc&egrave;s &agrave; la base de donn&eacute;es restreint, chaque utilisateur ne pouvant consulter que ses propres donn&eacute;es&nbsp;; double authentification sur les comptes d&apos;administration.</p>
+    </section>
+
+    <section class="section" id="s8">
+      <h2>8. Cookies</h2>
+      <p>Le site Kyno n&apos;utilise ni cookie publicitaire, ni pixel de suivi, ni outil de mesure d&apos;audience. Seuls les &eacute;l&eacute;ments techniques strictement n&eacute;cessaires au fonctionnement (maintien de votre connexion &agrave; l&apos;espace client) sont utilis&eacute;s&nbsp;; ils ne n&eacute;cessitent pas votre consentement. Si un outil de mesure d&apos;audience ou de suivi publicitaire est ajout&eacute; un jour, votre accord vous sera demand&eacute; au pr&eacute;alable et cette politique sera mise &agrave; jour.</p>
+    </section>
+
+    <section class="section" id="s9">
+      <h2>9. Modification de cette politique</h2>
+      <p>Kyno peut modifier cette politique, notamment en cas de nouveau prestataire ou de nouvelle utilisation des donn&eacute;es. Toute modification importante vous est notifi&eacute;e par email avant son entr&eacute;e en vigueur. La date de derni&egrave;re mise &agrave; jour figure en haut de cette page.</p>
+    </section>
+
   </div>
 </main>
+
 <footer class="ky-pied"><p>Kyno est &eacute;dit&eacute; par Elycoop, coop&eacute;rative d&apos;activit&eacute; et d&apos;emploi. &mdash; <a href="cgv.html">CGV</a> &middot; <a href="confidentialite.html">Politique de confidentialit&eacute;</a> &middot; Contact&nbsp;: <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a></p></footer>
 </body>
 </html>

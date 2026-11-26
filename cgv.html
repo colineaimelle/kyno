@@ -12,24 +12,219 @@ body{min-height:100vh;background:var(--papier);-webkit-font-smoothing:antialiase
 .nav-top{padding:22px 48px;border-bottom:3px solid var(--trait);}
 .nav-logo{display:inline-block;text-decoration:none;}
 .nav-logo img{height:38px;width:auto;}
-.page-wrap{max-width:720px;margin:52px auto 80px;padding:0 24px;}
-.page-titre{font-family:var(--font-titre);font-size:40px;font-weight:400;line-height:1.1;margin-bottom:8px;}
-.page-date{font-size:14px;color:var(--aubergine-doux);margin-bottom:40px;}
-.page-corps p{font-size:16px;line-height:1.75;color:var(--aubergine-doux);}
-@media(max-width:600px){.nav-top{padding:16px 20px;}.page-wrap{margin:32px auto 60px;padding:0 16px;}.page-titre{font-size:30px;}}
+.page-wrap{max-width:740px;margin:52px auto 100px;padding:0 24px;}
+.page-titre{font-family:var(--font-titre);font-size:38px;font-weight:400;line-height:1.1;margin-bottom:6px;}
+.page-version{font-size:14px;color:var(--aubergine-doux);margin-bottom:36px;}
+.sommaire{background:#FFF;border:2px solid var(--trait);border-radius:16px;padding:20px 24px;margin-bottom:48px;}
+.sommaire-titre{font:700 13px/1 var(--font-texte);text-transform:uppercase;letter-spacing:.06em;color:var(--canard);margin-bottom:12px;}
+.sommaire ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;}
+.sommaire li{font-size:14px;line-height:1.5;}
+.sommaire a{color:var(--aubergine);text-decoration:none;}
+.sommaire a:hover{text-decoration:underline;color:var(--canard);}
+.corps{display:flex;flex-direction:column;gap:36px;}
+.article{scroll-margin-top:24px;}
+.article h2{font-family:var(--font-titre);font-size:22px;font-weight:400;line-height:1.2;margin-bottom:12px;color:var(--aubergine);}
+.article p{font-size:15px;line-height:1.75;color:var(--aubergine);margin-bottom:10px;}
+.article p:last-child{margin-bottom:0;}
+.article ul,.article ol{margin:8px 0 10px 20px;display:flex;flex-direction:column;gap:6px;}
+.article li{font-size:15px;line-height:1.6;}
+.article strong{font-weight:700;}
+.article .bloc-loi{background:#FFF;border:2px solid var(--trait);border-radius:12px;padding:16px 20px;margin:12px 0;font-size:14px;line-height:1.65;font-style:italic;}
+.annexe{border-top:3px solid var(--trait);padding-top:36px;margin-top:12px;}
+.annexe h2{font-family:var(--font-titre);font-size:22px;font-weight:400;margin-bottom:12px;}
+.annexe p{font-size:15px;line-height:1.75;margin-bottom:8px;}
+@media(max-width:600px){
+  .nav-top{padding:16px 20px;}
+  .page-wrap{margin:32px auto 72px;padding:0 16px;}
+  .page-titre{font-size:28px;}
+}
 </style>
 </head>
 <body>
 <nav class="nav-top">
   <a href="index.html" class="nav-logo"><img src="kyno-logo.svg" alt="Kyno"></a>
 </nav>
+
 <main class="page-wrap">
-  <h1 class="page-titre">Conditions g&eacute;n&eacute;rales de vente</h1>
-  <p class="page-date">Derni&egrave;re mise &agrave; jour : 3 novembre 2026</p>
-  <div class="page-corps">
-    <p>Le texte d&eacute;finitif des CGV sera ajout&eacute; prochainement.</p>
+  <h1 class="page-titre">Conditions g&eacute;n&eacute;rales de vente et d&apos;utilisation de Kyno</h1>
+  <p class="page-version">Version du 26 novembre 2026</p>
+
+  <nav class="sommaire" aria-label="Sommaire">
+    <p class="sommaire-titre">Sommaire</p>
+    <ol>
+      <li><a href="#art1">Article 1 &mdash; Identit&eacute; du vendeur</a></li>
+      <li><a href="#art2">Article 2 &mdash; Objet et d&eacute;finitions</a></li>
+      <li><a href="#art3">Article 3 &mdash; Description du service</a></li>
+      <li><a href="#art4">Article 4 &mdash; Nature des informations, pas de conseil v&eacute;t&eacute;rinaire</a></li>
+      <li><a href="#art4bis">Article 4 bis &mdash; Recours &agrave; l&apos;intelligence artificielle</a></li>
+      <li><a href="#art5">Article 5 &mdash; Cr&eacute;ation de compte et acc&egrave;s</a></li>
+      <li><a href="#art6">Article 6 &mdash; Prix et TVA</a></li>
+      <li><a href="#art7">Article 7 &mdash; Bilan gratuit, commande, paiement et facturation</a></li>
+      <li><a href="#art8">Article 8 &mdash; Dur&eacute;e, renouvellement et r&eacute;siliation</a></li>
+      <li><a href="#art9">Article 9 &mdash; Droit de r&eacute;tractation</a></li>
+      <li><a href="#art10">Article 10 &mdash; Garanties l&eacute;gales et conformit&eacute;</a></li>
+      <li><a href="#art11">Article 11 &mdash; Obligations de l&apos;Utilisateur et usage du service</a></li>
+      <li><a href="#art12">Article 12 &mdash; Propri&eacute;t&eacute; intellectuelle</a></li>
+      <li><a href="#art13">Article 13 &mdash; Donn&eacute;es personnelles</a></li>
+      <li><a href="#art14">Article 14 &mdash; Responsabilit&eacute;</a></li>
+      <li><a href="#art15">Article 15 &mdash; Force majeure</a></li>
+      <li><a href="#art16">Article 16 &mdash; Modification des conditions</a></li>
+      <li><a href="#art17">Article 17 &mdash; R&eacute;clamations et m&eacute;diation</a></li>
+      <li><a href="#art18">Article 18 &mdash; Droit applicable et juridiction</a></li>
+      <li><a href="#art19">Article 19 &mdash; Dispositions g&eacute;n&eacute;rales</a></li>
+      <li><a href="#annexe">Annexe &mdash; Formulaire type de r&eacute;tractation</a></li>
+    </ol>
+  </nav>
+
+  <p style="font-size:15px;line-height:1.75;margin-bottom:48px;">Ces conditions r&eacute;gissent l&apos;utilisation du bilan gratuit et l&apos;abonnement au service Kyno entre Elycoop, SA coop&eacute;rative &agrave; conseil d&apos;administration, SIREN 429 851 637, si&egrave;ge 26 rue &Eacute;mile Decorps, 69100 Villeurbanne, repr&eacute;sent&eacute;e par Samir Blakaj, directeur g&eacute;n&eacute;ral, et tout consommateur qui les accepte.</p>
+
+  <div class="corps">
+
+    <section class="article" id="art1">
+      <h2>Article 1 &mdash; Identit&eacute; du vendeur</h2>
+      <p>Kyno est un service &eacute;dit&eacute; par Elycoop, SA coop&eacute;rative &agrave; conseil d&apos;administration &agrave; capital variable (minimum 18 500&nbsp;&euro;), SIRET 429 851 637 00034, RCS Lyon 429 851 637, TVA intracommunautaire FR63429851637, si&egrave;ge 26 rue &Eacute;mile Decorps, 69100 Villeurbanne, pour le compte de Coline Mangel, entrepreneure salari&eacute;e de la coop&eacute;rative.</p>
+      <p>Contact&nbsp;: <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a>.</p>
+      <p>Directeur de la publication&nbsp;: Samir Blakaj, directeur g&eacute;n&eacute;ral d&apos;Elycoop.</p>
+      <p>H&eacute;bergeur du site&nbsp;: Vercel Inc., 440 N Barranca Avenue #4133, Covina, CA 91723, &Eacute;tats-Unis.</p>
+    </section>
+
+    <section class="article" id="art2">
+      <h2>Article 2 &mdash; Objet et d&eacute;finitions</h2>
+      <p>Les pr&eacute;sentes conditions d&eacute;finissent les droits et obligations de Kyno et de l&apos;Utilisateur pour l&apos;acc&egrave;s au service. L&apos;Utilisateur est la personne physique majeure qui agit hors activit&eacute; professionnelle. Le Service d&eacute;signe la plateforme Kyno, qui produit pour un chien donn&eacute; des recommandations alimentaires personnalis&eacute;es. Le Chien d&eacute;signe l&apos;animal pour lequel l&apos;Utilisateur renseigne le questionnaire.</p>
+    </section>
+
+    <section class="article" id="art3">
+      <h2>Article 3 &mdash; Description du service</h2>
+      <p>Kyno aide l&apos;Utilisateur &agrave; nourrir son chien avec une alimentation maison &eacute;quilibr&eacute;e, adapt&eacute;e &agrave; ses besoins et simple &agrave; pr&eacute;parer. Sa valeur ajout&eacute;e repose sur des r&egrave;gles nutritionnelles d&eacute;finies par Kyno&nbsp;: calcul des besoins &eacute;nerg&eacute;tiques et nutritionnels du Chien selon les r&eacute;f&eacute;rences scientifiques NRC 2006 et FEDIAF 2023, &eacute;quilibre des proportions entre prot&eacute;ines, l&eacute;gumes, f&eacute;culents et compl&eacute;ments, exclusion des allerg&egrave;nes d&eacute;clar&eacute;s et de tous leurs d&eacute;riv&eacute;s. Kyno applique ces r&egrave;gles au profil de chaque Chien et les traduit en recettes, quantit&eacute;s, liste de courses et organisation de la cuisine. Avant d&apos;&ecirc;tre affich&eacute; ou envoy&eacute;, chaque menu fait l&apos;objet de contr&ocirc;les automatiques (apport calorique, pr&eacute;sence de l&apos;huile et du compl&eacute;ment min&eacute;ral et vitamin&eacute;, quantit&eacute;s coh&eacute;rentes avec le poids, absence des allerg&egrave;nes d&eacute;clar&eacute;s)&nbsp;; un menu qui ne les satisfait pas n&apos;est ni affich&eacute; ni envoy&eacute;.</p>
+      <p>Le Service est propos&eacute; en trois formules.</p>
+      <ul>
+        <li><strong>Le bilan gratuit</strong> comprend un questionnaire de 21 questions sur le chien et un rapport nutritionnel envoy&eacute; par email.</li>
+        <li><strong>L&apos;abonnement Kyno</strong> ajoute des menus hebdomadaires personnalis&eacute;s, une liste de courses, un plan de batch-cooking, un espace client o&ugrave; le profil du chien reste modifiable &agrave; tout moment, et un assistant conversationnel.</li>
+        <li><strong>L&apos;abonnement Kyno+</strong> comprend tout Kyno, avec un assistant conversationnel plus &eacute;tendu, plus des fonctions d&apos;intelligence artificielle avanc&eacute;es (menus &agrave; partir des ingr&eacute;dients disponibles, anti-gaspillage), des guides num&eacute;riques et un suivi sant&eacute; renforc&eacute; (courbe de poids, rapport &agrave; pr&eacute;senter au v&eacute;t&eacute;rinaire). Ces fonctions sont ouvertes progressivement. Celles qui ne sont pas encore disponibles sont signal&eacute;es par la mention &laquo;&nbsp;bient&ocirc;t disponible&nbsp;&raquo; sur le site, avant toute souscription, sans date de mise &agrave; disposition garantie.</li>
+      </ul>
+      <p>Un abonnement couvre un chien&nbsp;; des chiens suppl&eacute;mentaires peuvent &ecirc;tre ajout&eacute;s au m&ecirc;me compte, avec des menus distincts et une liste de courses commune.</p>
+      <p><strong>Assistant conversationnel.</strong> Le nombre de messages est limit&eacute; par jour et par Chien&nbsp;: 20 messages par jour pendant les 30 premiers jours suivant la souscription, puis 5 messages par jour en Kyno et 20 messages par jour en Kyno+. Au-del&agrave;, l&apos;assistant est indisponible jusqu&apos;au lendemain, le reste du Service restant accessible. Est consid&eacute;r&eacute; comme abusif tout usage automatis&eacute; (robot, script), la revente des r&eacute;ponses ou un usage sans rapport avec l&apos;alimentation et le suivi du Chien&nbsp;; dans ce cas, Kyno peut, apr&egrave;s en avoir inform&eacute; l&apos;Utilisateur, suspendre l&apos;acc&egrave;s &agrave; l&apos;assistant.</p>
+      <p>Les recommandations sont g&eacute;n&eacute;r&eacute;es &agrave; l&apos;aide d&apos;un mod&egrave;le d&apos;intelligence artificielle, &agrave; partir des informations fournies par l&apos;Utilisateur et des r&egrave;gles nutritionnelles d&eacute;finies par Kyno, dans les conditions de l&apos;article 4 bis.</p>
+    </section>
+
+    <section class="article" id="art4">
+      <h2>Article 4 &mdash; Nature des informations, pas de conseil v&eacute;t&eacute;rinaire</h2>
+      <p>Kyno fournit une information nutritionnelle &agrave; titre indicatif. Le Service ne constitue ni une consultation, ni un diagnostic, ni une prescription v&eacute;t&eacute;rinaire, et ne remplace pas l&apos;avis d&apos;un v&eacute;t&eacute;rinaire. L&apos;Utilisateur doit consulter un v&eacute;t&eacute;rinaire avant tout changement alimentaire si son Chien est malade, sous traitement, gestant, en croissance, &acirc;g&eacute; ou pr&eacute;sente une allergie, une intol&eacute;rance ou une pathologie. L&apos;Utilisateur s&apos;engage &agrave; fournir des informations exactes et compl&egrave;tes&nbsp;; la pertinence des recommandations en d&eacute;pend. L&apos;Utilisateur reste seul responsable des choix alimentaires faits pour son Chien. Les rapports, menus et r&eacute;ponses de l&apos;assistant sont g&eacute;n&eacute;r&eacute;s automatiquement et ne font pas l&apos;objet d&apos;une relecture humaine individuelle&nbsp;; ils peuvent comporter des erreurs. L&apos;Utilisateur doit les relire avant de les appliquer, notamment au regard des allergies et intol&eacute;rances de son Chien. Kyno ne garantit aucun r&eacute;sultat de sant&eacute; ou de poids.</p>
+    </section>
+
+    <section class="article" id="art4bis">
+      <h2>Article 4 bis &mdash; Recours &agrave; l&apos;intelligence artificielle</h2>
+      <p>Le Service est un syst&egrave;me con&ccedil;u par Kyno qui s&apos;appuie sur un mod&egrave;le d&apos;intelligence artificielle fourni par la soci&eacute;t&eacute; Anthropic (Claude). Kyno d&eacute;finit les r&egrave;gles nutritionnelles que le mod&egrave;le applique aux informations renseign&eacute;es par l&apos;Utilisateur. Kyno agit en qualit&eacute; de fournisseur de ce syst&egrave;me au sens du r&egrave;glement (UE) 2024/1689 du 13 juin 2024 sur l&apos;intelligence artificielle&nbsp;; ce syst&egrave;me ne rel&egrave;ve pas des cat&eacute;gories &agrave; haut risque.</p>
+      <p>Les rapports, menus et r&eacute;ponses de l&apos;assistant sont g&eacute;n&eacute;r&eacute;s automatiquement et identifi&eacute;s comme tels. L&apos;Utilisateur est inform&eacute;, lorsqu&apos;il utilise l&apos;assistant conversationnel, qu&apos;il &eacute;change avec une intelligence artificielle. Il s&apos;engage &agrave; n&apos;y communiquer que des informations utiles concernant son Chien, et non des informations sur lui-m&ecirc;me ou sur des tiers.</p>
+      <p>Les donn&eacute;es transmises au mod&egrave;le se limitent aux informations sur le Chien, sur le foyer (&eacute;quipement, temps de pr&eacute;paration, lieux de courses) et aux messages de l&apos;Utilisateur&nbsp;; elles ne comprennent ni son nom ni son adresse email. Le fournisseur du mod&egrave;le s&apos;interdit contractuellement de les utiliser pour entra&icirc;ner ses mod&egrave;les et les supprime dans un d&eacute;lai de 30 jours, sauf obligation l&eacute;gale ou contr&ocirc;le de s&eacute;curit&eacute;.</p>
+      <p>Kyno conserve les donn&eacute;es du compte et l&apos;historique de l&apos;assistant dans les conditions de la politique de confidentialit&eacute;. Kyno peut utiliser les donn&eacute;es relatives au Chien, apr&egrave;s anonymisation, pour am&eacute;liorer ses r&egrave;gles nutritionnelles&nbsp;; l&apos;Utilisateur peut s&apos;y opposer &agrave; tout moment.</p>
+    </section>
+
+    <section class="article" id="art5">
+      <h2>Article 5 &mdash; Cr&eacute;ation de compte et acc&egrave;s</h2>
+      <p>L&apos;acc&egrave;s &agrave; l&apos;espace client se fait par lien de connexion envoy&eacute; &agrave; l&apos;adresse email de l&apos;Utilisateur. L&apos;Utilisateur garantit &ecirc;tre majeur, fournir une adresse valide dont il a l&apos;usage exclusif, et pr&eacute;server la confidentialit&eacute; de son acc&egrave;s. Toute connexion depuis son adresse est r&eacute;put&eacute;e faite par lui. En cas de perte ou d&apos;usage frauduleux, il en informe Kyno sans d&eacute;lai.</p>
+    </section>
+
+    <section class="article" id="art6">
+      <h2>Article 6 &mdash; Prix et TVA</h2>
+      <p>Les prix sont indiqu&eacute;s en euros, toutes taxes comprises, et incluent la TVA applicable au taux en vigueur.</p>
+      <ul>
+        <li>Kyno&nbsp;: 12&nbsp;&euro; par mois, en formule mensuelle uniquement.</li>
+        <li>Kyno+&nbsp;: 21&nbsp;&euro; par mois, ou 180&nbsp;&euro; par an en formule annuelle.</li>
+        <li>Chien suppl&eacute;mentaire&nbsp;: 50&nbsp;% du prix de la formule souscrite, soit 6&nbsp;&euro; par mois en Kyno, 10,50&nbsp;&euro; par mois ou 90&nbsp;&euro; par an en Kyno+, factur&eacute; avec l&apos;abonnement principal.</li>
+      </ul>
+      <p><strong>Places fondatrices.</strong> Les 100 premiers abonn&eacute;s, b&ecirc;ta-testeurs compris, acc&egrave;dent &agrave; Kyno+ pour 12&nbsp;&euro; par mois. Ce tarif est maintenu tant que l&apos;abonnement reste actif&nbsp;; en cas de r&eacute;siliation, il est perdu et une nouvelle souscription se fait au tarif public en vigueur. Chaque chien suppl&eacute;mentaire ajout&eacute; &agrave; une place fondatrice est factur&eacute; 6&nbsp;&euro; par mois, soit 50&nbsp;% du tarif fondateur. Le nombre de places restantes affich&eacute; sur le site correspond au nombre r&eacute;el de places souscrites.</p>
+      <p>Kyno peut modifier ses tarifs publics (le tarif des places fondatrices n&apos;est pas concern&eacute;)&nbsp;; toute modification est notifi&eacute;e par email au moins 30 jours avant son application et ne s&apos;applique qu&apos;&agrave; la p&eacute;riode suivant ce d&eacute;lai. L&apos;Utilisateur qui refuse peut r&eacute;silier avant l&apos;entr&eacute;e en vigueur du nouveau prix.</p>
+    </section>
+
+    <section class="article" id="art7">
+      <h2>Article 7 &mdash; Bilan gratuit, commande, paiement et facturation</h2>
+      <p><strong>Bilan gratuit.</strong> Avant l&apos;envoi du questionnaire, l&apos;Utilisateur accepte les pr&eacute;sentes conditions et la politique de confidentialit&eacute; par une case &agrave; cocher non pr&eacute;-coch&eacute;e.</p>
+      <p><strong>Commande d&apos;un abonnement.</strong> La commande est conclue apr&egrave;s les &eacute;tapes suivantes&nbsp;: choix de l&apos;offre, v&eacute;rification du r&eacute;capitulatif, acceptation des pr&eacute;sentes conditions par case &agrave; cocher non pr&eacute;-coch&eacute;e, le cas &eacute;ch&eacute;ant demande d&apos;acc&egrave;s imm&eacute;diat au Service par la case distincte pr&eacute;vue &agrave; l&apos;article 9, puis validation par un bouton portant la mention &laquo;&nbsp;Commande avec obligation de paiement&nbsp;&raquo;. L&apos;Utilisateur re&ccedil;oit un email de confirmation reprenant les conditions et le r&eacute;capitulatif de sa commande.</p>
+      <p>Le paiement s&apos;effectue par carte bancaire via Stripe, prestataire de paiement s&eacute;curis&eacute;&nbsp;; Kyno ne conserve aucune donn&eacute;e de carte bancaire. Les formules mensuelles sont pr&eacute;lev&eacute;es chaque mois &agrave; la date anniversaire de la souscription. La formule annuelle est pay&eacute;e en une fois &agrave; la souscription, puis &agrave; chaque date anniversaire en cas de renouvellement. En cas d&apos;&eacute;chec de paiement, Kyno relance l&apos;Utilisateur et peut suspendre l&apos;acc&egrave;s apr&egrave;s 7 jours sans r&eacute;gularisation. Une facture est mise &agrave; disposition dans l&apos;espace client ou envoy&eacute;e par email.</p>
+    </section>
+
+    <section class="article" id="art8">
+      <h2>Article 8 &mdash; Dur&eacute;e, renouvellement et r&eacute;siliation</h2>
+      <p><strong>Formules mensuelles</strong> (Kyno, Kyno+ mensuel)&nbsp;: l&apos;abonnement est souscrit pour un mois, renouvel&eacute; tacitement pour des p&eacute;riodes identiques. L&apos;Utilisateur peut r&eacute;silier &agrave; tout moment, sans frais, sans pr&eacute;avis ni justification. La r&eacute;siliation prend effet &agrave; la fin du mois en cours, d&eacute;j&agrave; pay&eacute;&nbsp;: aucun pr&eacute;l&egrave;vement n&apos;intervient ensuite et le mois commenc&eacute; n&apos;est pas rembours&eacute;.</p>
+      <p><strong>Formule annuelle</strong> (Kyno+ annuel)&nbsp;: l&apos;abonnement est souscrit pour une dur&eacute;e ferme de douze mois, pay&eacute;e d&apos;avance en une fois. Hors exercice du droit de r&eacute;tractation (article 9) ou manquement de Kyno, une r&eacute;siliation en cours de p&eacute;riode ne donne lieu &agrave; aucun remboursement&nbsp;; l&apos;acc&egrave;s au Service est maintenu jusqu&apos;au terme de la p&eacute;riode pay&eacute;e. &Agrave; son terme, l&apos;abonnement est renouvel&eacute; tacitement pour une nouvelle p&eacute;riode de douze mois, pay&eacute;e d&apos;avance au tarif en vigueur. L&apos;Utilisateur qui ne souhaite pas la reconduction r&eacute;silie depuis son espace client ou par email au plus tard la veille de la date d&apos;&eacute;ch&eacute;ance&nbsp;; aucun autre pr&eacute;avis n&apos;est exig&eacute;.</p>
+      <p>Conform&eacute;ment &agrave; l&apos;article L.215-1 du Code de la consommation, reproduit ci-dessous, Kyno informe l&apos;Utilisateur par email d&eacute;di&eacute;, au plus t&ocirc;t trois mois et au plus tard un mois avant le terme, de sa facult&eacute; de ne pas reconduire le contrat, en mentionnant dans un encadr&eacute; apparent la date limite de non-reconduction. &Agrave; d&eacute;faut, l&apos;Utilisateur peut mettre gratuitement un terme au contrat &agrave; tout moment &agrave; compter de la date de reconduction&nbsp;; les sommes vers&eacute;es apr&egrave;s cette date lui sont rembours&eacute;es dans un d&eacute;lai de trente jours, d&eacute;duction faite des sommes correspondant &agrave; l&apos;ex&eacute;cution du contrat jusqu&apos;&agrave; la r&eacute;siliation.</p>
+      <div class="bloc-loi">Article L.215-1 du Code de la consommation&nbsp;: &laquo;&nbsp;Pour les contrats de prestations de services conclus pour une dur&eacute;e d&eacute;termin&eacute;e avec une clause de reconduction tacite, le professionnel prestataire de services informe le consommateur par &eacute;crit, par lettre nominative ou courrier &eacute;lectronique d&eacute;di&eacute;s, au plus t&ocirc;t trois mois et au plus tard un mois avant le terme de la p&eacute;riode autorisant le rejet de la reconduction, de la possibilit&eacute; de ne pas reconduire le contrat qu&apos;il a conclu avec une clause de reconduction tacite. Cette information, d&eacute;livr&eacute;e dans des termes clairs et compr&eacute;hensibles, mentionne, dans un encadr&eacute; apparent, la date limite de non-reconduction. Lorsque cette information ne lui a pas &eacute;t&eacute; adress&eacute;e conform&eacute;ment aux dispositions du premier alin&eacute;a, le consommateur peut mettre gratuitement un terme au contrat, &agrave; tout moment &agrave; compter de la date de reconduction. Les avances effectu&eacute;es apr&egrave;s la derni&egrave;re date de reconduction ou, s&apos;agissant des contrats &agrave; dur&eacute;e ind&eacute;termin&eacute;e, apr&egrave;s la date de transformation du contrat initial &agrave; dur&eacute;e d&eacute;termin&eacute;e, sont dans ce cas rembours&eacute;es dans un d&eacute;lai de trente jours &agrave; compter de la date de r&eacute;siliation, d&eacute;duction faite des sommes correspondant, jusqu&apos;&agrave; celle-ci, &agrave; l&apos;ex&eacute;cution du contrat. Les dispositions du pr&eacute;sent article s&apos;appliquent sans pr&eacute;judice de celles qui soumettent l&eacute;galement certains contrats &agrave; des r&egrave;gles particuli&egrave;res en ce qui concerne l&apos;information du consommateur.&nbsp;&raquo;</div>
+      <p>Dans tous les cas, la r&eacute;siliation se fait depuis l&apos;espace client, par le bouton &laquo;&nbsp;R&eacute;silier mon abonnement&nbsp;&raquo;, accessible en quelques clics (art. L.215-1-1 du Code de la consommation), ou par email &agrave; <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a>. Un email confirme la r&eacute;siliation et sa date d&apos;effet.</p>
+      <p>Kyno peut r&eacute;silier ou suspendre l&apos;abonnement en cas de manquement grave de l&apos;Utilisateur (fraude, impay&eacute; persistant, usage contraire aux pr&eacute;sentes), apr&egrave;s mise en demeure rest&eacute;e sans effet pendant 8 jours.</p>
+    </section>
+
+    <section class="article" id="art9">
+      <h2>Article 9 &mdash; Droit de r&eacute;tractation</h2>
+      <p>L&apos;Utilisateur dispose d&apos;un d&eacute;lai de quatorze jours &agrave; compter de la conclusion du contrat pour se r&eacute;tracter, sans avoir &agrave; motiver sa d&eacute;cision (art. L.221-18 du Code de la consommation). Pour l&apos;exercer, il utilise le bouton &laquo;&nbsp;Renoncer au contrat ici&nbsp;&raquo;, accessible gratuitement depuis son espace client pendant tout ce d&eacute;lai, ou adresse une d&eacute;claration d&eacute;nu&eacute;e d&apos;ambigu&iuml;t&eacute; par email &agrave; <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a>, le cas &eacute;ch&eacute;ant au moyen du formulaire type en annexe. Kyno accuse r&eacute;ception de la r&eacute;tractation sans d&eacute;lai, par email.</p>
+      <p>Lors de la commande, l&apos;Utilisateur qui souhaite acc&eacute;der au Service imm&eacute;diatement coche une case distincte, non pr&eacute;-coch&eacute;e, ainsi r&eacute;dig&eacute;e&nbsp;: &laquo;&nbsp;Je demande &agrave; acc&eacute;der au Service d&egrave;s maintenant, avant la fin du d&eacute;lai de r&eacute;tractation de 14 jours. Je reconnais que, si je me r&eacute;tracte, je paierai un montant correspondant au service fourni jusqu&apos;&agrave; ma r&eacute;tractation, proportionn&eacute; au prix total de l&apos;abonnement, et que je perds mon droit de r&eacute;tractation une fois le service pleinement ex&eacute;cut&eacute;.&nbsp;&raquo; (art. L.221-25 et L.221-28, 1&deg; du Code de la consommation).</p>
+      <p>En cas de r&eacute;tractation, Kyno rembourse les sommes vers&eacute;es, d&eacute;duction faite de ce montant, au plus tard quatorze jours apr&egrave;s en avoir &eacute;t&eacute; inform&eacute;, par le m&ecirc;me moyen de paiement (art. L.221-24 du Code de la consommation).</p>
+    </section>
+
+    <section class="article" id="art10">
+      <h2>Article 10 &mdash; Garanties l&eacute;gales et conformit&eacute;</h2>
+      <p>Kyno est tenu des garanties l&eacute;gales de conformit&eacute; des contenus et services num&eacute;riques (art. L.224-25-1 et suivants du Code de la consommation). Cette garantie s&apos;applique sans pr&eacute;judice du droit de r&eacute;tractation et de tout droit commercial plus favorable.</p>
+    </section>
+
+    <section class="article" id="art11">
+      <h2>Article 11 &mdash; Obligations de l&apos;Utilisateur et usage du service</h2>
+      <p>Le Service est r&eacute;serv&eacute; &agrave; un usage personnel et non commercial. L&apos;Utilisateur s&apos;interdit de revendre, copier ou diffuser publiquement les menus, rapports et contenus, d&apos;extraire massivement des donn&eacute;es du Service, de perturber son fonctionnement ou de tenter d&apos;acc&eacute;der aux donn&eacute;es d&apos;un autre utilisateur.</p>
+    </section>
+
+    <section class="article" id="art12">
+      <h2>Article 12 &mdash; Propri&eacute;t&eacute; intellectuelle</h2>
+      <p>La marque Kyno [num&eacute;ro de d&eacute;p&ocirc;t INPI &agrave; ajouter une fois d&eacute;pos&eacute;e], le site, les textes, illustrations, avatars, rapports, menus, logiciels, bases de donn&eacute;es et la charte graphique sont prot&eacute;g&eacute;s et restent la propri&eacute;t&eacute; de Coline Mangel. L&apos;Utilisateur dispose d&apos;un droit d&apos;usage personnel, non exclusif, non transf&eacute;rable, limit&eacute; &agrave; la dur&eacute;e de l&apos;abonnement. Les donn&eacute;es que l&apos;Utilisateur saisit lui restent propres&nbsp;; il conc&egrave;de &agrave; Kyno le droit de les traiter pour fournir le Service, dans les conditions de la politique de confidentialit&eacute;.</p>
+    </section>
+
+    <section class="article" id="art13">
+      <h2>Article 13 &mdash; Donn&eacute;es personnelles</h2>
+      <p>Elycoop est responsable du traitement des donn&eacute;es personnelles collect&eacute;es par Kyno. La politique de confidentialit&eacute;, accessible sur <a href="/confidentialite.html">monkyno.fr/confidentialite.html</a>, d&eacute;crit les donn&eacute;es collect&eacute;es, leurs finalit&eacute;s, leurs destinataires, leurs dur&eacute;es de conservation et l&apos;usage qui en est fait par l&apos;intelligence artificielle. L&apos;Utilisateur dispose des droits d&apos;acc&egrave;s, de rectification, d&apos;effacement, d&apos;opposition, de limitation et de portabilit&eacute;, exer&ccedil;ables &agrave; <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a>.</p>
+    </section>
+
+    <section class="article" id="art14">
+      <h2>Article 14 &mdash; Responsabilit&eacute;</h2>
+      <p>Kyno est tenu d&apos;une obligation de moyens. Kyno ne r&eacute;pond pas des dommages r&eacute;sultant&nbsp;: d&apos;informations inexactes ou incompl&egrave;tes fournies par l&apos;Utilisateur, du non-respect de l&apos;article 4 (notamment l&apos;absence de consultation v&eacute;t&eacute;rinaire), de l&apos;usage des recommandations sans validation v&eacute;t&eacute;rinaire en cas de pathologie, ou d&apos;un cas de force majeure. Kyno ne peut garantir une disponibilit&eacute; continue du Service&nbsp;; des interruptions de maintenance ou dues &agrave; des prestataires tiers sont possibles. Aucune stipulation ne limite la responsabilit&eacute; de Kyno en cas de dommage corporel, de faute lourde ou dolosive, ni ne prive le consommateur de ses droits imp&eacute;ratifs.</p>
+    </section>
+
+    <section class="article" id="art15">
+      <h2>Article 15 &mdash; Force majeure</h2>
+      <p>Kyno n&apos;est pas responsable de l&apos;inex&eacute;cution de ses obligations en cas d&apos;&eacute;v&eacute;nement r&eacute;pondant &agrave; la d&eacute;finition de l&apos;article 1218 du Code civil, notamment une panne g&eacute;n&eacute;ralis&eacute;e d&apos;un prestataire d&apos;h&eacute;bergement ou de r&eacute;seau.</p>
+    </section>
+
+    <section class="article" id="art16">
+      <h2>Article 16 &mdash; Modification des conditions</h2>
+      <p>Kyno peut modifier les pr&eacute;sentes conditions. L&apos;Utilisateur est inform&eacute; par email au moins 30 jours avant l&apos;entr&eacute;e en vigueur. La version applicable &agrave; une commande est celle accept&eacute;e lors de cette commande&nbsp;; l&apos;Utilisateur qui refuse la nouvelle version peut r&eacute;silier avant son entr&eacute;e en vigueur.</p>
+    </section>
+
+    <section class="article" id="art17">
+      <h2>Article 17 &mdash; R&eacute;clamations et m&eacute;diation</h2>
+      <p>Toute r&eacute;clamation s&apos;adresse d&apos;abord par &eacute;crit au service client de Kyno, &agrave; <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a>&nbsp;; Kyno r&eacute;pond sous 15 jours. En cas d&apos;&eacute;chec de cette d&eacute;marche, ou sans r&eacute;ponse dans un d&eacute;lai de deux mois, l&apos;Utilisateur peut saisir gratuitement le m&eacute;diateur de la consommation, dans un d&eacute;lai d&apos;un an &agrave; compter de sa r&eacute;clamation &eacute;crite (art. L.612-1 et L.612-2 du Code de la consommation)&nbsp;: Elycoop a d&eacute;sign&eacute;, par adh&eacute;sion enregistr&eacute;e sous le num&eacute;ro 50578/VM/2212, la SAS M&eacute;diation Solution comme entit&eacute; de m&eacute;diation de la consommation.</p>
+    </section>
+
+    <section class="article" id="art18">
+      <h2>Article 18 &mdash; Droit applicable et juridiction</h2>
+      <p>Les pr&eacute;sentes conditions sont soumises au droit fran&ccedil;ais. Le consommateur b&eacute;n&eacute;ficie de la protection des dispositions imp&eacute;ratives de son pays de r&eacute;sidence au sein de l&apos;Union europ&eacute;enne. &Agrave; d&eacute;faut d&apos;accord amiable ou de m&eacute;diation, les tribunaux comp&eacute;tents sont ceux d&eacute;termin&eacute;s par les r&egrave;gles l&eacute;gales de comp&eacute;tence, le consommateur pouvant saisir le tribunal de son domicile.</p>
+    </section>
+
+    <section class="article" id="art19">
+      <h2>Article 19 &mdash; Dispositions g&eacute;n&eacute;rales</h2>
+      <p>Si une stipulation est d&eacute;clar&eacute;e nulle, les autres demeurent applicables. Le fait de ne pas se pr&eacute;valoir d&apos;un manquement n&apos;emporte pas renonciation. Les pr&eacute;sentes conditions sont conserv&eacute;es par Kyno et accessibles &agrave; tout moment sur le site, dans leur version applicable.</p>
+    </section>
+
+    <section class="article annexe" id="annexe">
+      <h2>Annexe &mdash; Formulaire type de r&eacute;tractation</h2>
+      <p>&Agrave; l&apos;attention de Kyno (Elycoop), par email &agrave; <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a> ou par courrier au 26 rue &Eacute;mile Decorps, 69100 Villeurbanne&nbsp;:</p>
+      <p>Je vous notifie par la pr&eacute;sente ma r&eacute;tractation du contrat portant sur la prestation de service suivante&nbsp;: abonnement Kyno.<br>
+      Command&eacute; le&nbsp;: &hellip;&hellip;<br>
+      Nom du consommateur&nbsp;: &hellip;&hellip;<br>
+      Adresse du consommateur&nbsp;: &hellip;&hellip;<br>
+      Date&nbsp;: &hellip;&hellip;<br>
+      Signature (en cas de notification papier)&nbsp;: &hellip;&hellip;</p>
+    </section>
+
   </div>
 </main>
+
 <footer class="ky-pied"><p>Kyno est &eacute;dit&eacute; par Elycoop, coop&eacute;rative d&apos;activit&eacute; et d&apos;emploi. &mdash; <a href="cgv.html">CGV</a> &middot; <a href="confidentialite.html">Politique de confidentialit&eacute;</a> &middot; Contact&nbsp;: <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a></p></footer>
 </body>
 </html>
