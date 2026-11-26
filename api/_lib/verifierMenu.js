@@ -43,20 +43,18 @@ function verifierMenu(mc, chien, ciblesKcal) {
   }
 
   // ── 3. CMV ─────────────────────────────────────────────────────────────────
-  const hasCMV =
-    ingsCrus.some(i => /cmv|compl[eé]ment\s*min[eé]r/i.test(i.name) && (i.qty_g_jour || 0) > 0) ||
-    (Array.isArray(mc.recette?.ingredients) &&
-      mc.recette.ingredients.some(i => /cmv|compl[eé]ment\s*min[eé]r/i.test(i.name))) ||
-    (typeof mc.batch_special === 'string' && /cmv|compl[eé]ment\s*min[eé]r/i.test(mc.batch_special));
-  if (!hasCMV) raisons.push('CMV absent de la recette');
+  // Doit figurer dans ingredients_grammes_crus avec une quantité > 0 — batch_special ne suffit pas.
+  const hasCMV = ingsCrus.some(
+    i => /cmv|compl[eé]ment\s*min[eé]r/i.test(i.name) && (i.qty_g_jour || 0) > 0
+  );
+  if (!hasCMV) raisons.push('CMV absent de ingredients_grammes_crus');
 
   // ── 4. Huile ───────────────────────────────────────────────────────────────
-  const hasHuile =
-    ingsCrus.some(i => /huile/i.test(i.name) && (i.qty_g_jour || 0) > 0) ||
-    (Array.isArray(mc.recette?.ingredients) &&
-      mc.recette.ingredients.some(i => /huile/i.test(i.name))) ||
-    (typeof mc.batch_special === 'string' && /huile/i.test(mc.batch_special));
-  if (!hasHuile) raisons.push('Huile absente de la recette');
+  // Idem : doit figurer dans ingredients_grammes_crus avec une quantité > 0.
+  const hasHuile = ingsCrus.some(
+    i => /huile/i.test(i.name) && (i.qty_g_jour || 0) > 0
+  );
+  if (!hasHuile) raisons.push('Huile absente de ingredients_grammes_crus');
 
   // ── 5. Ration par kilo ─────────────────────────────────────────────────────
   if (poids > 0 && ingsCrus.length > 0) {

@@ -98,6 +98,23 @@ test('Recette sans CMV (refusée)', () => {
   assert(raisons.some(r => r.includes('CMV')), `Raison CMV manquante: ${raisons.join('; ')}`);
 });
 
+test('Huile seulement dans batch_special (refusée)', () => {
+  const menu = buildMc({
+    chien_id: 'chi1',
+    ings: [
+      ['bœuf haché 5%', 90],
+      ['patate douce',  30],
+      ['courgette',     20],
+      ['CMV adulte',     1],
+      // huile absente de ingredients_grammes_crus
+    ],
+    batchSpecial: 'Ajouter 3 g huile de colza',
+  });
+  const { ok, raisons } = verifierMenu(menu, chihuahua, ciblesChi);
+  assert(!ok, 'Attendu ECHEC mais vérification passée');
+  assert(raisons.some(r => r.includes('Huile')), `Raison huile manquante: ${raisons.join('; ')}`);
+});
+
 // ── Chien 2 : braque 25 kg (poids de forme, cible 1200 kcal/j) ───────────────
 // Valeurs Ciqual : poulet → 119 kcal/100g, patate douce → 86, courgette → 16, huile → 900
 console.log('\n── Braque 25 kg (cible 1200 kcal) ──');
