@@ -325,7 +325,7 @@ function todayParis() {
 }
 
 function computeLimit(formule, subscriptionStartedAt) {
-  if (!subscriptionStartedAt) return MSG_LIMIT_KYNO;
+  if (!subscriptionStartedAt) return MSG_LIMIT_PREMIERS_JOURS;
   const daysSince = (Date.now() - new Date(subscriptionStartedAt).getTime()) / 86400000;
   if (daysSince <= MSG_LIMIT_DUREE_JOURS) return MSG_LIMIT_PREMIERS_JOURS;
   return formule === 'kyno_plus' ? MSG_LIMIT_KYNO_PLUS : MSG_LIMIT_KYNO;

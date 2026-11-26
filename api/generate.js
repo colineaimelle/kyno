@@ -49,7 +49,7 @@ async function saveFoyerToSupabase(data, statut) {
     courses_ou:     coursesOu,
     attentes,
     jour_envoi:     parseJourEnvoi(data.jourEnvoi),
-    source:         data.source || null,
+    source:         data.source ? String(data.source).slice(0, 50) : null,
   };
 
   const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/user?on_conflict=email`, {
