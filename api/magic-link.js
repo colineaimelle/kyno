@@ -18,7 +18,31 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
 
   try {
-    const { email, redirectTo } = req.body;
+    const { action, email, redirectTo } = req.body || {};
+
+    // ── Enregistrement du consentement commande (§3) ─────────────────────────
+    if (action === 'consent') {
+      const { cgv_version, case_cgv, case_retractation, page } = req.body;
+      if (!cgv_version) return res.status(400).json({ error: 'Données manquantes' });
+      await fetch(`${process.env.SUPABASE_URL}/rest/v1/consent_logs`, {
+        method: 'POST',
+        headers: {
+          'apikey': process.env.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          email:             email || null,
+          cgv_version,
+          case_cgv:          !!case_cgv,
+          case_retractation: !!case_retractation,
+          page:              page || null,
+        }),
+      });
+      return res.status(200).json({ success: true });
+    }
+
     if (!email) return res.status(400).json({ error: 'Email manquant' });
 
     // ── 1. Envoyer le lien magique via Supabase Auth ──────
