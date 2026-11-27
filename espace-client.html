@@ -2044,6 +2044,15 @@ async function _pollJusquaGeneration(chienId, session, today, prt) {
               var updated = await allRes.json().catch(function() { return null; });
               if (updated) chiens = updated;
             }
+            // Recharger le foyer (batch cooking + courses écrits dans user par gen-chien)
+            var foyerRes = await fetch(
+              SUPABASE_URL + '/rest/v1/user?email=eq.' + encodeURIComponent(session.user.email) + '&select=*',
+              { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + session.access_token } }
+            );
+            if (foyerRes.ok) {
+              var foyerRows = await foyerRes.json().catch(function() { return null; });
+              if (foyerRows && foyerRows[0]) foyer = foyerRows[0];
+            }
             var cCurrent = chiens.find(function(c) { return c.id === (currentChienId || chienId); });
             if (cCurrent) {
               currentChien = cCurrent;
