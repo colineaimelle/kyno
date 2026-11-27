@@ -703,6 +703,19 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
   .s-cta-xpl p{top:22px;font-size:16px;}
 }
 .tarif-btn-sub{display:block;font-size:13px;color:var(--aubergine-doux);margin-top:5px;line-height:1.4;}
+/* Liste d'attente pré-lancement */
+.tarif-preouvs{font-family:var(--font-titre);font-size:17px;font-weight:400;color:var(--aubergine);margin-top:4px;display:none;}
+.wl-form{display:none;flex-direction:column;gap:10px;margin-top:4px;}
+.wl-email{display:block;width:100%;padding:11px 14px;border:2px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:15px;color:var(--aubergine);background:var(--blanc);box-sizing:border-box;outline:none;}
+.wl-email:focus{border-width:3px;}
+.wl-email::placeholder{color:var(--aubergine-doux);}
+.wl-case{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:13.5px;line-height:1.5;color:var(--aubergine);}
+.wl-case input[type=checkbox]{flex:none;width:16px;height:16px;margin-top:2px;cursor:pointer;accent-color:var(--canard);}
+.wl-err{font-size:13px;color:#E5432F;display:none;}
+.wl-btn{padding:13px 20px;background:var(--turquoise);border:3px solid var(--aubergine);border-radius:var(--radius-pill);font-family:var(--font-texte);font-size:16px;font-weight:700;color:var(--aubergine);cursor:pointer;width:100%;transition:background .15s;}
+.wl-btn:hover{background:#3BB8A8;}
+.wl-btn:disabled{opacity:.6;cursor:not-allowed;}
+.wl-ok{font-size:14px;color:var(--canard);font-weight:700;display:none;}
 </style>
 </head>
 <body>
@@ -1015,8 +1028,13 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
         <li><span class="tl-check">&#10003;</span><span>Chat IA pour les adaptations au quotidien</span></li>
       </ul>
       <p class="tarif-note tarif-note-doux">Chien supplémentaire : +6 &#x20AC;/mois. Menus distincts, une seule liste de courses.</p>
-      <a href="quiz.html" class="tarif-btn">Faire le bilan gratuit de mon chien</a>
-      <span class="tarif-btn-sub">21 questions, rapport envoy&eacute; par email</span>
+      <!-- CTA post-ouverture -->
+      <div id="kyno-postouv">
+        <a href="quiz.html" class="tarif-btn">Faire le bilan gratuit de mon chien</a>
+        <span class="tarif-btn-sub">21 questions, rapport envoy&eacute; par email</span>
+      </div>
+      <!-- CTA pré-ouverture -->
+      <p class="tarif-preouvs" id="kyno-preouvs">Ouverture des places le 4&nbsp;janvier</p>
     </div>
     <!-- Kyno+ -->
     <div class="tarif-card tarif-card-forte">
@@ -1034,10 +1052,32 @@ h1{animation:fadeUp 0.7s ease both;animation-delay:0.2s;}
         <li><span class="tl-check">&#10003;</span><span>Suivi santé renforcé : courbe de poids, rapport pour le vétérinaire <span class="ky-pastille ky-pastille-sm">Bientôt disponible</span></span></li>
       </ul>
       <p class="tarif-note">Chien supplémentaire : +10,50 &#x20AC;/mois ou +90 &#x20AC;/an.</p>
-      <a href="quiz.html" class="tarif-btn">Faire le bilan gratuit de mon chien</a>
-      <span class="tarif-btn-sub">21 questions, rapport envoy&eacute; par email</span>
+      <!-- CTA post-ouverture -->
+      <div id="kynoplus-postouv">
+        <a href="quiz.html" class="tarif-btn">Faire le bilan gratuit de mon chien</a>
+        <span class="tarif-btn-sub">21 questions, rapport envoy&eacute; par email</span>
+      </div>
+      <!-- CTA pré-ouverture -->
+      <p class="tarif-preouvs" id="kynoplus-preouvs">Ouverture des places le 4&nbsp;janvier</p>
     </div>
   </div>
+
+  <!-- Formulaire liste d'attente (affiché uniquement en pré-lancement) -->
+  <div id="tarif-wl-wrap" style="display:none;margin-top:-16px;padding:0 4px;">
+    <div style="max-width:480px;margin:0 auto;">
+      <form class="wl-form" id="tarif-wl-form" onsubmit="wlInscrire(event,'tarif')">
+        <input type="email" class="wl-email" id="tarif-wl-email" placeholder="ton@email.com" autocomplete="email">
+        <label class="wl-case">
+          <input type="checkbox" id="tarif-wl-case">
+          <span>J&#x2019;accepte de recevoir un email &agrave; l&apos;ouverture des places fondatrices et des nouvelles de Kyno.</span>
+        </label>
+        <div class="wl-err" id="tarif-wl-err"></div>
+        <button class="wl-btn" id="tarif-wl-btn" type="submit">Me pr&eacute;venir &agrave; l&apos;ouverture</button>
+        <div class="wl-ok" id="tarif-wl-ok">&#10003;&nbsp;Inscrit(e) ! On te pr&eacute;vient le 4 janvier.</div>
+      </form>
+    </div>
+  </div>
+
   <!-- Places fondatrices -->
   <div class="places-bandeau">
     <div class="places-xpl-wrap" aria-hidden="true">
@@ -1381,5 +1421,58 @@ document.querySelectorAll('#navLinks a').forEach(function(a){
   });
 })();
 
+// ── Mode pré-lancement ────────────────────────────────────────────────────────
+var DATE_OUVERTURE = '2027-01-04';
+(function() {
+  var parisNow = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
+  if (parisNow >= DATE_OUVERTURE) return; // Ouvert : rien à faire
+  // Masquer les CTA post-ouverture
+  ['kyno-postouv','kynoplus-postouv'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  // Afficher le message pré-ouverture dans les cartes
+  ['kyno-preouvs','kynoplus-preouvs'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.style.display = 'block';
+  });
+  // Afficher le formulaire liste d'attente
+  var wlWrap = document.getElementById('tarif-wl-wrap');
+  var wlForm = document.getElementById('tarif-wl-form');
+  if (wlWrap) wlWrap.style.display = 'block';
+  if (wlForm) wlForm.style.display = 'flex';
+})();
+
+async function wlInscrire(evt, ctx) {
+  evt.preventDefault();
+  var emailEl = document.getElementById(ctx + '-wl-email');
+  var caseEl  = document.getElementById(ctx + '-wl-case');
+  var errEl   = document.getElementById(ctx + '-wl-err');
+  var btnEl   = document.getElementById(ctx + '-wl-btn');
+  var okEl    = document.getElementById(ctx + '-wl-ok');
+  var email   = emailEl ? emailEl.value.trim() : '';
+  var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!emailOk || !caseEl || !caseEl.checked) {
+    errEl.textContent = 'Merci de saisir ton email et de cocher la case.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  btnEl.disabled = true;
+  btnEl.textContent = 'Inscription en cours…';
+  try {
+    var r = await fetch('/api/magic-link', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'liste_attente', email: email })
+    });
+    if (!r.ok) throw new Error();
+    btnEl.style.display = 'none';
+    okEl.style.display = 'block';
+  } catch(e) {
+    btnEl.disabled = false;
+    btnEl.textContent = 'Me prévenir à l\'ouverture';
+    errEl.textContent = 'Une erreur est survenue. Réessaie ou écris-nous à bonjour@monkyno.fr.';
+    errEl.style.display = 'block';
+  }
+}
 </script>
 </body></html>

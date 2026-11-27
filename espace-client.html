@@ -1012,6 +1012,20 @@ h2{font-family:var(--font-titre);font-weight:400;font-synthesis:none;font-size:c
         <div id="upgrade-wrap" style="display:none">
           <a id="btn-upgrade" href="commande.html" class="btn-retractation" style="text-decoration:none;display:inline-block;background:var(--moutarde);color:var(--aubergine);border-color:var(--aubergine);">Passer &agrave; Kyno+ &rarr;</a>
         </div>
+        <div id="upgrade-preouvs" style="display:none">
+          <p style="font-size:13px;font-weight:700;color:var(--aubergine);margin-bottom:8px;">Ouverture des places le 4&#160;janvier</p>
+          <form onsubmit="wlInscrireEC(event)" style="display:flex;flex-direction:column;gap:8px;">
+            <input type="email" id="ecWlEmail" placeholder="ton@email.fr" required
+              style="font-family:var(--font-texte);font-size:14px;padding:8px 12px;border:2px solid var(--aubergine);border-radius:var(--radius-pill);background:var(--blanc);color:var(--aubergine);outline:none;">
+            <label style="display:flex;gap:7px;align-items:flex-start;font-size:12px;line-height:1.5;cursor:pointer;">
+              <input type="checkbox" id="ecWlCase" style="margin-top:3px;flex-shrink:0;cursor:pointer;">
+              <span>J&#x2019;accepte de recevoir un email &#224; l&#x2019;ouverture des places fondatrices et des nouvelles de Kyno.</span>
+            </label>
+            <div id="ecWlErr" style="display:none;font-size:12px;color:var(--rouge-fonce);font-weight:500;"></div>
+            <button type="submit" id="ecWlBtn" class="btn-retractation" style="background:var(--moutarde);color:var(--aubergine);border-color:var(--aubergine);">Me pr&#233;venir &#224; l&#x2019;ouverture</button>
+            <div id="ecWlOk" style="display:none;font-size:13px;font-weight:700;color:var(--canard);">&#10003;&#160;Inscrit&#xB7;e&nbsp;! On te pr&#233;vient d&#232;s le 4&#160;janvier.</div>
+          </form>
+        </div>
         <!-- Rétractation : visible uniquement pendant 14 jours après l'abonnement -->
         <div id="retractation-wrap" style="display:none">
           <button class="btn-retractation" id="btn-retractation" onclick="showRetractConfirm()">Renoncer au contrat ici</button>
@@ -2468,6 +2482,8 @@ function daysSince(iso) { if (!iso) return 0; const d = Math.floor((Date.now() -
 function shortLabel(s) { return String(s || '').replace(/^Semaine du /i, ''); }
 
 // ── Rétractation et résiliation (§4) ────────────────────────────────────────
+var DATE_OUVERTURE = '2027-01-04';
+
 function checkRetractationVisibility() {
   if (!foyer || !foyer.subscription_started_at) return;
   if (daysSince(foyer.subscription_started_at) <= 14) {
@@ -2475,10 +2491,50 @@ function checkRetractationVisibility() {
   }
   const formule = foyer.formule || '';
   if (formule !== 'kyno_plus') {
-    const wrap = document.getElementById('upgrade-wrap');
-    const lien = document.getElementById('btn-upgrade');
-    if (wrap) wrap.style.display = 'block';
-    if (lien) lien.href = 'commande.html'; // l'email est lu depuis la session Supabase
+    var parisNow = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
+    if (parisNow < DATE_OUVERTURE) {
+      var preEl = document.getElementById('upgrade-preouvs');
+      if (preEl) {
+        preEl.style.display = 'block';
+        var emailInput = document.getElementById('ecWlEmail');
+        if (emailInput && currentUser && currentUser.email) emailInput.value = currentUser.email;
+      }
+    } else {
+      const wrap = document.getElementById('upgrade-wrap');
+      if (wrap) wrap.style.display = 'block';
+    }
+  }
+}
+
+async function wlInscrireEC(evt) {
+  evt.preventDefault();
+  var email = document.getElementById('ecWlEmail').value.trim();
+  var caseOk = document.getElementById('ecWlCase').checked;
+  var errEl = document.getElementById('ecWlErr');
+  var btnEl = document.getElementById('ecWlBtn');
+  var okEl  = document.getElementById('ecWlOk');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !caseOk) {
+    errEl.textContent = 'Merci de saisir ton email et de cocher la case.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  btnEl.disabled = true;
+  btnEl.textContent = 'Inscription en cours…';
+  try {
+    var r = await fetch('/api/magic-link', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'liste_attente', email: email })
+    });
+    if (!r.ok) throw new Error();
+    btnEl.style.display = 'none';
+    okEl.style.display = 'block';
+  } catch(e) {
+    btnEl.disabled = false;
+    btnEl.textContent = 'Me prévenir à l'ouverture';
+    errEl.textContent = 'Une erreur est survenue. Réessaie ou écris-nous à bonjour@monkyno.fr.';
+    errEl.style.display = 'block';
   }
 }
 function showRetractConfirm() {

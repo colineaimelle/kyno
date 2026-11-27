@@ -97,6 +97,37 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ success: true });
     }
 
+    // ── Liste d'attente (pré-lancement) ───────────────────────────────────────────
+    if (action === 'liste_attente') {
+      if (!email) return res.status(400).json({ error: 'Email manquant' });
+      const listId = process.env.BREVO_LIST_ATTENTE_ID;
+      if (listId) {
+        await fetch('https://api.brevo.com/v3/contacts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'api-key': process.env.BREVO_API_KEY },
+          body: JSON.stringify({ email, listIds: [parseInt(listId, 10)], updateEnabled: true }),
+        }).catch(() => {});
+      }
+      await fetch(`${process.env.SUPABASE_URL}/rest/v1/consent_logs`, {
+        method: 'POST',
+        headers: {
+          'apikey': process.env.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          email,
+          cgv_version: null,
+          case_cgv: false,
+          case_retractation: false,
+          case_newsletter: true,
+          page: 'liste_attente',
+        }),
+      });
+      return res.status(200).json({ success: true });
+    }
+
     if (!email) return res.status(400).json({ error: 'Email manquant' });
 
     // ── 1. Envoyer le lien magique via Supabase Auth ──────

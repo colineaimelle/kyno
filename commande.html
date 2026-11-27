@@ -74,6 +74,24 @@ body{min-height:100vh;background:var(--papier);-webkit-font-smoothing:antialiase
     <li><span class="cmd-check">&#10003;</span><span>Suivi sant&eacute; renforc&eacute; : courbe de poids, rapport pour le v&eacute;t&eacute;rinaire <span class="cmd-soon">Bient&ocirc;t disponible</span></span></li>
   </ul>
 
+  <!-- État pré-lancement -->
+  <div id="cmdPreOuv" style="display:none">
+    <div class="cmd-card">
+      <p style="font-family:var(--font-titre);font-size:20px;margin-bottom:12px;">Les places ouvrent le 4 janvier 2027.</p>
+      <p style="font-size:15px;line-height:1.6;color:var(--aubergine-doux);margin-bottom:16px;">Inscris-toi ci-dessous pour &ecirc;tre pr&eacute;venu(e) en premier.</p>
+      <form onsubmit="wlInscrireCommande(event)" style="display:flex;flex-direction:column;gap:12px;">
+        <input type="email" id="cmdWlEmail" class="cmd-email" placeholder="ton@email.com" autocomplete="email">
+        <label class="cmd-case">
+          <input type="checkbox" id="cmdWlCase">
+          <span>J&#x2019;accepte de recevoir un email &agrave; l&apos;ouverture des places fondatrices et des nouvelles de Kyno.</span>
+        </label>
+        <div class="cmd-err" id="cmdWlErr"></div>
+        <button class="cmd-btn" id="cmdWlBtn" type="submit">Me pr&eacute;venir &agrave; l&apos;ouverture</button>
+        <div style="display:none;font-weight:700;color:var(--canard);text-align:center;" id="cmdWlOk">&#10003;&nbsp;Inscrit(e) ! On te pr&eacute;vient le 4 janvier.</div>
+      </form>
+    </div>
+  </div>
+
   <!-- État : chargement session -->
   <div class="cmd-spinner" id="cmdSpinner">V&eacute;rification de ta connexion&hellip;</div>
 
@@ -113,14 +131,24 @@ body{min-height:100vh;background:var(--papier);-webkit-font-smoothing:antialiase
 
 <script>
 var VERSION_CGV = '26 novembre 2026';
+var DATE_OUVERTURE = '2027-01-04';
 var SUPABASE_URL  = 'https://peexewhsnewjkpyhzuen.supabase.co';
 var SUPABASE_ANON_KEY = 'sb_publishable_diGOGSUwIR3dHuLUcsni0g_XbfDdbo9';
 var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 var _userEmail = null;
 
-document.getElementById('cmdSpinner').style.display = 'block';
+// Mode pré-lancement : vérification immédiate, sans réseau
+(function() {
+  var parisNow = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
+  if (parisNow < DATE_OUVERTURE) {
+    document.getElementById('cmdPreOuv').style.display = 'block';
+    return; // init() n'est pas appelé
+  }
+  document.getElementById('cmdSpinner').style.display = 'block';
+  initCheckout();
+})();
 
-(async function init() {
+async function initCheckout() {
   const { data: { session } } = await sb.auth.getSession();
   document.getElementById('cmdSpinner').style.display = 'none';
   if (session && session.user && session.user.email) {
@@ -130,7 +158,7 @@ document.getElementById('cmdSpinner').style.display = 'block';
   } else {
     document.getElementById('cmdLogin').style.display = 'block';
   }
-})();
+}
 
 async function envoyerLienConnexion() {
   var email = document.getElementById('loginEmail').value.trim();
@@ -199,6 +227,38 @@ async function validerCommande() {
     btn.textContent = 'Commande avec obligation de paiement';
     err.textContent = 'Le lien de paiement n’est pas encore disponible. Reviens très bientôt !';
     err.style.display = 'block';
+  }
+}
+
+async function wlInscrireCommande(evt) {
+  evt.preventDefault();
+  var email = document.getElementById('cmdWlEmail').value.trim();
+  var caseOk = document.getElementById('cmdWlCase').checked;
+  var errEl = document.getElementById('cmdWlErr');
+  var btnEl = document.getElementById('cmdWlBtn');
+  var okEl  = document.getElementById('cmdWlOk');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !caseOk) {
+    errEl.textContent = 'Merci de saisir ton email et de cocher la case.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  btnEl.disabled = true;
+  btnEl.textContent = 'Inscription en cours…';
+  try {
+    var r = await fetch('/api/magic-link', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'liste_attente', email: email })
+    });
+    if (!r.ok) throw new Error();
+    btnEl.style.display = 'none';
+    okEl.style.display = 'block';
+  } catch(e) {
+    btnEl.disabled = false;
+    btnEl.textContent = 'Me prévenir à l’ouverture';
+    errEl.textContent = 'Une erreur est survenue. Réessaie ou écris-nous à bonjour@monkyno.fr.';
+    errEl.style.display = 'block';
   }
 }
 </script>

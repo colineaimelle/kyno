@@ -325,7 +325,23 @@ body{
           <span id="accessErrorText">Une erreur est survenue. R&#233;essaie dans quelques instants.</span>
         </div>
         <p class="mention">Aucun mot de passe &#224; retenir, juste un lien de connexion s&#233;curis&#233;.</p>
-        <p class="mention" style="margin-top:16px;">Tu veux passer &agrave; Kyno+&nbsp;? <a id="lienCommande" href="commande.html" style="color:var(--canard);font-weight:600;text-decoration:underline;">D&eacute;couvrir la place fondatrice &rarr;</a></p>
+        <div id="acces-postouv">
+          <p class="mention" style="margin-top:16px;">Tu veux passer &agrave; Kyno+&nbsp;? <a id="lienCommande" href="commande.html" style="color:var(--canard);font-weight:600;text-decoration:underline;">D&eacute;couvrir la place fondatrice &rarr;</a></p>
+        </div>
+        <div id="acces-preouvs" style="display:none;margin-top:16px;">
+          <p class="mention" style="font-weight:700;color:var(--aubergine);margin-bottom:10px;">Ouverture des places le 4&#160;janvier</p>
+          <form onsubmit="wlInscrireAcces(event)" style="display:flex;flex-direction:column;gap:10px;">
+            <input type="email" id="accWlEmail" placeholder="ton@email.fr" required
+              style="font-family:var(--font-texte);font-size:15px;padding:10px 14px;border:3px solid var(--aubergine);border-radius:var(--radius-pill);background:var(--blanc);color:var(--aubergine);outline:none;">
+            <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.5;cursor:pointer;">
+              <input type="checkbox" id="accWlCase" style="margin-top:3px;flex-shrink:0;cursor:pointer;">
+              <span>J&#x2019;accepte de recevoir un email &#224; l&#x2019;ouverture des places fondatrices et des nouvelles de Kyno.</span>
+            </label>
+            <div id="accWlErr" style="display:none;font-size:13px;color:var(--rouge-fonce);font-weight:500;"></div>
+            <button type="submit" id="accWlBtn" class="btn-main" style="font-size:15px;padding:11px 20px;">Me pr&#233;venir &#224; l&#x2019;ouverture</button>
+            <div id="accWlOk" style="display:none;font-size:14px;font-weight:700;color:var(--canard);">&#10003;&#160;Inscrit&#xB7;e&nbsp;! On te pr&#233;vient d&#232;s le 4&#160;janvier.</div>
+          </form>
+        </div>
       </div>
     </div>
 
@@ -434,6 +450,46 @@ body{
 
   function hideError() {
     document.getElementById('accessError').style.display = 'none';
+  }
+
+  var DATE_OUVERTURE = '2027-01-04';
+  (function() {
+    var parisNow = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
+    if (parisNow >= DATE_OUVERTURE) return;
+    document.getElementById('acces-postouv').style.display = 'none';
+    document.getElementById('acces-preouvs').style.display = 'block';
+  })();
+
+  async function wlInscrireAcces(evt) {
+    evt.preventDefault();
+    var email = document.getElementById('accWlEmail').value.trim();
+    var caseOk = document.getElementById('accWlCase').checked;
+    var errEl = document.getElementById('accWlErr');
+    var btnEl = document.getElementById('accWlBtn');
+    var okEl  = document.getElementById('accWlOk');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !caseOk) {
+      errEl.textContent = 'Merci de saisir ton email et de cocher la case.';
+      errEl.style.display = 'block';
+      return;
+    }
+    errEl.style.display = 'none';
+    btnEl.disabled = true;
+    btnEl.textContent = 'Inscription en cours…';
+    try {
+      var r = await fetch('/api/magic-link', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ action: 'liste_attente', email: email })
+      });
+      if (!r.ok) throw new Error();
+      btnEl.style.display = 'none';
+      okEl.style.display = 'block';
+    } catch(e) {
+      btnEl.disabled = false;
+      btnEl.textContent = 'Me prévenir à l'ouverture';
+      errEl.textContent = 'Une erreur est survenue. Réessaie ou écris-nous à bonjour@monkyno.fr.';
+      errEl.style.display = 'block';
+    }
   }
 </script>
 <footer class="ky-pied"><p>Kyno est &eacute;dit&eacute; par Elycoop, coop&eacute;rative d&apos;activit&eacute; et d&apos;emploi. &mdash; <a href="cgv.html">CGV</a> &middot; <a href="confidentialite.html">Politique de confidentialit&eacute;</a> &middot; Contact&nbsp;: <a href="mailto:bonjour@monkyno.fr">bonjour@monkyno.fr</a></p></footer>
